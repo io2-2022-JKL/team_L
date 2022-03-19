@@ -16,23 +16,31 @@ namespace VaccinationSystem.Controllers
 
         [Route("/register")]
         [HttpPost]
-        public IActionResult Register([FromBody] Patient patient)
+        public IActionResult Register([FromBody] RegisteringPatient patient)
         {
-            return NotFound("Not implemented yet");
+            if (ModelState.IsValid)
+            {
+                return Ok("Not implemented yet");
+            }
+            else return BadRequest();
+
         }
         [Route("/Signin")]
         [HttpPost]
         public IActionResult SignIn([FromBody] Login login)
         {
-            return NotFound("Not implemented yet");
-
+            if (ModelState.IsValid)
+            {
+                return Ok("Not implemented yet");
+            }
+            else
+                return BadRequest();
         }
         [Route("/user/Logout/{userId}")]
         [HttpPost]
         public IActionResult Post([FromRoute] string userId)
         {
-            return NotFound("Not implemented yet");
-
+            return Ok("Not implemented yet");
         }
 
     }
