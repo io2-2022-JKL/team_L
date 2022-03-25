@@ -7,6 +7,6 @@ namespace VaccinationSystem.Models
 {
     public class Admin : User
     {
-        // metody
+
     }
 }

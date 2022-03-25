@@ -201,9 +201,9 @@ namespace VaccinationSystem.Migrations
                     completed = table.Column<bool>(type: "bit", nullable: false),
                     vaccineBatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Doctorid = table.Column<int>(type: "int", nullable: true),
-                    Doctorid1 = table.Column<int>(type: "int", nullable: true),
+                    //Doctorid1 = table.Column<int>(type: "int", nullable: true),
                     Patientid = table.Column<int>(type: "int", nullable: true),
-                    Patientid1 = table.Column<int>(type: "int", nullable: true)
+                    //Patientid1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -214,12 +214,12 @@ namespace VaccinationSystem.Migrations
                         principalTable: "Doctors",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
+                    /*table.ForeignKey(
                         name: "FK_Appointments_Doctors_Doctorid1",
                         column: x => x.Doctorid1,
                         principalTable: "Doctors",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Restrict);*/
                     /*table.ForeignKey(
                         name: "FK_Appointments_Patients_patientid",
                         column: x => x.patientid,
@@ -232,12 +232,12 @@ namespace VaccinationSystem.Migrations
                         principalTable: "Patients",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
+                    /*table.ForeignKey(
                         name: "FK_Appointments_Patients_Patientid1",
                         column: x => x.Patientid1,
                         principalTable: "Patients",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Restrict);*/
                     table.ForeignKey(
                         name: "FK_Appointments_TimeSlot_timeSlotid",
                         column: x => x.timeSlotid,
@@ -257,10 +257,10 @@ namespace VaccinationSystem.Migrations
                 table: "Appointments",
                 column: "Doctorid");
 
-            migrationBuilder.CreateIndex(
+            /*migrationBuilder.CreateIndex(
                 name: "IX_Appointments_Doctorid1",
                 table: "Appointments",
-                column: "Doctorid1");
+                column: "Doctorid1");*/
 
             /*migrationBuilder.CreateIndex(
                 name: "IX_Appointments_patientid",
@@ -272,10 +272,10 @@ namespace VaccinationSystem.Migrations
                 table: "Appointments",
                 column: "Patientid");
 
-            migrationBuilder.CreateIndex(
+            /*migrationBuilder.CreateIndex(
                 name: "IX_Appointments_Patientid1",
                 table: "Appointments",
-                column: "Patientid1");
+                column: "Patientid1");*/
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_timeSlotid",
