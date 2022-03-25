@@ -8,9 +8,9 @@ namespace VaccinationSystem.Models
     public class Appointment
     {
         public int whichDose { get; set; }
-        public TimeSlot timeSlot { get; set; }
-        public Patient patient { get; set; }
-        public Vaccine vaccine { get; set; }
+        public virtual TimeSlot timeSlot { get; set; }
+        public virtual Patient patient { get; set; }
+        public virtual Vaccine vaccine { get; set; }
         public bool completed { get; set; }
         public string vaccineBatchNumber { get; set; }
     }

@@ -19,11 +19,9 @@ namespace VaccinationSystem.Models
         public int numberOfDoses { get; set; }
         public int minDaysBetweenDoses { get; set; }
         public int maxDaysBetweenDoses { get; set; }
-        public Virus virus { get; set; }
+        public virtual Virus virus { get; set; }
         public int minPatientAge { get; set; }
         public int maxPatientAge { get; set; }
         public bool used { get; set; }
-
-        // metody
     }
 }

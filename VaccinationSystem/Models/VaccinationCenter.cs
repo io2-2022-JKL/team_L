@@ -13,10 +13,10 @@ namespace VaccinationSystem.Models
         public string name { get; set; }
         public string city { get; set; }
         public string address { get; set; }
-        public List<Vaccine> availableVaccines { get; set; }
+        public virtual ICollection<Vaccine> availableVaccines { get; set; }
         public DateTime[] openingHours = new DateTime[7];
         public DateTime[] closingHours = new DateTime[7];
-        public List<Doctor> doctors { get; set; }
+        public  virtual ICollection<Doctor> doctors { get; set; }
         public bool active { get; set; }
     }
 }
