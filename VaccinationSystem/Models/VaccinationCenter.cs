@@ -8,6 +8,12 @@ namespace VaccinationSystem.Models
 {
     public class VaccinationCenter
     {
+        public VaccinationCenter()
+        {
+            this.availableVaccines = new HashSet<Vaccine>();
+            this.doctors = new HashSet<Doctor>();
+        }
+
         [Key]
         public int id { get; set; }
         public string name { get; set; }

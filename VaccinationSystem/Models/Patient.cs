@@ -7,7 +7,13 @@ namespace VaccinationSystem.Models
 {
     public class Patient : User
     {
-        public virtual Dictionary<Virus, int> vaccinationsCount { get; set; }
+        public Patient()
+        {
+            this.vaccinationHistory = new HashSet<Appointment>();
+            this.futureVaccinations = new HashSet<Appointment>();
+            this.certificates = new HashSet<Certificate>();
+        }
+        //public virtual ICollection<(Virus, int)> vaccinationsCount { get; set; }
         public virtual ICollection<Appointment> vaccinationHistory { get; set; }
         public virtual ICollection<Appointment> futureVaccinations { get; set; }
         public virtual ICollection<Certificate> certificates { get; set; }
