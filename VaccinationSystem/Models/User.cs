@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
@@ -9,13 +10,14 @@ namespace VaccinationSystem.Models
 {
     public abstract class User
     {
-        public string Id { get; set; }
-        public string PESEL { get; set; }
-        string FirstName { get; set; }
-        string LastName { get; set; }
-        DateTime DateOfBirth { get; set; }
-        string Mail { get; set; }
-        string Password { get; set; }
-        string PhoneNumber { get; set; }
+        [Key]
+        public int id { get; set; }
+        public string pesel { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+        public DateTime dateOfBirth { get; set; }
+        public string mail { get; set; }
+        public string password { get; set; }
+        public string phoneNumber { get; set; }
     }
 }

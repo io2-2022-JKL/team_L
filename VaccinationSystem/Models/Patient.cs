@@ -7,27 +7,19 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public partial class Patient
+    public class Patient : User
     {
         public Patient()
         {
-            Appointments = new HashSet<Appointment>();
-            Doctors = new HashSet<Doctor>();
-            PatientArchivedAppointments = new HashSet<PatientArchivedAppointment>();
-            PatientFutureAppointments = new HashSet<PatientFutureAppointment>();
-            PatientsCertificates = new HashSet<PatientsCertificate>();
-            VaccinationCounts = new HashSet<VaccinationCount>();
+            this.vaccinationHistory = new HashSet<Appointment>();
+            this.futureVaccinations = new HashSet<Appointment>();
+            this.certificates = new HashSet<Certificate>();
         }
-
-        public int PatientId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Pesel { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public string Mail { get; set; }
-        public string Password { get; set; }
-        public string PhoneNumber { get; set; }
-        public bool Active { get; set; }
+        //public virtual ICollection<(Virus, int)> vaccinationsCount { get; set; }
+        public virtual ICollection<Appointment> vaccinationHistory { get; set; }
+        public virtual ICollection<Appointment> futureVaccinations { get; set; }
+        public virtual ICollection<Certificate> certificates { get; set; }
+        public bool active { get; set; }
 
         public virtual ICollection<Appointment> Appointments { get; set; }
         public virtual ICollection<Doctor> Doctors { get; set; }

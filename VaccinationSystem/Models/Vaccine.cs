@@ -1,31 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-
-#nullable disable
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public partial class Vaccine
+    public enum Virus
     {
-        public Vaccine()
-        {
-            Appointments = new HashSet<Appointment>();
-            VaccCentersVaccines = new HashSet<VaccCentersVaccine>();
-        }
-
-        public int VaccineId { get; set; }
-        public string VaccineName { get; set; }
-        public string Company { get; set; }
-        public int NumberOfDoses { get; set; }
-        public int? MinDaysBetweenDoses { get; set; }
-        public int? MaxDaysBetweenDoses { get; set; }
-        public int VirusId { get; set; }
-        public int MinPatientAge { get; set; }
-        public int? MaxPatientAge { get; set; }
-        public bool Used { get; set; }
-
-        public virtual Virus Virus { get; set; }
-        public virtual ICollection<Appointment> Appointments { get; set; }
-        public virtual ICollection<VaccCentersVaccine> VaccCentersVaccines { get; set; }
+        Coronavirus
+    }
+    public class Vaccine
+    {
+        [Key]
+        public int id { get; set; }
+        public string company { get; set; }
+        public string name { get; set; }
+        public int numberOfDoses { get; set; }
+        public int minDaysBetweenDoses { get; set; }
+        public int maxDaysBetweenDoses { get; set; }
+        public virtual Virus virus { get; set; }
+        public int minPatientAge { get; set; }
+        public int maxPatientAge { get; set; }
+        public bool used { get; set; }
     }
 }

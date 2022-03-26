@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 
 namespace VaccinationSystem
@@ -19,14 +20,14 @@ namespace VaccinationSystem
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
-      
+        
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Vaccination_DBContext>(options =>
+            services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
-            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
