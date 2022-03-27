@@ -17,6 +17,7 @@ namespace VaccinationSystem.Data
         public DbSet<Patient> Patients { get; set; }
         public DbSet<VaccinationCount> VaccinationCounts { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<OpeningHours> OpeningHours { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<Vaccine> Vaccines { get; set; }

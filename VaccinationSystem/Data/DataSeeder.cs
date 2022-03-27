@@ -9,10 +9,10 @@ namespace VaccinationSystem.Data
     {
         public static void SeedData(AppDBContext context)
         {
-            /*if(!context.Patients.Any())
+            if(!context.Patients.Any())
             {
 
-            }*/
+            }
         }
     }
 }

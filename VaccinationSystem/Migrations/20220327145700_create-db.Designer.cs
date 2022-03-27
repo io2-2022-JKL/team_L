@@ -10,8 +10,8 @@ using VaccinationSystem.Data;
 namespace VaccinationSystem.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20220325164959_createDatabase")]
-    partial class createDatabase
+    [Migration("20220327145700_create-db")]
+    partial class createdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -73,10 +73,10 @@ namespace VaccinationSystem.Migrations
                     b.Property<int?>("Patientid1")
                         .HasColumnType("int");
 
-                    b.Property<bool>("completed")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("patientid")
+                        .HasColumnType("int");
+
+                    b.Property<int>("state")
                         .HasColumnType("int");
 
                     b.Property<int?>("timeSlotid")
@@ -174,6 +174,24 @@ namespace VaccinationSystem.Migrations
                     b.HasIndex("vaccinationCenterid");
 
                     b.ToTable("Doctors");
+                });
+
+            modelBuilder.Entity("VaccinationSystem.Models.OpeningHours", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<TimeSpan>("from")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("to")
+                        .HasColumnType("time");
+
+                    b.HasKey("id");
+
+                    b.ToTable("OpeningHours");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Patient", b =>
