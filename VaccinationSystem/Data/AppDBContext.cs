@@ -33,7 +33,7 @@ namespace VaccinationSystem.Data
             modelBuilder.Entity<Appointment>().HasOne(appointment => appointment.patient);
 
             // filling db
-            modelBuilder.Entity<Admin>().HasData(
+            /*modelBuilder.Entity<Admin>().HasData(
                     new Admin
                     {
                         id = 1,
@@ -126,6 +126,6 @@ namespace VaccinationSystem.Data
                         used = true,
                         virus = 0
                     }
-                );
+                );*/
         }    }
 }
