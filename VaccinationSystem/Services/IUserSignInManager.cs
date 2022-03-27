@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Services
 {
-    interface IUserSignInManager
+    public interface IUserSignInManager
     {
-        public void SignIn(string email, string password);
+        public string SignIn(string email, string password);
         public (bool valid, string user) IsValid(string token);
         public void SignOut(string token);
     }

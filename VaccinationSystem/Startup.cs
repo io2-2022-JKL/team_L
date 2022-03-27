@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Data;
 using VaccinationSystem.Models;
+using VaccinationSystem.Services;
 
 namespace VaccinationSystem
 {
@@ -25,10 +26,12 @@ namespace VaccinationSystem
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
             services.AddDbContext<AppDBContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
-            );
+    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+);
+            services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
+            services.AddControllers();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
