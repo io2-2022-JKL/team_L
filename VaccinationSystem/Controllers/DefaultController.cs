@@ -25,7 +25,7 @@ namespace VaccinationSystem.Controllers
             else return BadRequest();
 
         }
-        [Route("/Signin")]
+        [Route("/signin")]
         [HttpPost]
         public IActionResult SignIn([FromBody] Login login)
         {

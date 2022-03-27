@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
 
 namespace VaccinationSystem.Models
 {
-    public partial class Virus
+    public partial class Virus2
     {
-        public Virus()
+        public Virus2()
         {
             VaccinationCounts = new HashSet<VaccinationCount>();
             Vaccines = new HashSet<Vaccine>();
