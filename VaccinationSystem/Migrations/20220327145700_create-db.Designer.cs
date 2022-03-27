@@ -10,8 +10,8 @@ using VaccinationSystem.Data;
 namespace VaccinationSystem.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20220325182642_mig")]
-    partial class mig
+    [Migration("20220327145700_create-db")]
+    partial class createdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,19 +52,6 @@ namespace VaccinationSystem.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Admins");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            dateOfBirth = new DateTime(1985, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            firstName = "Jan",
-                            lastName = "Nowak",
-                            mail = "superadmin@mail.com",
-                            password = "tajnehaslo123",
-                            pesel = "85020219191",
-                            phoneNumber = "+48111222333"
-                        });
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Appointment", b =>
@@ -86,10 +73,10 @@ namespace VaccinationSystem.Migrations
                     b.Property<int?>("Patientid1")
                         .HasColumnType("int");
 
-                    b.Property<bool>("completed")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("patientid")
+                        .HasColumnType("int");
+
+                    b.Property<int>("state")
                         .HasColumnType("int");
 
                     b.Property<int?>("timeSlotid")
@@ -141,13 +128,6 @@ namespace VaccinationSystem.Migrations
                     b.HasIndex("Patientid");
 
                     b.ToTable("Certificates");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            url = "placeholder"
-                        });
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Doctor", b =>
@@ -194,20 +174,24 @@ namespace VaccinationSystem.Migrations
                     b.HasIndex("vaccinationCenterid");
 
                     b.ToTable("Doctors");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            active = true,
-                            dateOfBirth = new DateTime(1970, 12, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            firstName = "Janina",
-                            lastName = "Kowalska",
-                            mail = "kowalskaj@mail.com",
-                            password = "password-456",
-                            pesel = "70120319293",
-                            phoneNumber = "+48444567333"
-                        });
+            modelBuilder.Entity("VaccinationSystem.Models.OpeningHours", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<TimeSpan>("from")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("to")
+                        .HasColumnType("time");
+
+                    b.HasKey("id");
+
+                    b.ToTable("OpeningHours");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Patient", b =>
@@ -244,20 +228,6 @@ namespace VaccinationSystem.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Patients");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            active = true,
-                            dateOfBirth = new DateTime(1985, 2, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            firstName = "Jan",
-                            lastName = "Kowalski",
-                            mail = "kowalskij@mail.com",
-                            password = "password#123",
-                            pesel = "85020319293",
-                            phoneNumber = "+48444222333"
-                        });
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.TimeSlot", b =>
@@ -287,16 +257,6 @@ namespace VaccinationSystem.Migrations
                     b.HasIndex("doctorid");
 
                     b.ToTable("TimeSlot");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            active = false,
-                            from = new DateTime(2022, 4, 13, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            isFree = true,
-                            to = new DateTime(2022, 4, 13, 13, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.VaccinationCenter", b =>
@@ -321,16 +281,6 @@ namespace VaccinationSystem.Migrations
                     b.HasKey("id");
 
                     b.ToTable("VaccinationCenters");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            active = true,
-                            address = "ul. Chmielna 15/43",
-                            city = "Warszawa",
-                            name = "Fajny punkt szczepien"
-                        });
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.VaccinationCount", b =>
@@ -398,21 +348,6 @@ namespace VaccinationSystem.Migrations
                     b.HasIndex("VaccinationCenterid");
 
                     b.ToTable("Vaccines");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1,
-                            company = "Pfeizer",
-                            maxDaysBetweenDoses = 90,
-                            maxPatientAge = 99,
-                            minDaysBetweenDoses = 30,
-                            minPatientAge = 12,
-                            name = "Pfeizer vaccine",
-                            numberOfDoses = 2,
-                            used = true,
-                            virus = 0
-                        });
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Appointment", b =>

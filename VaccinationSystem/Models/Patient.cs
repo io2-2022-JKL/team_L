@@ -9,16 +9,11 @@ namespace VaccinationSystem.Models
 {
     public class Patient : User
     {
-        public Patient()
-        {
-            this.vaccinationHistory = new HashSet<Appointment>();
-            this.futureVaccinations = new HashSet<Appointment>();
-            this.certificates = new HashSet<Certificate>();
-        }
-        //public virtual ICollection<(Virus, int)> vaccinationsCount { get; set; }
-        public virtual ICollection<Appointment> vaccinationHistory { get; set; }
-        public virtual ICollection<Appointment> futureVaccinations { get; set; }
-        public virtual ICollection<Certificate> certificates { get; set; }
+
+        //public virtual Dictionary<Virus, int> vaccinationsCount { get; set; }
+        public virtual IEnumerable<Appointment> vaccinationHistory { get; set; }
+        public virtual IEnumerable<Appointment> futureVaccinations { get; set; }
+        public virtual IEnumerable<Certificate> certificates { get; set; }
         public bool active { get; set; }
 
         public virtual ICollection<Appointment> Appointments { get; set; }

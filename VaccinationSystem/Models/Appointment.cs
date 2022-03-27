@@ -9,6 +9,13 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
+    public enum AppointmentState
+    {
+        Cancelled,
+        Planned,
+        Finished
+    }
+
     public class Appointment
     {
         [Key]
@@ -17,7 +24,7 @@ namespace VaccinationSystem.Models
         public virtual TimeSlot timeSlot { get; set; }
         public virtual Patient patient { get; set; }
         public virtual Vaccine vaccine { get; set; }
-        public bool completed { get; set; }
+        public AppointmentState state { get; set; }
         public string vaccineBatchNumber { get; set; }
     }
 }

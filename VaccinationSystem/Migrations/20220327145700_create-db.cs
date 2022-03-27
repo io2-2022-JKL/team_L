@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VaccinationSystem.Migrations
 {
-    public partial class createDatabase : Migration
+    public partial class createdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,6 +24,20 @@ namespace VaccinationSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Admins", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OpeningHours",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    from = table.Column<TimeSpan>(type: "time", nullable: false),
+                    to = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpeningHours", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -196,13 +210,13 @@ namespace VaccinationSystem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     whichDose = table.Column<int>(type: "int", nullable: false),
                     timeSlotid = table.Column<int>(type: "int", nullable: true),
-                    //patientid = table.Column<int>(type: "int", nullable: true),
+                    patientid = table.Column<int>(type: "int", nullable: true),
                     vaccineid = table.Column<int>(type: "int", nullable: true),
-                    completed = table.Column<bool>(type: "bit", nullable: false),
+                    state = table.Column<int>(type: "int", nullable: false),
                     vaccineBatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Doctorid = table.Column<int>(type: "int", nullable: true),
                     //Doctorid1 = table.Column<int>(type: "int", nullable: true),
-                    Patientid = table.Column<int>(type: "int", nullable: true),
+                    //Patientid = table.Column<int>(type: "int", nullable: true),
                     //Patientid1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -220,18 +234,18 @@ namespace VaccinationSystem.Migrations
                         principalTable: "Doctors",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);*/
-                    /*table.ForeignKey(
+                    table.ForeignKey(
                         name: "FK_Appointments_Patients_patientid",
                         column: x => x.patientid,
                         principalTable: "Patients",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);*/
-                    table.ForeignKey(
+                        onDelete: ReferentialAction.Restrict);
+                    /*table.ForeignKey(
                         name: "FK_Appointments_Patients_Patientid",
                         column: x => x.Patientid,
                         principalTable: "Patients",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Restrict);*/
                     /*table.ForeignKey(
                         name: "FK_Appointments_Patients_Patientid1",
                         column: x => x.Patientid1,
@@ -262,17 +276,17 @@ namespace VaccinationSystem.Migrations
                 table: "Appointments",
                 column: "Doctorid1");*/
 
-            /*migrationBuilder.CreateIndex(
+            migrationBuilder.CreateIndex(
                 name: "IX_Appointments_patientid",
                 table: "Appointments",
-                column: "patientid");*/
+                column: "patientid");
 
-            migrationBuilder.CreateIndex(
+            /*migrationBuilder.CreateIndex(
                 name: "IX_Appointments_Patientid",
                 table: "Appointments",
                 column: "Patientid");
 
-            /*migrationBuilder.CreateIndex(
+            migrationBuilder.CreateIndex(
                 name: "IX_Appointments_Patientid1",
                 table: "Appointments",
                 column: "Patientid1");*/
@@ -328,6 +342,9 @@ namespace VaccinationSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Certificates");
+
+            migrationBuilder.DropTable(
+                name: "OpeningHours");
 
             migrationBuilder.DropTable(
                 name: "VaccinationCounts");

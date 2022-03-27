@@ -17,6 +17,7 @@ namespace VaccinationSystem.Data
         public DbSet<Patient> Patients { get; set; }
         public DbSet<VaccinationCount> VaccinationCounts { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<OpeningHours> OpeningHours { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<Vaccine> Vaccines { get; set; }
@@ -33,7 +34,7 @@ namespace VaccinationSystem.Data
             modelBuilder.Entity<Appointment>().HasOne(appointment => appointment.patient);
 
             // filling db
-            modelBuilder.Entity<Admin>().HasData(
+            /*modelBuilder.Entity<Admin>().HasData(
                     new Admin
                     {
                         id = 1,
@@ -126,6 +127,6 @@ namespace VaccinationSystem.Data
                         used = true,
                         virus = 0
                     }
-                );
+                );*/
         }    }
 }
