@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Data;
+using VaccinationSystem.Services;
 
 namespace VaccinationSystem
 {
@@ -27,6 +28,9 @@ namespace VaccinationSystem
             services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
+            services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
+            services.AddScoped<IDatabase, SQLServerLocalDB>();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,10 +45,7 @@ namespace VaccinationSystem
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
         }
     }
