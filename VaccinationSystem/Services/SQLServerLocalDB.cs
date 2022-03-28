@@ -16,7 +16,7 @@ namespace VaccinationSystem.Services
             dbContext = context;
         }
 
-        public bool AddPatient(RegisteringPatient patient)
+        public void AddPatient(RegisteringPatient patient)
         {
             Patient p = new Patient
             {
@@ -43,6 +43,17 @@ namespace VaccinationSystem.Services
             }
 
             return true;
+        }
+
+        public bool IsUserInDatabase(string email)
+        {
+            int emailOccurane = dbContext.Patients.Where(p => p.mail == email).Count();
+
+            if (emailOccurane > 0)
+                return true;
+            else
+                return false;
+
         }
     }
 }

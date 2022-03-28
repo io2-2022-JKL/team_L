@@ -9,6 +9,7 @@ namespace VaccinationSystem.Services
 {
     public interface IDatabase
     {
-        public bool AddPatient(RegisteringPatient patient);
+        public void AddPatient(RegisteringPatient patient);
+        public bool IsUserInDatabase(string email);
     }
 }

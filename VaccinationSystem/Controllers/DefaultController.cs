@@ -28,8 +28,17 @@ namespace VaccinationSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (dbManager.AddPatient(patient))
-                    return Ok();
+                try
+                {
+                   dbManager.AddPatient(patient);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return BadRequest();
+                }
+                
+                return Ok();
             }
             
             return BadRequest();
@@ -41,8 +50,17 @@ namespace VaccinationSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var token = signInManager.SignIn(login.mail, login.password);
-                if (token == null)
+                string token = "";
+                try
+                {
+                    if(dbManager.IsUserInDatabase(login.mail))
+                        token = signInManager.SignIn(login.mail, login.password);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                if (token.Length==0)
                     return BadRequest();
 
                 return Ok(new { token = token });
