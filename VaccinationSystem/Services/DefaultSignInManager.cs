@@ -27,7 +27,7 @@ namespace VaccinationSystem.Services
             if(!signedInUsers.ContainsKey(email))
             {
                 var token = new DefaultToken(email);
-                signedInUsers.Add(email, new DefaultToken(email));
+                signedInUsers.Add(email, token);
                 return token.Value;
             }
 
@@ -35,7 +35,8 @@ namespace VaccinationSystem.Services
         }
         public void SignOut(string tokenValue)
         {
-            foreach( var user in signedInUsers.Where(p => p.Value.Value == tokenValue))
+
+            foreach( var user in signedInUsers.Where(p => p.Value.Value.CompareTo(tokenValue)==0))
             {
                 signedInUsers.Remove(user.Key);
             }

@@ -11,5 +11,7 @@ namespace VaccinationSystem.Services
     {
         public void AddPatient(RegisteringPatient patient);
         public bool IsUserInDatabase(string email);
+        public bool AreCredentialsValid(Login login);
+        public List<Patient> GetPatients();
     }
 }

@@ -26,11 +26,15 @@ namespace VaccinationSystem.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] RegisteringPatient patient)
         {
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                   dbManager.AddPatient(patient);
+                    if (!dbManager.IsUserInDatabase(patient.Mail))
+                        dbManager.AddPatient(patient);
+                    else
+                        return BadRequest();
                 }
                 catch(Exception e)
                 {
@@ -53,14 +57,14 @@ namespace VaccinationSystem.Controllers
                 string token = "";
                 try
                 {
-                    if(dbManager.IsUserInDatabase(login.mail))
+                    if(dbManager.IsUserInDatabase(login.mail)&&dbManager.AreCredentialsValid(login))
                         token = signInManager.SignIn(login.mail, login.password);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
-                if (token.Length==0)
+                if (token==null||token.Length==0)
                     return BadRequest();
 
                 return Ok(new { token = token });
