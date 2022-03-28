@@ -28,13 +28,11 @@ namespace VaccinationSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-
-                
-
-                return Ok();
-
+                if (dbManager.AddPatient(patient))
+                    return Ok();
             }
-            else return BadRequest();
+            
+            return BadRequest();
 
         }
         [Route("/signin")]
