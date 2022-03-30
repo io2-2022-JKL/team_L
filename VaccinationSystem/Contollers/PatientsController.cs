@@ -24,12 +24,20 @@ namespace VaccinationSystem.Contollers
 
         // GET: api/Patients
 
-        [Route("/admin/patients/showPatients")]
+        [Route("/admin/patients")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
             var patients = _patientRepository.Get();
             return Ok(await patients);
+        }
+
+        [Route("/admin/patients/{patientId}")]
+        [Route("/doctor/patients/{patientId}")]
+        [HttpGet]
+        public async Task<ActionResult<Patient>> GetBooks([FromRoute] int patientId)
+        {
+            return Ok(await _patientRepository.Get(patientId));
         }
     }
 }
