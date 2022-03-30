@@ -35,7 +35,7 @@ namespace VaccinationSystem.Contollers
         [Route("/admin/patients/{patientId}")]
         [Route("/doctor/patients/{patientId}")]
         [HttpGet]
-        public async Task<ActionResult<Patient>> GetBooks([FromRoute] int patientId)
+        public async Task<ActionResult<Patient>> GetPatients([FromRoute] int patientId)
         {
             return Ok(await _patientRepository.Get(patientId));
         }
