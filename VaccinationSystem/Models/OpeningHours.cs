@@ -9,8 +9,10 @@ namespace VaccinationSystem.Models
     public class OpeningHours
     {
         [Key]
-        public int id { get; set; }
+        public Guid id { get; set; }
+        [Required]
         public TimeSpan from { get; set; }
+        [Required]
         public TimeSpan to { get; set; }
     }
 }

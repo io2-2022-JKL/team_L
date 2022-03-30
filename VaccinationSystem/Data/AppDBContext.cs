@@ -23,14 +23,13 @@ namespace VaccinationSystem.Data
         public DbSet<Vaccine> Vaccines { get; set; }
         public DbSet<VaccinationCenter> VaccinationCenters { get; set; }        public DbSet<Admin> Admins { get; set; }        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Appointment>().HasOne(appointment => appointment.patient);
             modelBuilder.Entity<Patient>().HasMany(patient => patient.vaccinationHistory);
             modelBuilder.Entity<Patient>().HasMany(patient => patient.futureVaccinations);
             modelBuilder.Entity<Patient>().HasMany(patient => patient.certificates);
-            modelBuilder.Entity<Doctor>().HasMany(doc => doc.vaccinationsArchive);
-            modelBuilder.Entity<Doctor>().HasMany(doc => doc.futureVaccinations);
-            modelBuilder.Entity<VaccinationCenter>().HasMany(vc => vc.availableVaccines);
-            modelBuilder.Entity<VaccinationCenter>().HasMany(vc => vc.doctors);
+            //modelBuilder.Entity<Doctor>().HasMany(doc => doc.vaccinationsArchive);
+            //modelBuilder.Entity<Doctor>().HasMany(doc => doc.futureVaccinations);
+            //modelBuilder.Entity<VaccinationCenter>().HasMany(vc => vc.availableVaccines);
+            //modelBuilder.Entity<VaccinationCenter>().HasMany(vc => vc.doctors);
             modelBuilder.Entity<Appointment>().HasOne(appointment => appointment.patient);
 
             // filling db

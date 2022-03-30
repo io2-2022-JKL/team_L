@@ -17,11 +17,20 @@ namespace VaccinationSystem.Models
     public class Appointment
     {
         [Key]
-        public int id { get; set; }
+        public Guid id { get; set; }
+        [Required]
         public int whichDose { get; set; }
-        public virtual TimeSlot timeSlot { get; set; }
-        public virtual Patient patient { get; set; }
-        public virtual Vaccine vaccine { get; set; }
+        [Required]
+        [ForeignKey("timeSlotId")]
+        public TimeSlot timeSlot { get; set; }
+        [Required]
+        [ForeignKey("patientId")]
+        //public Guid patientId { get; set; }
+        public Patient patient { get; set; }
+        [Required]
+        [ForeignKey("vaccineId")]
+        public Vaccine vaccine { get; set; }
+        [Required]
         public AppointmentState state { get; set; }
         public string vaccineBatchNumber { get; set; }
     }
