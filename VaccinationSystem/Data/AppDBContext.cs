@@ -47,6 +47,7 @@ namespace VaccinationSystem.Data
                         phoneNumber = "+48111222333"
                     }
                 );
+
             modelBuilder.Entity<Certificate>().HasData(
                     new Certificate
                     {
@@ -71,6 +72,10 @@ namespace VaccinationSystem.Data
                         futureVaccinations = { }
                     }
                 );
+
+            { "PESEL": 85020319293, "firstName": "Jan", "lastName": "Kowalski", "mail": "kowalskij@mail.com", "dateOfBirth": "1985-02-03", phoneNumber": "+48444222333"}
+
+
             modelBuilder.Entity<Doctor>().HasData(
                     new Doctor
                     {

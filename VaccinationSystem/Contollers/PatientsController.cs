@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.Data;
 using VaccinationSystem.Models;
+using VaccinationSystem.Repositories;
 
 namespace VaccinationSystem.Contollers
 {
@@ -14,27 +15,21 @@ namespace VaccinationSystem.Contollers
     [ApiController]
     public class PatientsController : ControllerBase
     {
-        private readonly AppDBContext _context;
+        private readonly IPatientRepository _patientRepository;
 
-        public PatientsController(AppDBContext context)
+        public PatientsController(IPatientRepository patientRepository)
         {
-            _context = context;
+            _patientRepository = patientRepository;
         }
 
         // GET: api/Patients
 
         [Route("/admin/patients/showPatients")]
-        [HttpPost]
-        public async Task<ActionResult<IEnumerable<Patient>>> GetPatients(Patient patient)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
-            var patients = _context.Patients.Where(p =>  p.pesel==patient.pesel &&
-                                                p.firstName == patient.firstName && 
-                                                p.lastName == patient.lastName && 
-                                                p.mail == patient.mail && 
-                                                p.dateOfBirth == patient.dateOfBirth &&
-                                                p.phoneNumber == patient.phoneNumber
-                ).ToListAsync();
-            return await patients;
+            var patients = _patientRepository.Get();
+            return Ok(await patients);
         }
     }
 }
