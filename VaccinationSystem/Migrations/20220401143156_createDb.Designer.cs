@@ -10,8 +10,8 @@ using VaccinationSystem.Data;
 namespace VaccinationSystem.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20220330171438_createDB")]
-    partial class createDB
+    [Migration("20220401143156_createDb")]
+    partial class createDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -189,13 +189,21 @@ namespace VaccinationSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("day")
+                        .HasColumnType("int");
+
                     b.Property<TimeSpan>("from")
                         .HasColumnType("time");
 
                     b.Property<TimeSpan>("to")
                         .HasColumnType("time");
 
+                    b.Property<Guid>("vaccinationCenterId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("id");
+
+                    b.HasIndex("vaccinationCenterId");
 
                     b.ToTable("OpeningHours");
                 });
@@ -266,7 +274,7 @@ namespace VaccinationSystem.Migrations
 
                     b.HasIndex("doctorId");
 
-                    b.ToTable("TimeSlot");
+                    b.ToTable("TimeSlots");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.VaccinationCenter", b =>
@@ -362,6 +370,27 @@ namespace VaccinationSystem.Migrations
                     b.ToTable("Vaccines");
                 });
 
+            modelBuilder.Entity("VaccinationSystem.Models.VaccinesInCenters", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("vaccineCenterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("vaccineId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("vaccineCenterId");
+
+                    b.HasIndex("vaccineId");
+
+                    b.ToTable("VaccinesInCenters");
+                });
+
             modelBuilder.Entity("VaccinationSystem.Models.Appointment", b =>
                 {
                     b.HasOne("VaccinationSystem.Models.Doctor", null)
@@ -427,6 +456,17 @@ namespace VaccinationSystem.Migrations
                     b.Navigation("vaccinationCenter");
                 });
 
+            modelBuilder.Entity("VaccinationSystem.Models.OpeningHours", b =>
+                {
+                    b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
+                        .WithMany()
+                        .HasForeignKey("vaccinationCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("vaccinationCenter");
+                });
+
             modelBuilder.Entity("VaccinationSystem.Models.TimeSlot", b =>
                 {
                     b.HasOne("VaccinationSystem.Models.Doctor", "doctor")
@@ -454,6 +494,25 @@ namespace VaccinationSystem.Migrations
                     b.HasOne("VaccinationSystem.Models.VaccinationCenter", null)
                         .WithMany("availableVaccines")
                         .HasForeignKey("VaccinationCenterid");
+                });
+
+            modelBuilder.Entity("VaccinationSystem.Models.VaccinesInCenters", b =>
+                {
+                    b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
+                        .WithMany()
+                        .HasForeignKey("vaccineCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VaccinationSystem.Models.Vaccine", "vaccine")
+                        .WithMany()
+                        .HasForeignKey("vaccineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("vaccinationCenter");
+
+                    b.Navigation("vaccine");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Doctor", b =>

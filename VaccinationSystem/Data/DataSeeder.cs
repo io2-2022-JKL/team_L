@@ -68,12 +68,6 @@ namespace VaccinationSystem.Data
                 Vaccine jj = context.Vaccines.Where(vaccine => vaccine.company == "Johnson and Johnson").ToList().First();
                 Vaccine moderna = context.Vaccines.Where(vaccine => vaccine.company == "Moderna").ToList().First();
 
-                var openingHours = new OpeningHours
-                {
-                    from = new TimeSpan(8, 0, 0),
-                    to = new TimeSpan(20, 0, 0)
-                };
-
                 List<VaccinationCenter> centerList = new List<VaccinationCenter>
                 {
                     new VaccinationCenter
@@ -93,13 +87,130 @@ namespace VaccinationSystem.Data
                 };
                 context.VaccinationCenters.AddRange(centerList);
                 context.SaveChanges();
-                centerList[0].availableVaccines = new Vaccine[] { pfeizer, jj, moderna };
-                centerList[1].availableVaccines = new Vaccine[] { pfeizer, jj, moderna };
-                for (int i = 0; i < 7; i++)
+
+                var center1 = context.VaccinationCenters.Where(center => center.name == "Punkt Szczepień Populacyjnych").ToList().First();
+                var center2 = context.VaccinationCenters.Where(center => center.name == "Apteczny Punkt Szczepień").ToList().First();
+
+                List<OpeningHours> hours = new List<OpeningHours>()
                 {
-                    centerList[0].openingHours[i] = openingHours;
-                    centerList[1].openingHours[i] = openingHours;
-                }
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Monday,
+                        vaccinationCenter = center1
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Tuesday,
+                        vaccinationCenter = center1
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Wednesday,
+                        vaccinationCenter = center1
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Thursday,
+                        vaccinationCenter = center1
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Friday,
+                        vaccinationCenter = center1
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Saturday,
+                        vaccinationCenter = center1
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Monday,
+                        vaccinationCenter = center2
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Tuesday,
+                        vaccinationCenter = center2
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Wednesday,
+                        vaccinationCenter = center2
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Thursday,
+                        vaccinationCenter = center2
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Friday,
+                        vaccinationCenter = center2
+                    },
+                    new OpeningHours
+                    {
+                        from = new TimeSpan(8, 0, 0),
+                        to = new TimeSpan(20, 0, 0),
+                        day = WeekDay.Saturday,
+                        vaccinationCenter = center2
+                    }
+                };
+                context.OpeningHours.AddRange(hours);
+                context.SaveChanges();
+
+                List<VaccinesInCenters> vaccineList = new List<VaccinesInCenters>()
+                {
+                    new VaccinesInCenters
+                    {
+                        vaccine = pfeizer,
+                        vaccinationCenter = center1
+                    },
+                    new VaccinesInCenters
+                    {
+                        vaccine = jj,
+                        vaccinationCenter = center1
+                    },
+                    new VaccinesInCenters
+                    {
+                        vaccine = moderna,
+                        vaccinationCenter = center1
+                    },
+                    new VaccinesInCenters
+                    {
+                        vaccine = pfeizer,
+                        vaccinationCenter = center2
+                    },
+                    new VaccinesInCenters
+                    {
+                        vaccine = jj,
+                        vaccinationCenter = center2
+                    }
+                };
+                context.VaccinesInCenters.AddRange(vaccineList);
+                context.SaveChanges();
             }
             if (!context.Patients.Any())
             {
@@ -151,7 +262,7 @@ namespace VaccinationSystem.Data
                     },
                     new Patient
                     {
-                        pesel = "82121211111",
+                        pesel = "82121211133",
                         dateOfBirth = new DateTime(1982, 12, 12),
                         firstName = "Leon",
                         lastName = "Izabelski",
@@ -183,8 +294,25 @@ namespace VaccinationSystem.Data
                 patientWeide.certificates = new Certificate[] { certificateW };//patientWeide.certificates.Append(certificateW);
                 patientKowalska.certificates = new Certificate[] { certificateK };
 
-                context.Add(certificateW);
-                context.Add(certificateK);
+                List<VaccinationCount> count = new List<VaccinationCount>()
+                {
+                    new VaccinationCount
+                    {
+                        patient = patientWeide,
+                        virus = Virus.Coronavirus,
+                        count = 2
+                    },
+                    new VaccinationCount
+                    {
+                        patient = patientKowalska,
+                        virus = Virus.Coronavirus,
+                        count = 2
+                    }
+                };
+
+                context.Certificates.Add(certificateW);
+                context.Certificates.Add(certificateK);
+                context.VaccinationCounts.AddRange(count);
                 context.SaveChanges();
             }
             if (!context.Doctors.Any())
@@ -219,16 +347,114 @@ namespace VaccinationSystem.Data
                     vaccinationCenter = vaccCenter2,
                     active = true
                 };
-                vaccCenter1.doctors = new List<Doctor>() { doctorWeide};
+                vaccCenter1.doctors = new List<Doctor>() { doctorWeide };
                 vaccCenter2.doctors = new List<Doctor>() { doctorKowalska };
 
                 context.Doctors.Add(doctorWeide);
                 context.Doctors.Add(doctorKowalska);
                 context.SaveChanges();
             }
-            if (!context.Appointments.Any()) 
-            { 
+            if (!context.Appointments.Any())
+            {
+                var doctorWeide = context.Doctors.Where(patient => patient.lastName == "Weide").ToList().First();
+                var doctorKowalska = context.Doctors.Where(patient => patient.lastName == "Kowalska").ToList().First();
+                List<TimeSlot> listSlots = new List<TimeSlot>()
+                {
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 25, 12, 30, 00),
+                        to = new DateTime(2022, 05, 25, 12, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 25, 12, 45, 00),
+                        to = new DateTime(2022, 05, 25, 13, 00, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 04, 25, 12, 30, 00),
+                        to = new DateTime(2022, 04, 25, 12, 45, 00),
+                        isFree = false,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 04, 24, 12, 30, 00),
+                        to = new DateTime(2022, 04, 24, 12, 45, 00),
+                        isFree = false,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 04, 25, 9, 15, 00),
+                        to = new DateTime(2022, 04, 25, 9, 30, 00),
+                        isFree = false,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 03, 20, 9, 15, 00),
+                        to = new DateTime(2022, 03, 20, 9, 30, 00),
+                        isFree = false,
+                        active = false,
+                        doctor = doctorKowalska
+                    }
+                };
+                context.TimeSlots.AddRange(listSlots);
+                context.SaveChanges();
 
+                List<TimeSlot> slotsList = context.TimeSlots.Where(slot => slot.isFree == false).ToList();
+                //powinno byc ich 4, przy czym 4 jest juz wykonany
+
+                List<Appointment> list = new List<Appointment>() {
+                    new Appointment
+                    {
+                        whichDose = 1,
+                        timeSlot = slotsList[0],
+                        patient = context.Patients.Where(patient => patient.pesel == "82121211111").ToList().First(),
+                        vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
+                        state = AppointmentState.Planned,
+                        vaccineBatchNumber = "AB-123-nie-wiem"
+                    },
+                    new Appointment
+                    {
+                        whichDose = 1,
+                        timeSlot = slotsList[1],
+                        patient = context.Patients.Where(patient => patient.pesel == "92120211122").ToList().First(),
+                        vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
+                        state = AppointmentState.Planned,
+                        vaccineBatchNumber = "AB-123-nie-wiem"
+                    },
+                    new Appointment
+                    {
+                        whichDose = 1,
+                        timeSlot = slotsList[2],
+                        patient = context.Patients.Where(patient => patient.pesel == "82121211133").ToList().First(),
+                        vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Johnson and Johnson").ToList().First(),
+                        state = AppointmentState.Planned,
+                        vaccineBatchNumber = "AB-123-nie-wiem"
+                    },
+                    new Appointment
+                    {
+                        whichDose = 2,
+                        timeSlot = slotsList[3],
+                        patient = context.Patients.Where(patient => patient.pesel == "59062011333").ToList().First(), // doctorWeide szczepil sie u doctorKowalska :)
+                        vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
+                        state = AppointmentState.Finished,
+                        vaccineBatchNumber = "AB-123-nie-wiem"
+                    }
+                };
+                context.Appointments.AddRange(list);
+                context.SaveChanges();
             }
         }
     }

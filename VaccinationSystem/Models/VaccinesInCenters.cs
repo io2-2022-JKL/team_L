@@ -7,28 +7,15 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public enum WeekDay
-    {
-        Monday,
-        Tuesday,
-        Wednesday,
-        Thursday,
-        Friday,
-        Saturday,
-        Sunday
-    }
-    public class OpeningHours
+    public class VaccinesInCenters
     {
         [Key]
         public Guid id { get; set; }
         [Required]
-        public TimeSpan from { get; set; }
+        [ForeignKey("vaccineId")]
+        public Vaccine vaccine { get; set; }
         [Required]
-        public TimeSpan to { get; set; }
-        [Required]
-        [ForeignKey("vaccinationCenterId")]
+        [ForeignKey("vaccineCenterId")]
         public VaccinationCenter vaccinationCenter { get; set; }
-        [Required]
-        public WeekDay day { get; set; }
     }
 }
