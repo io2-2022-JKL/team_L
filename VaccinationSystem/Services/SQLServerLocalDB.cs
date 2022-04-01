@@ -38,13 +38,13 @@ namespace VaccinationSystem.Services
 
         }
 
-        public bool AreCredentialsValid(Login login)
+        public Guid AreCredentialsValid(Login login)
         {
             var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail)==0).FirstOrDefault();
-            if (patient != null && patient.password.CompareTo(login.password)==0)
-                return true;
+            if (patient != null && patient.password.CompareTo(login.password) == 0)
+                return patient.id;
 
-            return false;
+            return Guid.Empty;
         }
 
         public List<Patient> GetPatients()
@@ -54,9 +54,9 @@ namespace VaccinationSystem.Services
 
         public bool IsUserInDatabase(string email)
         {
-            int emailOccurane = dbContext.Patients.Where(p => p.mail.CompareTo(email)==0).Count();
+            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email)==0).Count();
 
-            if (emailOccurane > 0)
+            if (emailOccurance > 0)
                 return true;
             
             return false;
