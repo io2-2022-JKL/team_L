@@ -13,5 +13,8 @@ namespace VaccinationSystem.Services
         public bool IsUserInDatabase(string email);
         public Guid AreCredentialsValid(Login login);
         public List<Patient> GetPatients();
+        public Task<List<VaccinationCenter>> GetVaccinationCenters(VCCriteria crietria);
+        public Task<bool> EditVaccinationCenter(EditedVaccinationCenter center);
+        public Task<bool> DeleteVaccinationCenter(Guid vaccinationCenterId);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Models;
 using VaccinationSystem.Data;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace VaccinationSystem.Services
@@ -61,6 +62,56 @@ namespace VaccinationSystem.Services
             
             return false;
 
+        }
+
+        public async Task<List<VaccinationCenter>> GetVaccinationCenters(VCCriteria crietria)
+        {
+            var centers = await dbContext.VaccinationCenters.ToListAsync();
+
+            return centers.Where(center =>
+            {
+                if (crietria.Name != null && center.name.CompareTo(crietria.Name) != 0)
+                    return false;
+                if (crietria.City != null && center.city.CompareTo(crietria.City) != 0)
+                    return false;
+                if (crietria.Street != null && center.address.CompareTo(crietria.Street) != 0)
+                    return false;
+
+                return true;
+            }).ToList();
+        }
+
+        public async Task<bool> EditVaccinationCenter(EditedVaccinationCenter center)
+        {
+            var dbCenter = await dbContext.VaccinationCenters.SingleAsync(c => c.id == center.VaccinationCentersId);
+
+            if (dbCenter != null)
+            {
+                dbCenter.name = center.Name;
+                dbCenter.city = center.City;
+                dbCenter.address = center.Street;
+
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteVaccinationCenter(Guid vaccinationCenterId)
+        {
+            var dbCenter = await dbContext.VaccinationCenters.SingleAsync(c => c.id == vaccinationCenterId);
+
+            if(dbCenter!=null)
+            {
+                dbContext.VaccinationCenters.Remove(dbCenter);
+
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }
