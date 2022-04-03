@@ -10,15 +10,17 @@ namespace VaccinationSystem.Models
     {
 
         [Key]
-        public int id { get; set; }
+        public Guid id { get; set; }
+        [Required]
         public string name { get; set; }
+        [Required]
         public string city { get; set; }
+        [Required]
         public string address { get; set; }
-        public virtual IEnumerable<Vaccine> availableVaccines { get; set; }
+        public IEnumerable<Vaccine> availableVaccines { get; set; }
         public OpeningHours[] openingHours = new OpeningHours[7];
-        //public DateTime[] openingHours = new DateTime[7];
-        //public DateTime[] closingHours = new DateTime[7];
-        public  virtual List<Doctor> doctors { get; set; }
+        public List<Doctor> doctors { get; set; }
+        [Required]
         public bool active { get; set; }
     }
 }
