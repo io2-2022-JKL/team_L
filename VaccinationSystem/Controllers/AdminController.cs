@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Services;
 using VaccinationSystem.Models;
+using VaccinationSystem.DTOs;
 
 namespace VaccinationSystem.Controllers
 {
@@ -19,18 +20,16 @@ namespace VaccinationSystem.Controllers
             dbManager = db;
         }
 
-        [HttpPost]
-        [Route("vaccinationCenter/showVaccinationCenters")]
-        public async Task<IActionResult> ShowVaccinationCenters([FromBody]VCCriteria criteria)
+        [HttpGet]
+        [Route("vaccinationCenters")]
+        public async Task<IActionResult> ShowVaccinationCenters()
         {
-            //ToDo
-            //check if admin
 
 
-            List<VaccinationCenter> centers;
+            List<VaccinationCenterResponse> centers;
             try
             {
-                centers = await dbManager.GetVaccinationCenters(criteria);
+                centers = await dbManager.GetVaccinationCenters();
 
             }
             catch(Exception e)
@@ -46,11 +45,29 @@ namespace VaccinationSystem.Controllers
         }
 
         [HttpPost]
-        [Route("vaccinationCenter/editVaccinationCenter")]
+        [Route("vaccinationCenters/addVaccinationCenter")]
+        public async Task<IActionResult> AddVaccinationCenter([FromBody] AddVaccinationRequest center)
+        {
+
+            try
+            {
+                await dbManager.AddVaccinationCenter(center);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("vaccinationCenters/editVaccinationCenter")]
         public async Task<IActionResult> EditVaccinationCenter([FromBody] EditedVaccinationCenter center)
         {
-            //ToDo
-            //check rights
 
             bool edited = false;
             try
@@ -60,7 +77,7 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.Message+" "+e.StackTrace);
                 return BadRequest("Something went wrong");
             }
 
@@ -70,11 +87,9 @@ namespace VaccinationSystem.Controllers
             return NotFound("Data not found");
         }
         [HttpDelete]
-        [Route("vaccinationCenter/deleteVaccinationCenter/{vaccinationCenterId}")]
+        [Route("vaccinationCenters/deleteVaccinationCenter/{vaccinationCenterId}")]
         public async Task<IActionResult> DeleteVaccinationCenter([FromRoute] Guid vaccinationCenterId)
         {
-            //ToDo
-            //check rights
 
             bool deleted = false;
             try
