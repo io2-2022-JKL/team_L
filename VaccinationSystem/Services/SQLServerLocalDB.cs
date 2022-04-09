@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Models;
 using VaccinationSystem.Data;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace VaccinationSystem.Services
@@ -38,13 +39,13 @@ namespace VaccinationSystem.Services
 
         }
 
-        public bool AreCredentialsValid(Login login)
+        public Guid AreCredentialsValid(Login login)
         {
             var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail)==0).FirstOrDefault();
-            if (patient != null && patient.password.CompareTo(login.password)==0)
-                return true;
+            if (patient != null && patient.password.CompareTo(login.password) == 0)
+                return patient.id;
 
-            return false;
+            return Guid.Empty;
         }
 
         public List<Patient> GetPatients()
@@ -54,13 +55,63 @@ namespace VaccinationSystem.Services
 
         public bool IsUserInDatabase(string email)
         {
-            int emailOccurane = dbContext.Patients.Where(p => p.mail.CompareTo(email)==0).Count();
+            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email)==0).Count();
 
-            if (emailOccurane > 0)
+            if (emailOccurance > 0)
                 return true;
             
             return false;
 
+        }
+
+        public async Task<List<VaccinationCenter>> GetVaccinationCenters(VCCriteria crietria)
+        {
+            var centers = await dbContext.VaccinationCenters.ToListAsync();
+
+            return centers.Where(center =>
+            {
+                if (crietria.Name != null && center.name.CompareTo(crietria.Name) != 0)
+                    return false;
+                if (crietria.City != null && center.city.CompareTo(crietria.City) != 0)
+                    return false;
+                if (crietria.Street != null && center.address.CompareTo(crietria.Street) != 0)
+                    return false;
+
+                return true;
+            }).ToList();
+        }
+
+        public async Task<bool> EditVaccinationCenter(EditedVaccinationCenter center)
+        {
+            var dbCenter = await dbContext.VaccinationCenters.SingleAsync(c => c.id == center.VaccinationCentersId);
+
+            if (dbCenter != null)
+            {
+                dbCenter.name = center.Name;
+                dbCenter.city = center.City;
+                dbCenter.address = center.Street;
+
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteVaccinationCenter(Guid vaccinationCenterId)
+        {
+            var dbCenter = await dbContext.VaccinationCenters.SingleAsync(c => c.id == vaccinationCenterId);
+
+            if(dbCenter!=null)
+            {
+                dbContext.VaccinationCenters.Remove(dbCenter);
+
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

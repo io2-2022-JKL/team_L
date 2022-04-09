@@ -34,7 +34,7 @@ namespace VaccinationSystem.Controllers
                     if (!dbManager.IsUserInDatabase(patient.Mail))
                         dbManager.AddPatient(patient);
                     else
-                        return BadRequest();
+                        return BadRequest("Patient already exists");
                 }
                 catch(Exception e)
                 {
@@ -45,7 +45,7 @@ namespace VaccinationSystem.Controllers
                 return Ok();
             }
             
-            return BadRequest();
+            return BadRequest("Bad arguments");
 
         }
         [Route("/signin")]
@@ -55,29 +55,32 @@ namespace VaccinationSystem.Controllers
             if (ModelState.IsValid)
             {
                 string token = "";
+                Guid userId = Guid.Empty;
                 try
                 {
-                    if(dbManager.IsUserInDatabase(login.mail)&&dbManager.AreCredentialsValid(login))
-                        token = signInManager.SignIn(login.mail, login.password);
+                    userId = dbManager.AreCredentialsValid(login);
+                    Console.WriteLine(userId);
+                    //if(userId!=Guid.Empty)
+                      //  token = signInManager.SignIn(login.mail, login.password);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
-                if (token==null||token.Length==0)
-                    return BadRequest();
+                if (userId == Guid.Empty)
+                    return BadRequest("Credentials are not valid");
 
-                return Ok(new { token = token });
+                return Ok(new { userId = userId });
             }
             else
-                return BadRequest();
+                return BadRequest("Bad arguments");
         }
         [Route("/user/Logout/{userId}")]
         [HttpPost]
         public IActionResult Post([FromRoute] string userId)
         {
 
-            signInManager.SignOut(userId);
+            //signInManager.SignOut(userId);
             return Ok();
         }
 
