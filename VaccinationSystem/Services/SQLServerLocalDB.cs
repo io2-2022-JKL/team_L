@@ -113,5 +113,35 @@ namespace VaccinationSystem.Services
 
             return false;
         }
+
+        public async Task<bool> EditPatient(EditedPatient patient)
+        {
+            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patient.id);
+            if (dbPatient != null)
+            {
+                dbPatient.dateOfBirth = patient.dateOfBirth;
+                dbPatient.firstName = patient.firstName;
+                dbPatient.lastName = patient.lastName;
+                dbPatient.mail = patient.mail;
+                dbPatient.pesel = patient.pesel;
+                dbPatient.phoneNumber = patient.phoneNumber;
+
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeletePatient(Guid patientId)
+        {
+            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patientId);
+            if (dbPatient != null)
+            {
+                dbContext.Patients.Remove(dbPatient);
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
     }
 }

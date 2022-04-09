@@ -16,5 +16,7 @@ namespace VaccinationSystem.Services
         public Task<List<VaccinationCenter>> GetVaccinationCenters(VCCriteria crietria);
         public Task<bool> EditVaccinationCenter(EditedVaccinationCenter center);
         public Task<bool> DeleteVaccinationCenter(Guid vaccinationCenterId);
+        public Task<bool> EditPatient(EditedPatient patient);
+        public Task<bool> DeletePatient(Guid patientId);
     }
 }
