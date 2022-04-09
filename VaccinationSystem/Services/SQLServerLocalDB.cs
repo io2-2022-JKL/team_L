@@ -116,7 +116,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> EditPatient(EditedPatient patient)
         {
-            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patient.id);
+            var dbPatient = await dbContext.Patients.SingleAsync(pat => pat.id == patient.id);
             if (dbPatient != null)
             {
                 dbPatient.dateOfBirth = patient.dateOfBirth;
@@ -133,10 +133,68 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> DeletePatient(Guid patientId)
         {
-            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patientId);
+            var dbPatient = await dbContext.Patients.SingleAsync(patient => patient.id == patientId);
             if (dbPatient != null)
             {
                 dbContext.Patients.Remove(dbPatient);
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> AddDoctor(RegisteringDoctor doctor)
+        {
+            var patient = await dbContext.Patients.SingleAsync(patient => patient.pesel == doctor.pesel);
+            var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
+            Doctor doc = new Doctor
+            {
+                pesel = doctor.pesel,
+                firstName = doctor.firstName,
+                lastName = doctor.lastName,
+                mail = doctor.mail,
+                password = doctor.password,
+                phoneNumber = doctor.phoneNumber,
+                vaccinationCenter = center,
+                active = true,
+                vaccinationsArchive = { },
+                futureVaccinations = { },
+                patientAccount = patient
+            };
+
+            dbContext.Doctors.Add(doc);
+            var saved = dbContext.SaveChanges();
+            if (saved > 0)
+                return true;
+            else
+                return false;
+        }
+
+        public async Task<bool> EditDoctor(EditedDoctor doctor)
+        {
+            var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctor.id);
+            if (dbDoctor != null)
+            {
+                dbDoctor.pesel = doctor.pesel;
+                dbDoctor.firstName = doctor.firstName;
+                dbDoctor.lastName = doctor.lastName;
+                dbDoctor.vaccinationCenter = doctor.vaccinationCenter;
+                dbDoctor.dateOfBirth = doctor.dateOfBirth;
+                dbDoctor.mail = doctor.mail;
+                dbDoctor.phoneNumber = doctor.phoneNumber;
+
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteDoctor(Guid doctorId)
+        {
+            var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctorId);
+            if (dbDoctor != null)
+            {
+                dbContext.Doctors.Remove(dbDoctor);
                 await dbContext.SaveChangesAsync();
                 return true;
             }

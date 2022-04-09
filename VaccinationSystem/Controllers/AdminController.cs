@@ -103,7 +103,6 @@ namespace VaccinationSystem.Controllers
             try
             {
                 edited = await dbManager.EditPatient(patient);
-
             }
             catch (Exception e)
             {
@@ -126,6 +125,72 @@ namespace VaccinationSystem.Controllers
             try
             {
                 deleted = await dbManager.DeletePatient(patientId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (deleted)
+                return Ok();
+
+            return NotFound("Data not found");
+        }
+        [HttpPost]
+        [Route("doctors/addDoctor")]
+        public async Task<IActionResult> AddDoctor([FromBody] RegisteringDoctor doctor)
+        {
+            //autoryzacja
+
+            bool edited = false;
+            try
+            {
+                edited = await dbManager.AddDoctor(doctor);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (edited)
+                return Ok();
+
+            return NotFound("Data not found");
+        }
+        [HttpPost]
+        [Route("doctors/editDoctor")]
+        public async Task<IActionResult> EditDoctor([FromBody] EditedDoctor doctor)
+        {
+            //autoryzacja
+
+            bool edited = false;
+            try
+            {
+                edited = await dbManager.EditDoctor(doctor);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (edited)
+                return Ok();
+
+            return NotFound("Data not found");
+        }
+        [HttpDelete]
+        [Route("doctors/deleteDoctor/{doctorId}")]
+        public async Task<IActionResult> DeleteDoctor([FromRoute] Guid doctorId)
+        {
+            //autoryzacja
+
+            bool deleted = false;
+            try
+            {
+                deleted = await dbManager.DeleteDoctor(doctorId);
             }
             catch (Exception e)
             {
