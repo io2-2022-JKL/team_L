@@ -64,7 +64,7 @@ namespace VaccinationSystem.Controllers
             }
 
 
-            return Ok("Doctor added");
+            return Ok("TIme slot added");
         }
 
         [HttpPost]
@@ -97,7 +97,10 @@ namespace VaccinationSystem.Controllers
         [Route("timeSlots/modify/{doctorId}/{timeSlotId}")]
         public async Task<IActionResult> ModifyTimeSlot([FromRoute] Guid doctorId, [FromRoute] Guid timeSlotId, [FromBody]  EditedTimeSlot slot)
         {
-
+            if(!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data");
+            }
             bool deleted = false;
             try
             {
