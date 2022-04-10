@@ -16,7 +16,6 @@ namespace VaccinationSystem.Repositories
         {
             _context = context;
         }
-
         public async Task<IEnumerable<Doctor>> Get()
         {
             return await _context.Doctors.ToListAsync();

@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Data;
 using VaccinationSystem.Repositories;
+using VaccinationSystem.Services;
+
 namespace VaccinationSystem
 {
     public class Startup
@@ -30,6 +32,7 @@ namespace VaccinationSystem
             services.AddControllers();
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IDatabase, SQLServerLocalDB>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
