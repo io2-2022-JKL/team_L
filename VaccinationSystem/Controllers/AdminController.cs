@@ -259,5 +259,16 @@ namespace VaccinationSystem.Controllers
 
             return NotFound("Data not found");
         }
+        [HttpGet]
+        [Route("doctors/timeSlots/{doctorId}")]
+        public async Task<IActionResult> GetTimeSlots([FromRoute] Guid doctorId)
+        {
+            List<TimeSlotsResponse> timeSlots = await dbManager.GetTimeSlots(doctorId);
+
+            if (timeSlots == null || timeSlots.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(timeSlots);
+        }
     }
 }
