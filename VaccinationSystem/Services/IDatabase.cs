@@ -24,5 +24,8 @@ namespace VaccinationSystem.Services
         public Task AddVaccinationCenter(AddVaccinationCenterRequest center);
         public Task<bool> EditPatient(EditedPatient patient);
         public Task<bool> DeletePatient(Guid patientId);
+        public Task<bool> AddDoctor(RegisteringDoctor doctor);
+        public Task<bool> EditDoctor(EditedDoctor doctor);
+        public Task<bool> DeleteDoctor(Guid doctorId);
     }
 }
