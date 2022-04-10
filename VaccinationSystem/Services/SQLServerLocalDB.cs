@@ -312,12 +312,13 @@ namespace VaccinationSystem.Services
         public async Task<bool> EditDoctor(EditedDoctor doctor)
         {
             var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctor.id);
+            var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             if (dbDoctor != null)
             {
                 dbDoctor.pesel = doctor.pesel;
                 dbDoctor.firstName = doctor.firstName;
                 dbDoctor.lastName = doctor.lastName;
-                dbDoctor.vaccinationCenter = doctor.vaccinationCenter;
+                dbDoctor.vaccinationCenter = center;
                 dbDoctor.dateOfBirth = doctor.dateOfBirth;
                 dbDoctor.mail = doctor.mail;
                 dbDoctor.phoneNumber = doctor.phoneNumber;
@@ -332,6 +333,12 @@ namespace VaccinationSystem.Services
             var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctorId);
             if (dbDoctor != null)
             {
+                var appointments = dbContext.Appointments.Where(d => d.timeSlot.doctor.id == doctorId);
+                dbContext.Appointments.RemoveRange(appointments);
+                var times = dbContext.TimeSlots.Where(t => t.doctor.id == doctorId);
+                dbContext.TimeSlots.RemoveRange(times);
+                //var center = dbContext.VaccinationCenters.Where(c => c.id == dbDoctor.vaccinationCenter.id);
+
                 dbContext.Doctors.Remove(dbDoctor);
                 await dbContext.SaveChangesAsync();
                 return true;

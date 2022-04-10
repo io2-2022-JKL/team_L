@@ -161,29 +161,31 @@ namespace VaccinationSystem.Controllers
         [Route("doctors/addDoctor")]
         public async Task<IActionResult> AddDoctor([FromBody] RegisteringDoctor doctor)
         {
-            //autoryzacja
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
 
-            bool edited = false;
             try
             {
-                edited = await dbManager.AddDoctor(doctor);
+                await dbManager.AddDoctor(doctor);
+
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
                 return BadRequest("Something went wrong");
             }
 
-            if (edited)
-                return Ok();
 
-            return NotFound("Data not found");
+            return Ok("Doctor added");
         }
         [HttpPost]
         [Route("doctors/editDoctor")]
         public async Task<IActionResult> EditDoctor([FromBody] EditedDoctor doctor)
         {
             //autoryzacja
+
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
 
             bool edited = false;
             try
@@ -192,12 +194,11 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
                 return BadRequest("Something went wrong");
             }
 
             if (edited)
-                return Ok();
+                return Ok("Doctor edited");
 
             return NotFound("Data not found");
         }
@@ -219,7 +220,7 @@ namespace VaccinationSystem.Controllers
             }
 
             if (deleted)
-                return Ok();
+                return Ok("Doctor deleted");
 
             return NotFound("Data not found");
         }
