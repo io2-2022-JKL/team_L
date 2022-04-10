@@ -32,7 +32,7 @@ namespace Backend_Tests
 
             var okResult = Assert.IsType<OkObjectResult>(centers);
 
-            
+
             var returnValue = Assert.IsType<List<VaccinationCenterResponse>>(okResult.Value);
             Assert.Equal(2, returnValue.Count);
 
@@ -104,7 +104,7 @@ namespace Backend_Tests
             mockDB.Setup(dB => dB.AddVaccinationCenter(center));
             var controller = new AdminController(mockSignIn.Object, mockDB.Object);
 
-            var result= await controller.AddVaccinationCenter(center);
+            var result = await controller.AddVaccinationCenter(center);
 
             Assert.IsType<OkObjectResult>(result);
         }
@@ -361,7 +361,7 @@ namespace Backend_Tests
             });
 
 
-                return centers;
+            return centers;
         }
 
         private AddVaccinationCenterRequest GetAddingVaccinationCenter()
@@ -544,7 +544,7 @@ namespace Backend_Tests
 
             Assert.IsType<BadRequestObjectResult>(result);
         }
-        
+
         [Fact]
         public async Task DeletePatientReturnsOk()
         {
@@ -583,7 +583,6 @@ namespace Backend_Tests
 
             Assert.IsType<NotFoundObjectResult>(result);
         }
-
         private EditedDoctor GetEditedDoctor()
         {
             return new EditedDoctor
@@ -745,6 +744,68 @@ namespace Backend_Tests
             var result = await controller.DeleteDoctor(doctorID);
 
             Assert.IsType<NotFoundObjectResult>(result);
+        }
+        [Fact]
+        public async Task GetDoctorsReturnsCenters()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctors()).ReturnsAsync(GetDoctors);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var doctors = await controller.GetDoctors();
+
+            var okResult = Assert.IsType<OkObjectResult>(doctors);
+
+            var returnValue = Assert.IsType<List<DoctorResponse>>(okResult.Value);
+            Assert.Equal(2, returnValue.Count);
+        }
+
+        [Fact]
+        public async Task GetDoctorsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctors()).ReturnsAsync(new List<DoctorResponse>());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var doctors = await controller.GetDoctors();
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(doctors);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        private List<DoctorResponse> GetDoctors()
+        {
+            var doctors = new List<DoctorResponse>();
+            doctors.Add(new DoctorResponse()
+            {
+                id = new Guid("98A1B9A6-0E4E-46C7-443A-08DA1B08BAE6"),
+                pesel = "59062011333",
+                firstName = "Robert",
+                lastName = "Weide",
+                dateOfBirth = new DateTime(1959, 06, 20),
+                mail = "robert.b.weide@mail.com",
+                phoneNumber = "+48125200331",
+                active = true,
+                vaccinationCenterId = new Guid("99766467-2246-4DE2-FF97-08DA1B08BA99"),
+                name = "Punkt Szczepień Populacyjnych",
+                city = "Warszawa",
+                street = "Żwirki i Wigury 95/97",
+            });
+            doctors.Add(new DoctorResponse()
+            {
+                pesel = "74011011111",
+                dateOfBirth = new DateTime(1974, 01, 10),
+                firstName = "Monika",
+                lastName = "Kowalska",
+                mail = "m.kowalska@mail.com",
+                phoneNumber = "+48349824991",
+                vaccinationCenterId = new Guid("B8FA9079-6FD0-4759-FF98-08DA1B08BA99"),
+                name = "Apteczny Punkt Szczepień",
+                city = "Warszawa",
+                street = "Mokotowska 27/Lok.1 i 4",
+            });
+            return doctors;
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Data;
+using VaccinationSystem.Repositories;
 using VaccinationSystem.Services;
 
 namespace VaccinationSystem
@@ -28,8 +29,11 @@ namespace VaccinationSystem
             services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
-            services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
+            services.AddControllers();
+            services.AddScoped<IPatientRepository, PatientRepository>();
+            services.AddScoped<IDoctorRepository, DoctorRepository>();
             services.AddScoped<IDatabase, SQLServerLocalDB>();
+            services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
             services.AddControllers();
         }
 
