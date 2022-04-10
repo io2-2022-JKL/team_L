@@ -9,6 +9,7 @@ namespace VaccinationSystem.Models
 {
     public class Doctor : User
     {
+
         [ForeignKey("vaccinationCenterId")]
         public VaccinationCenter vaccinationCenter { get; set; }
         public IEnumerable<Appointment> vaccinationsArchive { get; set; }
