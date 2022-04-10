@@ -10,9 +10,7 @@ namespace VaccinationSystem.Services
 {
     public interface IDatabase
     {
-        public Task<List<Patient>> GetPatients();
-        public Task<Patient> GetPatient(int id);
-        public Task<List<Doctor>> GetDoctors();
+        public Task<List<DoctorResponse>> GetDoctors();
         public void AddPatient(RegisteringPatient patient);
         public bool IsUserInDatabase(string email);
         public Guid AreCredentialsValid(Login login);

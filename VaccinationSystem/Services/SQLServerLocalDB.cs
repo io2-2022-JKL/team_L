@@ -16,19 +16,33 @@ namespace VaccinationSystem.Services
         {
             dbContext = context;
         }
-
-        public async Task<List<Doctor>> GetDoctors()
+        public async Task<List<DoctorResponse>> GetDoctors()
         {
-            return await dbContext.Doctors.ToListAsync();
-        }
-
-        public async Task<Patient> GetPatient(int id)
-        {
-            return await dbContext.Patients.FindAsync(id);
-        }
-        public async Task<List<Patient>> GetPatients()
-        {
-            return await dbContext.Patients.ToListAsync();
+            var doctors =  dbContext.Doctors.Include(d => d.vaccinationCenter).ToList();
+            var doctorsResponse = new List<DoctorResponse>();
+            VaccinationCenter center;
+            DoctorResponse dR;
+            foreach (var doctor in doctors)
+            {
+                    center = await dbContext.VaccinationCenters.FindAsync(doctor.vaccinationCenter.id);
+                    dR = new DoctorResponse()
+                    {
+                        id = doctor.id,
+                        pesel = doctor.pesel,
+                        firstName = doctor.firstName,
+                        lastName = doctor.lastName,
+                        dateOfBirth = doctor.dateOfBirth,
+                        mail = doctor.mail,
+                        phoneNumber = doctor.phoneNumber,
+                        active = doctor.active,
+                        vaccinationCenterId = doctor.vaccinationCenter.id,
+                        city = center.city,
+                        name = center.name,
+                        street = center.address,
+                    };
+                    doctorsResponse.Add(dR);
+            }
+            return doctorsResponse;
         }
         
         public void AddPatient(RegisteringPatient patient)
@@ -60,11 +74,6 @@ namespace VaccinationSystem.Services
                 return patient.id;
 
             return Guid.Empty;
-        }
-
-        public List<Patient> GetPatients()
-        {
-            return dbContext.Patients.ToList();
         }
 
         public bool IsUserInDatabase(string email)

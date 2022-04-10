@@ -158,5 +158,16 @@ namespace VaccinationSystem.Controllers
 
             return NotFound("Data not found");
         }
+
+        [Route("doctors")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctors()
+        {
+            var doctors = await dbManager.GetDoctors();
+            if (doctors != null && doctors.Count != 0)
+                return Ok(doctors);
+            else
+                return NotFound("Data not found");
+        }
     }
 }
