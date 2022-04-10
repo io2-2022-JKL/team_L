@@ -409,5 +409,81 @@ namespace VaccinationSystem.Services
 
             return false;
         }
+
+        public Task<List<TimeSlotsResponse>> GetTimeSlots(Guid doctorId)
+        {
+            var slots = dbContext.TimeSlots.Where(s => s.doctor.id == doctorId)
+                .Select(s => new TimeSlotsResponse
+                {
+                    Id = s.id,
+                    From = s.from.ToString("s"),
+                    To = s.to.ToString("s"),
+                    IsFree = s.isFree
+                }).ToListAsync();
+
+            return slots;
+        }
+
+        public async Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest)
+        {
+            DateTime date = visitRequest.From;
+            Doctor doctor = await dbContext.Doctors.SingleOrDefaultAsync(d => d.id == doctorId);
+            if (doctor == null)
+                throw new ArgumentException();
+
+            while(date.AddMinutes(visitRequest.TimeSlotDurationInMinutes)<=visitRequest.To)
+            {
+                await dbContext.TimeSlots.AddAsync(new TimeSlot
+                {
+                    from = date,
+                    to = date.AddMinutes(visitRequest.TimeSlotDurationInMinutes),
+                    doctor = doctor,
+                    active = true,
+                    isFree = true
+                });
+
+                date = date.AddMinutes(visitRequest.TimeSlotDurationInMinutes);
+            }
+
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> EditTimeSlot(Guid doctorId, Guid slotId, EditedTimeSlot timeSlot)
+        {
+            var slot = await dbContext.TimeSlots.Include(s=>s.doctor).SingleOrDefaultAsync(s=>s.id==slotId);
+            if (slot == null)
+                return false;
+
+            if (slot.doctor.id != doctorId)
+                throw new ArgumentException();
+
+            slot.from = timeSlot.From;
+            slot.to = timeSlot.To;
+
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteTimeSlots(Guid doctorId, List<DeleteTimeSlot> timeSlotsIds)
+        {
+            foreach(var slotId in timeSlotsIds)
+            {
+                var slot = await dbContext.TimeSlots.Include(s=>s.doctor).SingleOrDefaultAsync(s => s.id == slotId.Id);
+                if (slot == null)
+                    return false;
+
+                if(slot.doctor.id != doctorId)
+                {
+                    throw new ArgumentException();
+                }
+
+                dbContext.TimeSlots.Remove(slot);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

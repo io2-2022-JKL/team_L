@@ -29,5 +29,9 @@ namespace VaccinationSystem.Services
         public Task<bool> AddDoctor(RegisteringDoctor doctor);
         public Task<bool> EditDoctor(EditedDoctor doctor);
         public Task<bool> DeleteDoctor(Guid doctorId);
+        public Task<List<TimeSlotsResponse>> GetTimeSlots(Guid doctorId);
+        public Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest);
+        public Task<bool> EditTimeSlot(Guid doctorId, Guid slotId, EditedTimeSlot timeSlot);
+        public Task<bool> DeleteTimeSlots(Guid doctorId, List<DeleteTimeSlot> timeSlotsIds);
     }
 }
