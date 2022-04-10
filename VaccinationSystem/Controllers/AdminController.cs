@@ -124,7 +124,6 @@ namespace VaccinationSystem.Controllers
             try
             {
                 edited = await dbManager.EditPatient(patient);
-
             }
             catch (Exception e)
             {
@@ -158,7 +157,6 @@ namespace VaccinationSystem.Controllers
 
             return NotFound("Data not found");
         }
-
         [Route("doctors")]
         [HttpGet]
         public async Task<IActionResult> GetDoctors()
@@ -168,6 +166,73 @@ namespace VaccinationSystem.Controllers
                 return Ok(doctors);
             else
                 return NotFound("Data not found");
+        }
+        [HttpPost]
+        [Route("doctors/addDoctor")]
+        public async Task<IActionResult> AddDoctor([FromBody] RegisteringDoctor doctor)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
+
+            try
+            {
+                await dbManager.AddDoctor(doctor);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return BadRequest("Something went wrong");
+            }
+
+
+            return Ok("Doctor added");
+        }
+        [HttpPost]
+        [Route("doctors/editDoctor")]
+        public async Task<IActionResult> EditDoctor([FromBody] EditedDoctor doctor)
+        {
+            //autoryzacja
+
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
+
+            bool edited = false;
+            try
+            {
+                edited = await dbManager.EditDoctor(doctor);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (edited)
+                return Ok("Doctor edited");
+
+            return NotFound("Data not found");
+        }
+        [HttpDelete]
+        [Route("doctors/deleteDoctor/{doctorId}")]
+        public async Task<IActionResult> DeleteDoctor([FromRoute] Guid doctorId)
+        {
+            //autoryzacja
+
+            bool deleted = false;
+            try
+            {
+                deleted = await dbManager.DeleteDoctor(doctorId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (deleted)
+                return Ok("Doctor deleted");
+
+            return NotFound("Data not found");
         }
     }
 }

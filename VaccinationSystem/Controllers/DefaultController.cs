@@ -26,7 +26,6 @@ namespace VaccinationSystem.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] RegisteringPatient patient)
         {
-
             if (ModelState.IsValid)
             {
                 try

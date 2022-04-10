@@ -270,7 +270,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> EditPatient(EditedPatient patient)
         {
-            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patient.id);
+            var dbPatient = await dbContext.Patients.SingleAsync(pat => pat.id == patient.id);
             if (dbPatient != null)
             {
                 dbPatient.dateOfBirth = patient.dateOfBirth;
@@ -288,7 +288,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> DeletePatient(Guid patientId)
         {
-            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patientId);
+            var dbPatient = await dbContext.Patients.SingleAsync(patient => patient.id == patientId);
             if (dbPatient != null)
             {
                 var counts = dbContext.VaccinationCounts.Where(c => c.patient.id == patientId);
@@ -298,6 +298,72 @@ namespace VaccinationSystem.Services
                 var certificates = dbContext.Certificates.Where(c => c.patientId == patientId);
                 dbContext.Certificates.RemoveRange(certificates);
                 dbContext.Patients.Remove(dbPatient);
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> AddDoctor(RegisteringDoctor doctor)
+        {
+            var patient = await dbContext.Patients.SingleAsync(patient => patient.pesel == doctor.pesel);
+            var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
+            Doctor doc = new Doctor
+            {
+                pesel = doctor.pesel,
+                firstName = doctor.firstName,
+                lastName = doctor.lastName,
+                dateOfBirth = doctor.dateOfBirth,
+                mail = doctor.mail,
+                password = doctor.password,
+                phoneNumber = doctor.phoneNumber,
+                vaccinationCenter = center,
+                active = true,
+                vaccinationsArchive = { },
+                futureVaccinations = { },
+                patientAccount = patient
+            };
+
+            dbContext.Doctors.Add(doc);
+            var saved = dbContext.SaveChanges();
+            if (saved > 0)
+                return true;
+            else
+                return false;
+        }
+
+        public async Task<bool> EditDoctor(EditedDoctor doctor)
+        {
+            var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctor.id);
+            var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
+            if (dbDoctor != null)
+            {
+                dbDoctor.pesel = doctor.pesel;
+                dbDoctor.firstName = doctor.firstName;
+                dbDoctor.lastName = doctor.lastName;
+                dbDoctor.vaccinationCenter = center;
+                dbDoctor.dateOfBirth = doctor.dateOfBirth;
+                dbDoctor.mail = doctor.mail;
+                dbDoctor.phoneNumber = doctor.phoneNumber;
+
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteDoctor(Guid doctorId)
+        {
+            var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctorId);
+            if (dbDoctor != null)
+            {
+                var appointments = dbContext.Appointments.Where(d => d.timeSlot.doctor.id == doctorId);
+                dbContext.Appointments.RemoveRange(appointments);
+                var times = dbContext.TimeSlots.Where(t => t.doctor.id == doctorId);
+                dbContext.TimeSlots.RemoveRange(times);
+                //var center = dbContext.VaccinationCenters.Where(c => c.id == dbDoctor.vaccinationCenter.id);
+
+                dbContext.Doctors.Remove(dbDoctor);
                 await dbContext.SaveChangesAsync();
                 return true;
             }
