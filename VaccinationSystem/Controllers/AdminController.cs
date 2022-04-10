@@ -4,6 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using VaccinationSystem.Data;
+using VaccinationSystem.Models;
+using VaccinationSystem.Repositories;
+using VaccinationSystem.Services;
 using VaccinationSystem.Services;
 using VaccinationSystem.Models;
 using VaccinationSystem.DTOs;
@@ -19,7 +24,6 @@ namespace VaccinationSystem.Controllers
         {
             dbManager = db;
         }
-
         [HttpGet]
         [Route("vaccinationCenters")]
         public async Task<IActionResult> ShowVaccinationCenters()
@@ -110,6 +114,27 @@ namespace VaccinationSystem.Controllers
                 return Ok("Vaccination center deleted");
 
             return NotFound("Data not found");
+        }
+        [Route("patients")]
+        [HttpGet]
+        public async Task<IActionResult> GetPatients()
+        {
+            var patients = await dbManager.GetPatients();
+            if (patients != null && patients.Count != 0)
+                return Ok(patients);
+            else
+                return NotFound("Data not found");
+        }
+
+        [Route("patients/{patientId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPatient([FromRoute] Guid patientId)
+        {
+            var patient = await dbManager.GetPatient(patientId);
+            if (patient != null)
+                return Ok(patient);
+            else
+                return NotFound("Data not found");
         }
         [HttpPost]
         [Route("patients/editPatient")]

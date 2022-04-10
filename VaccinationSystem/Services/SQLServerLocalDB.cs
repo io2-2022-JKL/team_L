@@ -16,6 +16,45 @@ namespace VaccinationSystem.Services
         {
             dbContext = context;
         }
+        public async Task<PatientResponse> GetPatient(Guid id)
+        {
+            var patient = await dbContext.Patients.FindAsync(id);
+            if (patient == null)
+                return null;
+            else
+                return new PatientResponse()
+                {
+                    id = patient.id,
+                    pesel = patient.pesel,
+                    firstName = patient.firstName,
+                    lastName = patient.lastName,
+                    dateOfBirth = patient.dateOfBirth,
+                    mail = patient.mail,
+                    phoneNumber = patient.phoneNumber,
+                    active = patient.active,
+                };
+        }
+        public async Task<List<PatientResponse>> GetPatients()
+        {
+            var patients = await dbContext.Patients.ToListAsync();
+            var patientsResponse = new List<PatientResponse>();
+            foreach(var patient in patients)
+            {
+                var pR = new PatientResponse()
+                {
+                    id = patient.id,
+                    pesel = patient.pesel,
+                    firstName = patient.firstName,
+                    lastName = patient.lastName,
+                    dateOfBirth = patient.dateOfBirth,
+                    mail = patient.mail,
+                    phoneNumber = patient.phoneNumber,
+                    active = patient.active,
+                };
+                patientsResponse.Add(pR);
+            }
+            return patientsResponse;
+        }
         public async Task<List<DoctorResponse>> GetDoctors()
         {
             var doctors =  dbContext.Doctors.Include(d => d.vaccinationCenter).ToList();
