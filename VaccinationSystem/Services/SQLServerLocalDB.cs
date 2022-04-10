@@ -106,13 +106,43 @@ namespace VaccinationSystem.Services
 
         }
 
-        public Guid AreCredentialsValid(Login login)
+        public LoginResponse AreCredentialsValid(Login login)
         {
             var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail)==0).FirstOrDefault();
             if (patient != null && patient.password.CompareTo(login.password) == 0)
-                return patient.id;
+            {
+                return new LoginResponse() {
+                    userId = patient.id,
+                    userType = "patient"
+                };
+            }
+            else
+            {
+                var doctor = dbContext.Doctors.Where(d => d.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                if (doctor != null && doctor.password.CompareTo(login.password) == 0)
+                {
+                    return new LoginResponse()
+                    {
+                        userId = doctor.id,
+                        userType = "doctor"
+                    };
+                }
+                else
+                {
+                    var admin = dbContext.Admins.Where(a => a.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                    if (admin != null && admin.password.CompareTo(login.password) == 0)
+                        return new LoginResponse()
+                        {
+                            userId = admin.id,
+                            userType = "admin"
+                        };
+                }
+            }
 
-            return Guid.Empty;
+            return new LoginResponse() {
+                userId = Guid.Empty,
+                userType = ""
+            };
         }
 
         public bool IsUserInDatabase(string email)

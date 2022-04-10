@@ -15,7 +15,7 @@ namespace VaccinationSystem.Services
         public Task<List<DoctorResponse>> GetDoctors();
         public void AddPatient(RegisteringPatient patient);
         public bool IsUserInDatabase(string email);
-        public Guid AreCredentialsValid(Login login);
+        public LoginResponse AreCredentialsValid(Login login);
         public Task<List<VaccinationCenterResponse>> GetVaccinationCenters();
         public Task<bool> EditVaccinationCenter(EditedVaccinationCenter center);
         public Task<bool> DeleteVaccinationCenter(Guid vaccinationCenterId);
