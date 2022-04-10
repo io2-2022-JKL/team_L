@@ -54,11 +54,11 @@ namespace VaccinationSystem.Controllers
             if (ModelState.IsValid)
             {
                 string token = "";
-                Guid userId = Guid.Empty;
+                LoginResponse lR = new LoginResponse() { userId = Guid.Empty, userType = "" };
                 try
                 {
-                    userId = dbManager.AreCredentialsValid(login);
-                    Console.WriteLine(userId);
+                    lR = dbManager.AreCredentialsValid(login);
+                    //Console.WriteLine(userId);
                     //if(userId!=Guid.Empty)
                       //  token = signInManager.SignIn(login.mail, login.password);
                 }
@@ -66,10 +66,10 @@ namespace VaccinationSystem.Controllers
                 {
                     Console.WriteLine(e.Message);
                 }
-                if (userId == Guid.Empty)
+                if (lR.userId == Guid.Empty)
                     return BadRequest("Credentials are not valid");
 
-                return Ok(new { userId = userId });
+                return Ok(lR);
             }
             else
                 return BadRequest("Bad arguments");
