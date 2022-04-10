@@ -18,6 +18,8 @@ namespace VaccinationSystem.Models
         [Required]
         public string lastName { get; set; }
         [Required]
+        public DateTime dateOfBirth { get; set; }
+        [Required]
         [Mail]
         public string mail { get; set; }
         [Required]

@@ -291,6 +291,7 @@ namespace VaccinationSystem.Services
                 pesel = doctor.pesel,
                 firstName = doctor.firstName,
                 lastName = doctor.lastName,
+                dateOfBirth = doctor.dateOfBirth,
                 mail = doctor.mail,
                 password = doctor.password,
                 phoneNumber = doctor.phoneNumber,
