@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccinationSystem", "VaccinationSystem\VaccinationSystem.csproj", "{03720423-B02A-46A2-BBC1-80E6FCD2ED6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaccinationSystem", "VaccinationSystem\VaccinationSystem.csproj", "{03720423-B02A-46A2-BBC1-80E6FCD2ED6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend_Tests", "Backend_Tests\Backend_Tests.csproj", "{DD32CD5A-4C5F-4F18-9914-76A407687236}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{03720423-B02A-46A2-BBC1-80E6FCD2ED6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03720423-B02A-46A2-BBC1-80E6FCD2ED6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03720423-B02A-46A2-BBC1-80E6FCD2ED6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD32CD5A-4C5F-4F18-9914-76A407687236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD32CD5A-4C5F-4F18-9914-76A407687236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD32CD5A-4C5F-4F18-9914-76A407687236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD32CD5A-4C5F-4F18-9914-76A407687236}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
