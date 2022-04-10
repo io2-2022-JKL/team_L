@@ -746,7 +746,7 @@ namespace Backend_Tests
             Assert.IsType<NotFoundObjectResult>(result);
         }
         [Fact]
-        public async Task GetDoctorsReturnsCenters()
+        public async Task GetDoctorsReturnsDoctors()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
@@ -806,6 +806,111 @@ namespace Backend_Tests
                 street = "Mokotowska 27/Lok.1 i 4",
             });
             return doctors;
+        }
+        [Fact]
+        public async Task GetPatientsReturnsPatients()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetPatients()).ReturnsAsync(GetPatients);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var patients = await controller.GetPatients();
+
+            var okResult = Assert.IsType<OkObjectResult>(patients);
+
+            var returnValue = Assert.IsType<List<PatientResponse>>(okResult.Value);
+            Assert.Equal(2, returnValue.Count);
+        }
+
+        [Fact]
+        public async Task GetPatientsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetPatients()).ReturnsAsync(new List<PatientResponse>());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var patients = await controller.GetPatients();
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(patients);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        private List<PatientResponse> GetPatients()
+        {
+            var patients = new List<PatientResponse>();
+            patients.Add(new PatientResponse()
+            {
+                id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
+                pesel = "82121211111",
+                dateOfBirth = new DateTime(1982, 12, 12),
+                firstName = "Jan",
+                lastName = "Nowak",
+                mail = "j.nowak@mail.com",
+                phoneNumber = "+48555221331",
+                active = true,
+            }) ;
+            patients.Add(new PatientResponse()
+            {
+                id = new Guid("35D520DC-16AF-48E6-A309-08DA1B08BABF"),
+                pesel = "92120211122",
+                dateOfBirth = new DateTime(1992, 12, 02),
+                firstName = "Janina",
+                lastName = "Nowakowa",
+                mail = "j.nowakowa@mail.com",
+                phoneNumber = "+48576221390",
+                active = true,
+            });
+            return patients;
+        }
+        [Fact]
+        public async Task GetPatientReturnsPatient()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            var patient = GetPatient();
+
+            mockDB.Setup(dB => dB.GetPatient(patient.id)).ReturnsAsync(GetPatient);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var patientFromController = await controller.GetPatient(patient.id);
+            var okResult = Assert.IsType<OkObjectResult>(patientFromController);
+
+            var returnValue = Assert.IsType<PatientResponse>(okResult.Value);
+            Assert.Equal(patient.id, returnValue.id);
+        }
+
+        [Fact]
+        public async Task GetPatientReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            var patient = GetPatient();
+            PatientResponse patientRNull = null;
+
+            mockDB.Setup(dB => dB.GetPatient(patient.id)).ReturnsAsync(patientRNull);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var patientFromController = await controller.GetPatient(patient.id);
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(patientFromController);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        private PatientResponse GetPatient()
+        {
+            return new PatientResponse()
+            {
+                id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
+                pesel = "82121211111",
+                dateOfBirth = new DateTime(1982, 12, 12),
+                firstName = "Jan",
+                lastName = "Nowak",
+                mail = "j.nowak@mail.com",
+                phoneNumber = "+48555221331",
+                active = true,
+            };
         }
     }
 }

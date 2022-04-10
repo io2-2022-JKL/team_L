@@ -8,7 +8,7 @@ namespace VaccinationSystem.Repositories
 {
     public interface IPatientRepository
     {
-        Task<List<Patient>> Get();
+        Task<IEnumerable<Patient>> Get();
         Task<Patient> Get(int id);
     }
 }

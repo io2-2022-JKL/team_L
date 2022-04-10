@@ -116,10 +116,10 @@ namespace VaccinationSystem.Controllers
         }
         [Route("patients")]
         [HttpGet]
-        public async Task<ActionResult<List<Patient>>> GetPatients()
+        public async Task<IActionResult> GetPatients()
         {
             var patients = await dbManager.GetPatients();
-            if (patients != null || patients.Count != 0)
+            if (patients != null && patients.Count != 0)
                 return Ok(patients);
             else
                 return NotFound("Data not found");
@@ -127,7 +127,7 @@ namespace VaccinationSystem.Controllers
 
         [Route("patients/{patientId}")]
         [HttpGet]
-        public async Task<ActionResult<Patient>> GetPatient([FromRoute] int patientId)
+        public async Task<IActionResult> GetPatient([FromRoute] Guid patientId)
         {
             var patient = await dbManager.GetPatient(patientId);
             if (patient != null)

@@ -17,13 +17,13 @@ namespace VaccinationSystem.Contollers
     {
         private IDatabase dbManager;
 
-        public DoctorController(IDatabase db)
+        public DoctorController(IUserSignInManager signInManager, IDatabase db)
         {
             dbManager = db;
         }
         [Route("patients/{patientId}")]
         [HttpGet]
-        public async Task<ActionResult<Patient>> GetPatient([FromRoute] int patientId)
+        public async Task<IActionResult> GetPatient([FromRoute] Guid patientId)
         {
             var patient = await dbManager.GetPatient(patientId);
             if (patient != null)
