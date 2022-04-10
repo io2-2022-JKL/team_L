@@ -22,5 +22,7 @@ namespace VaccinationSystem.Services
         public Task<List<OpeningHoursDays>> GetOpeningHoursFromVaccinationCenter(Guid vaccinationCenterId);
         public Task<List<Doctor>> GetDoctorsFromVaccinationCenter(Guid vaccinationCenterId);
         public Task AddVaccinationCenter(AddVaccinationCenterRequest center);
+        public Task<bool> EditPatient(EditedPatient patient);
+        public Task<bool> DeletePatient(Guid patientId);
     }
 }

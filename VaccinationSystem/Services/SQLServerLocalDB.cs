@@ -244,5 +244,42 @@ namespace VaccinationSystem.Services
             dbContext.VaccinationCenters.Add(vC);
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> EditPatient(EditedPatient patient)
+        {
+            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patient.id);
+            if (dbPatient != null)
+            {
+                dbPatient.dateOfBirth = patient.dateOfBirth;
+                dbPatient.firstName = patient.firstName;
+                dbPatient.lastName = patient.lastName;
+                dbPatient.mail = patient.mail;
+                dbPatient.pesel = patient.pesel;
+                dbPatient.phoneNumber = patient.phoneNumber;
+                dbPatient.active = patient.active;
+
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeletePatient(Guid patientId)
+        {
+            var dbPatient = await dbContext.Patients.SingleAsync(p => p.id == patientId);
+            if (dbPatient != null)
+            {
+                var counts = dbContext.VaccinationCounts.Where(c => c.patient.id == patientId);
+                dbContext.VaccinationCounts.RemoveRange(counts);
+                var appointments = dbContext.Appointments.Where(c => c.patient.id == patientId);
+                dbContext.Appointments.RemoveRange(appointments);
+                var certificates = dbContext.Certificates.Where(c => c.patientId == patientId);
+                dbContext.Certificates.RemoveRange(certificates);
+                dbContext.Patients.Remove(dbPatient);
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
     }
 }

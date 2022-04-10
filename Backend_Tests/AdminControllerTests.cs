@@ -17,6 +17,7 @@ namespace Backend_Tests
     {
 
         private Guid vCenterId = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f");
+        private Guid patientID = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5");
         [Fact]
         public async Task ShowVaccinationCentersReturnsCenters()
         {
@@ -474,5 +475,112 @@ namespace Backend_Tests
             };
         }
 
+        private EditedPatient GetEditedPatient()
+        {
+            return new EditedPatient
+            {
+                id = patientID,
+                firstName = "Jan",
+                lastName = "Nowakowy",
+                dateOfBirth = new DateTime(1982, 12, 12),
+                pesel = "82121211111",
+                mail = "j.nowak@zmienionymail.com",
+                phoneNumber = "+48555221331",
+                active = true
+            };
+        }
+
+        [Fact]
+        public async Task EditPatientReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var patient = GetEditedPatient();
+            mockDB.Setup(dB => dB.EditPatient(patient)).ReturnsAsync(true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditPatient(patient);
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+        [Fact]
+        public async Task EditPatientReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var patient = GetEditedPatient();
+            mockDB.Setup(dB => dB.EditPatient(patient)).ReturnsAsync(false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditPatient(patient);
+
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+        [Fact]
+        public async Task EditPatientReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var patient = GetEditedPatient();
+
+            mockDB.Setup(dB => dB.EditPatient(patient)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditPatient(patient);
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task EditPatientReturnsBadRequestInvalidModel()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            controller.ModelState.AddModelError("id", "Bad format");
+
+            var result = await controller.EditPatient(null);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+        
+        [Fact]
+        public async Task DeletePatientReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeletePatient(patientID)).ReturnsAsync(true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeletePatient(patientID);
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+        [Fact]
+        public async Task DeletePatientReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.DeletePatient(patientID)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeletePatient(patientID);
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeletePatientReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeletePatient(patientID)).ReturnsAsync(false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeletePatient(patientID);
+
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
     }
 }
