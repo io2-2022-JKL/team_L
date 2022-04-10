@@ -912,5 +912,56 @@ namespace Backend_Tests
                 active = true,
             };
         }
+        [Fact]
+        public async Task GetTimeSlotsReturnsTimeSlots()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ReturnsAsync(GetTimeSlots);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var slots = await controller.GetTimeSlots(doctorID);
+
+
+            var okResult = Assert.IsType<OkObjectResult>(slots);
+
+
+            var returnValue = Assert.IsType<List<TimeSlotsResponse>>(okResult.Value);
+            Assert.Equal(2, returnValue.Count);
+
+        }
+
+        [Fact]
+        public async Task GetTimeSlotsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ReturnsAsync(new List<TimeSlotsResponse>());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var timeSlots = await controller.GetTimeSlots(doctorID);
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(timeSlots);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        private List<TimeSlotsResponse> GetTimeSlots()
+        {
+            var timeSlots = new List<TimeSlotsResponse>()
+            {
+                new TimeSlotsResponse()
+                {
+                    Id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    From = "2022-01-29T08:00",
+                    To = "2022-01-29T09:00"
+                },
+                new TimeSlotsResponse()
+                {
+                    Id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
+                    From = "2022-01-29T09:00",
+                    To = "2022-01-29T10:00"
+                }
+            };
+            return timeSlots;
+        }
     }
 }
