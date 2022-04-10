@@ -7,7 +7,7 @@ using VaccinationSystem.Models;
 
 namespace VaccinationSystem.DTOs
 {
-    public class AddVaccinationRequest
+    public class AddVaccinationCenterRequest
     {
         [Required]
         [MinLength(1)]

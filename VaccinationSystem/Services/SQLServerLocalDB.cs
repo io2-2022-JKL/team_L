@@ -94,8 +94,8 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> EditVaccinationCenter(EditedVaccinationCenter center)
         {
-            Console.WriteLine(center.Id);
-            var dbCenter = await dbContext.VaccinationCenters.SingleAsync(c => c.id == center.Id);
+
+            var dbCenter = await dbContext.VaccinationCenters.SingleOrDefaultAsync(c => c.id == center.Id);
 
             if (dbCenter != null)
             {
@@ -203,7 +203,7 @@ namespace VaccinationSystem.Services
             return doctors;
         }
 
-        public async Task AddVaccinationCenter(AddVaccinationRequest center)
+        public async Task AddVaccinationCenter(AddVaccinationCenterRequest center)
         {
             var vC = new VaccinationCenter
             {

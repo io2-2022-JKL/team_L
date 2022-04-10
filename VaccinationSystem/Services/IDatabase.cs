@@ -21,6 +21,6 @@ namespace VaccinationSystem.Services
         public Task<List<Vaccine>> GetVaccinesFromVaccinationCenter(Guid vaccinationCenterId);
         public Task<List<OpeningHoursDays>> GetOpeningHoursFromVaccinationCenter(Guid vaccinationCenterId);
         public Task<List<Doctor>> GetDoctorsFromVaccinationCenter(Guid vaccinationCenterId);
-        public Task AddVaccinationCenter(AddVaccinationRequest center);
+        public Task AddVaccinationCenter(AddVaccinationCenterRequest center);
     }
 }

@@ -35,19 +35,21 @@ namespace VaccinationSystem.Controllers
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
-                return NotFound("Data not found");
+                return BadRequest("Something went wrong");
             }
 
             if (centers == null || centers.Count == 0)
                 return NotFound("Data not found");
 
-            return Ok(new { data = centers });
+            return Ok(centers);
         }
 
         [HttpPost]
         [Route("vaccinationCenters/addVaccinationCenter")]
-        public async Task<IActionResult> AddVaccinationCenter([FromBody] AddVaccinationRequest center)
+        public async Task<IActionResult> AddVaccinationCenter([FromBody] AddVaccinationCenterRequest center)
         {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
 
             try
             {
@@ -56,18 +58,20 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
                 return BadRequest("Something went wrong");
             }
 
 
-            return Ok();
+            return Ok("Vaccination center added");
         }
 
         [HttpPost]
         [Route("vaccinationCenters/editVaccinationCenter")]
         public async Task<IActionResult> EditVaccinationCenter([FromBody] EditedVaccinationCenter center)
         {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
 
             bool edited = false;
             try
@@ -77,12 +81,11 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message+" "+e.StackTrace);
                 return BadRequest("Something went wrong");
             }
 
             if(edited)
-                return Ok();
+                return Ok("Vaccination center edited");
 
             return NotFound("Data not found");
         }
@@ -104,7 +107,7 @@ namespace VaccinationSystem.Controllers
             }
 
             if (deleted)
-                return Ok();
+                return Ok("Vaccination center deleted");
 
             return NotFound("Data not found");
         }
