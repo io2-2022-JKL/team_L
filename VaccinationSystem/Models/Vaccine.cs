@@ -13,15 +13,21 @@ namespace VaccinationSystem.Models
     public class Vaccine
     {
         [Key]
-        public int id { get; set; }
+        public Guid id { get; set; }
+        [Required]
         public string company { get; set; }
+        [Required]
         public string name { get; set; }
+        [Required]
         public int numberOfDoses { get; set; }
         public int minDaysBetweenDoses { get; set; }
         public int maxDaysBetweenDoses { get; set; }
-        public virtual Virus virus { get; set; }
+        [Required]
+        public Virus virus { get; set; }
+        [Required]
         public int minPatientAge { get; set; }
         public int maxPatientAge { get; set; }
-        public bool used { get; set; }
+        [Required]
+        public bool active { get; set; }
     }
 }

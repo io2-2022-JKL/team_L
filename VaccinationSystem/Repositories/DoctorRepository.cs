@@ -8,21 +8,17 @@ using VaccinationSystem.Data;
 
 namespace VaccinationSystem.Repositories
 {
-    public class PatientRepository : IPatientRepository
+    public class DoctorRepository : IDoctorRepository
     {
         private readonly AppDBContext _context;
 
-        public PatientRepository(AppDBContext context)
+        public DoctorRepository(AppDBContext context)
         {
             _context = context;
         }
-        public async Task<IEnumerable<Patient>> Get()
+        public async Task<IEnumerable<Doctor>> Get()
         {
-            return await _context.Patients.ToListAsync();
-        }
-        public async Task<Patient> Get(int id)
-        {
-            return await _context.Patients.FindAsync(id);
+            return await _context.Doctors.ToListAsync();
         }
     }
 }

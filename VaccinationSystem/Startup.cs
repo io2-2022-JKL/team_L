@@ -31,7 +31,10 @@ namespace VaccinationSystem
             );
             services.AddControllers();
             services.AddScoped<IPatientRepository, PatientRepository>();
+            services.AddScoped<IDoctorRepository, DoctorRepository>();
             services.AddScoped<IDatabase, SQLServerLocalDB>();
+            services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,10 +50,6 @@ namespace VaccinationSystem
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapGet("", async context =>
-                //{
-                //    await context.Response.WriteAsync("Hello World!");
-                //});
             });
         }
     }

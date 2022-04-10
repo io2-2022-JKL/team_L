@@ -21,30 +21,35 @@ namespace VaccinationSystem.Migrations
 
             modelBuilder.Entity("VaccinationSystem.Models.Admin", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("dateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("firstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("lastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("mail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("pesel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("phoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
@@ -54,37 +59,33 @@ namespace VaccinationSystem.Migrations
 
             modelBuilder.Entity("VaccinationSystem.Models.Appointment", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Doctorid")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("Doctorid")
+                        .HasColumnType("uniqueidentifier");
 
-                    /*b.Property<int?>("Doctorid1")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("Doctorid1")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Patientid")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("Patientid1")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Patientid1")
-                        .HasColumnType("int");*/
-
-                    b.Property<int?>("patientid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("patientId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("state")
                         .HasColumnType("int");
 
-                    b.Property<int?>("timeSlotid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("timeSlotId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("vaccineBatchNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("vaccineid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("vaccineId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("whichDose")
                         .HasColumnType("int");
@@ -93,47 +94,47 @@ namespace VaccinationSystem.Migrations
 
                     b.HasIndex("Doctorid");
 
-                    //b.HasIndex("Doctorid1");
+                    b.HasIndex("Doctorid1");
 
-                    //b.HasIndex("Patientid");
+                    b.HasIndex("Patientid1");
 
-                    //b.HasIndex("Patientid1");
+                    b.HasIndex("patientId");
 
-                    b.HasIndex("patientid");
+                    b.HasIndex("timeSlotId");
 
-                    b.HasIndex("timeSlotid");
-
-                    b.HasIndex("vaccineid");
+                    b.HasIndex("vaccineId");
 
                     b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Certificate", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Patientid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("patientId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("vaccineId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("id");
 
-                    b.HasIndex("Patientid");
+                    b.HasIndex("patientId");
 
                     b.ToTable("Certificates");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Doctor", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("active")
                         .HasColumnType("bit");
@@ -142,44 +143,52 @@ namespace VaccinationSystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("firstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("lastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("mail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("patientAccountid")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("patientAccountId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("pesel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("phoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("vaccinationCenterid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("vaccinationCenterId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("id");
 
-                    b.HasIndex("patientAccountid");
+                    b.HasIndex("patientAccountId");
 
-                    b.HasIndex("vaccinationCenterid");
+                    b.HasIndex("vaccinationCenterId");
 
                     b.ToTable("Doctors");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.OpeningHours", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("day")
+                        .HasColumnType("int");
 
                     b.Property<TimeSpan>("from")
                         .HasColumnType("time");
@@ -187,17 +196,21 @@ namespace VaccinationSystem.Migrations
                     b.Property<TimeSpan>("to")
                         .HasColumnType("time");
 
+                    b.Property<Guid>("vaccinationCenterId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("id");
+
+                    b.HasIndex("vaccinationCenterId");
 
                     b.ToTable("OpeningHours");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Patient", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("active")
                         .HasColumnType("bit");
@@ -206,21 +219,27 @@ namespace VaccinationSystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("firstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("lastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("mail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("pesel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("phoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
@@ -230,16 +249,15 @@ namespace VaccinationSystem.Migrations
 
             modelBuilder.Entity("VaccinationSystem.Models.TimeSlot", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("doctorid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("doctorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("from")
                         .HasColumnType("datetime2");
@@ -252,28 +270,30 @@ namespace VaccinationSystem.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("doctorid");
+                    b.HasIndex("doctorId");
 
-                    b.ToTable("TimeSlot");
+                    b.ToTable("TimeSlots");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.VaccinationCenter", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
                     b.Property<string>("address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("city")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
@@ -283,38 +303,40 @@ namespace VaccinationSystem.Migrations
 
             modelBuilder.Entity("VaccinationSystem.Models.VaccinationCount", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("count")
                         .HasColumnType("int");
 
-                    b.Property<int?>("patientid")
-                        .HasColumnType("int");
+                    b.Property<Guid>("patientId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("virus")
                         .HasColumnType("int");
 
                     b.HasKey("id");
 
-                    b.HasIndex("patientid");
+                    b.HasIndex("patientId");
 
                     b.ToTable("VaccinationCounts");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Vaccine", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("VaccinationCenterid")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("VaccinationCenterid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("company")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("maxDaysBetweenDoses")
@@ -330,13 +352,11 @@ namespace VaccinationSystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("numberOfDoses")
                         .HasColumnType("int");
-
-                    b.Property<bool>("used")
-                        .HasColumnType("bit");
 
                     b.Property<int>("virus")
                         .HasColumnType("int");
@@ -346,6 +366,27 @@ namespace VaccinationSystem.Migrations
                     b.HasIndex("VaccinationCenterid");
 
                     b.ToTable("Vaccines");
+                });
+
+            modelBuilder.Entity("VaccinationSystem.Models.VaccinesInCenters", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("vaccineCenterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("vaccineId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("vaccineCenterId");
+
+                    b.HasIndex("vaccineId");
+
+                    b.ToTable("VaccinesInCenters");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Appointment", b =>
@@ -359,24 +400,26 @@ namespace VaccinationSystem.Migrations
                         .HasForeignKey("Doctorid1");
 
                     b.HasOne("VaccinationSystem.Models.Patient", null)
-                        .WithMany("vaccinationHistory")
-                        .HasForeignKey("Patientid");
-
-                    b.HasOne("VaccinationSystem.Models.Patient", null)
                         .WithMany("futureVaccinations")
                         .HasForeignKey("Patientid1");
 
                     b.HasOne("VaccinationSystem.Models.Patient", "patient")
-                        .WithMany()
-                        .HasForeignKey("patientid");
+                        .WithMany("vaccinationHistory")
+                        .HasForeignKey("patientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("VaccinationSystem.Models.TimeSlot", "timeSlot")
                         .WithMany()
-                        .HasForeignKey("timeSlotid");
+                        .HasForeignKey("timeSlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("VaccinationSystem.Models.Vaccine", "vaccine")
                         .WithMany()
-                        .HasForeignKey("vaccineid");
+                        .HasForeignKey("vaccineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("patient");
 
@@ -389,20 +432,35 @@ namespace VaccinationSystem.Migrations
                 {
                     b.HasOne("VaccinationSystem.Models.Patient", null)
                         .WithMany("certificates")
-                        .HasForeignKey("Patientid");
+                        .HasForeignKey("patientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Doctor", b =>
                 {
                     b.HasOne("VaccinationSystem.Models.Patient", "patientAccount")
                         .WithMany()
-                        .HasForeignKey("patientAccountid");
+                        .HasForeignKey("patientAccountId");
 
                     b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
                         .WithMany("doctors")
-                        .HasForeignKey("vaccinationCenterid");
+                        .HasForeignKey("vaccinationCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("patientAccount");
+
+                    b.Navigation("vaccinationCenter");
+                });
+
+            modelBuilder.Entity("VaccinationSystem.Models.OpeningHours", b =>
+                {
+                    b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
+                        .WithMany()
+                        .HasForeignKey("vaccinationCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("vaccinationCenter");
                 });
@@ -411,7 +469,9 @@ namespace VaccinationSystem.Migrations
                 {
                     b.HasOne("VaccinationSystem.Models.Doctor", "doctor")
                         .WithMany()
-                        .HasForeignKey("doctorid");
+                        .HasForeignKey("doctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("doctor");
                 });
@@ -420,7 +480,9 @@ namespace VaccinationSystem.Migrations
                 {
                     b.HasOne("VaccinationSystem.Models.Patient", "patient")
                         .WithMany()
-                        .HasForeignKey("patientid");
+                        .HasForeignKey("patientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("patient");
                 });
@@ -430,6 +492,25 @@ namespace VaccinationSystem.Migrations
                     b.HasOne("VaccinationSystem.Models.VaccinationCenter", null)
                         .WithMany("availableVaccines")
                         .HasForeignKey("VaccinationCenterid");
+                });
+
+            modelBuilder.Entity("VaccinationSystem.Models.VaccinesInCenters", b =>
+                {
+                    b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
+                        .WithMany()
+                        .HasForeignKey("vaccineCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VaccinationSystem.Models.Vaccine", "vaccine")
+                        .WithMany()
+                        .HasForeignKey("vaccineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("vaccinationCenter");
+
+                    b.Navigation("vaccine");
                 });
 
             modelBuilder.Entity("VaccinationSystem.Models.Doctor", b =>

@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public class TimeSlot
+    public class EditedPatient
     {
         [Key]
         public Guid id { get; set; }
         [Required]
-        public DateTime from { get; set; }
+        public string pesel { get; set; }
         [Required]
-        public DateTime to { get; set; }
+        public string firstName { get; set; }
         [Required]
-
-        [ForeignKey("doctorId")]
-        public  Doctor doctor { get; set; }
+        public string lastName { get; set; }
         [Required]
-        public bool isFree { get; set; }
+        public DateTime dateOfBirth { get; set; }
+        [Required]
+        public string mail { get; set; }
+        [Required]
+        public string phoneNumber { get; set; }
         [Required]
         public bool active { get; set; }
     }
