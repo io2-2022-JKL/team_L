@@ -30,7 +30,7 @@ namespace VaccinationSystem.Controllers
             {
                 try
                 {
-                    if (!dbManager.IsUserInDatabase(patient.Mail))
+                    if (!dbManager.IsUserInDatabase(patient.mail))
                         dbManager.AddPatient(patient);
                     else
                         return BadRequest("Patient already exists");

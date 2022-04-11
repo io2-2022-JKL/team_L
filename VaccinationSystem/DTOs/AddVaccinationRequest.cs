@@ -11,18 +11,18 @@ namespace VaccinationSystem.DTOs
     {
         [Required]
         [MinLength(1)]
-        public string Name { get; set; }
+        public string name { get; set; }
         [Required]
         [MinLength(1)]
-        public string City { get; set; }
+        public string city { get; set; }
         [Required]
         [MinLength(1)]
-        public string Street { get; set; }
+        public string street { get; set; }
         [Required]
-        public List<Guid> VaccineIds { get; set; } = new List<Guid>();
+        public List<Guid> vaccineIds { get; set; } = new List<Guid>();
         [Required]
         public OpeningHoursDays[] openingHoursDays { get; set; } = new OpeningHoursDays[7];
         [Required]
-        public bool Active { get; set; }
+        public bool active { get; set; }
     }
 }

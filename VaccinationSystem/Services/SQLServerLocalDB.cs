@@ -25,7 +25,7 @@ namespace VaccinationSystem.Services
                 return new PatientResponse()
                 {
                     id = patient.id,
-                    pesel = patient.pesel,
+                    PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
                     dateOfBirth = patient.dateOfBirth,
@@ -43,7 +43,7 @@ namespace VaccinationSystem.Services
                 var pR = new PatientResponse()
                 {
                     id = patient.id,
-                    pesel = patient.pesel,
+                    PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
                     dateOfBirth = patient.dateOfBirth,
@@ -67,7 +67,7 @@ namespace VaccinationSystem.Services
                     dR = new DoctorResponse()
                     {
                         id = doctor.id,
-                        pesel = doctor.pesel,
+                        PESEL = doctor.pesel,
                         firstName = doctor.firstName,
                         lastName = doctor.lastName,
                         dateOfBirth = doctor.dateOfBirth,
@@ -89,11 +89,11 @@ namespace VaccinationSystem.Services
             Patient p = new Patient
             {
                 pesel = patient.PESEL,
-                firstName = patient.Names,
-                lastName = patient.Password,
-                mail = patient.Mail,
-                password = patient.Password,
-                phoneNumber = patient.PhoneNumber,
+                firstName = patient.name,
+                lastName = patient.password,
+                mail = patient.mail,
+                password = patient.password,
+                phoneNumber = patient.phoneNumber,
                 active = true,
                 certificates = { },
                 vaccinationHistory = { },
@@ -168,13 +168,13 @@ namespace VaccinationSystem.Services
 
                 var vC = new VaccinationCenterResponse()
                 {
-                    Id = center.id,
-                    Name = center.name,
-                    City = center.city,
-                    Street = center.address,
-                    Vaccines = vaccines,
-                    Active = center.active,
-                    OpeningHoursDays = hours.ToArray(),
+                    id = center.id,
+                    name = center.name,
+                    city = center.city,
+                    street = center.address,
+                    vaccines = vaccines,
+                    active = center.active,
+                    openingHoursDays = hours.ToArray(),
                 };
 
                 centersToReturn.Add(vC);
@@ -187,19 +187,19 @@ namespace VaccinationSystem.Services
         public async Task<bool> EditVaccinationCenter(EditedVaccinationCenter center)
         {
 
-            var dbCenter = await dbContext.VaccinationCenters.SingleOrDefaultAsync(c => c.id == center.Id);
+            var dbCenter = await dbContext.VaccinationCenters.SingleOrDefaultAsync(c => c.id == center.id);
 
             if (dbCenter != null)
             {
-                dbCenter.name = center.Name;
-                dbCenter.city = center.City;
-                dbCenter.address = center.Street;
-                dbCenter.active = center.Active;
+                dbCenter.name = center.name;
+                dbCenter.city = center.city;
+                dbCenter.address = center.street;
+                dbCenter.active = center.active;
 
                 var vaccines = dbContext.VaccinesInCenters.Where(w => w.vaccinationCenter.id == dbCenter.id);
                 dbContext.VaccinesInCenters.RemoveRange(vaccines);
 
-                foreach (var vId in center.VaccineIds)
+                foreach (var vId in center.vaccineIds)
                 {
                     Vaccine vaccine = await GetVaccine(vId);
                     dbContext.VaccinesInCenters.Add(new VaccinesInCenters
@@ -299,9 +299,9 @@ namespace VaccinationSystem.Services
         {
             var vC = new VaccinationCenter
             {
-                name = center.Name,
-                city = center.City,
-                address = center.Street,
+                name = center.name,
+                city = center.city,
+                address = center.street,
                 active = true
             };
 
@@ -323,7 +323,7 @@ namespace VaccinationSystem.Services
             }
             
 
-            foreach (var vId in center.VaccineIds)
+            foreach (var vId in center.vaccineIds)
             {
                 Vaccine vaccine = await GetVaccine(vId);
                 dbContext.VaccinesInCenters.Add(new VaccinesInCenters
@@ -346,7 +346,7 @@ namespace VaccinationSystem.Services
                 dbPatient.firstName = patient.firstName;
                 dbPatient.lastName = patient.lastName;
                 dbPatient.mail = patient.mail;
-                dbPatient.pesel = patient.pesel;
+                dbPatient.pesel = patient.PESEL;
                 dbPatient.phoneNumber = patient.phoneNumber;
                 dbPatient.active = patient.active;
 
@@ -376,11 +376,11 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> AddDoctor(RegisteringDoctor doctor)
         {
-            var patient = await dbContext.Patients.SingleAsync(patient => patient.pesel == doctor.pesel);
+            var patient = await dbContext.Patients.SingleAsync(patient => patient.pesel == doctor.PESEL);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             Doctor doc = new Doctor
             {
-                pesel = doctor.pesel,
+                pesel = doctor.PESEL,
                 firstName = doctor.firstName,
                 lastName = doctor.lastName,
                 dateOfBirth = doctor.dateOfBirth,
@@ -408,7 +408,7 @@ namespace VaccinationSystem.Services
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             if (dbDoctor != null)
             {
-                dbDoctor.pesel = doctor.pesel;
+                dbDoctor.pesel = doctor.PESEL;
                 dbDoctor.firstName = doctor.firstName;
                 dbDoctor.lastName = doctor.lastName;
                 dbDoctor.vaccinationCenter = center;
@@ -445,10 +445,10 @@ namespace VaccinationSystem.Services
             var slots = dbContext.TimeSlots.Where(s => s.doctor.id == doctorId)
                 .Select(s => new TimeSlotsResponse
                 {
-                    Id = s.id,
-                    From = s.from.ToString("s"),
-                    To = s.to.ToString("s"),
-                    IsFree = s.isFree
+                    id = s.id,
+                    from = s.from.ToString("s"),
+                    to = s.to.ToString("s"),
+                    isFree = s.isFree
                 }).ToListAsync();
 
             return slots;
@@ -456,23 +456,23 @@ namespace VaccinationSystem.Services
 
         public async Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest)
         {
-            DateTime date = visitRequest.From;
+            DateTime date = visitRequest.from;
             Doctor doctor = await dbContext.Doctors.SingleOrDefaultAsync(d => d.id == doctorId);
             if (doctor == null)
                 throw new ArgumentException();
 
-            while(date.AddMinutes(visitRequest.TimeSlotDurationInMinutes)<=visitRequest.To)
+            while(date.AddMinutes(visitRequest.timeSlotDurationInMinutes)<=visitRequest.to)
             {
                 await dbContext.TimeSlots.AddAsync(new TimeSlot
                 {
                     from = date,
-                    to = date.AddMinutes(visitRequest.TimeSlotDurationInMinutes),
+                    to = date.AddMinutes(visitRequest.timeSlotDurationInMinutes),
                     doctor = doctor,
                     active = true,
                     isFree = true
                 });
 
-                date = date.AddMinutes(visitRequest.TimeSlotDurationInMinutes);
+                date = date.AddMinutes(visitRequest.timeSlotDurationInMinutes);
             }
 
             await dbContext.SaveChangesAsync();
@@ -487,8 +487,8 @@ namespace VaccinationSystem.Services
             if (slot.doctor.id != doctorId)
                 throw new ArgumentException();
 
-            slot.from = timeSlot.From;
-            slot.to = timeSlot.To;
+            slot.from = timeSlot.from;
+            slot.to = timeSlot.to;
 
             await dbContext.SaveChangesAsync();
 
@@ -499,7 +499,7 @@ namespace VaccinationSystem.Services
         {
             foreach(var slotId in timeSlotsIds)
             {
-                var slot = await dbContext.TimeSlots.Include(s=>s.doctor).SingleOrDefaultAsync(s => s.id == slotId.Id);
+                var slot = await dbContext.TimeSlots.Include(s=>s.doctor).SingleOrDefaultAsync(s => s.id == slotId.id);
                 if (slot == null)
                     return false;
 

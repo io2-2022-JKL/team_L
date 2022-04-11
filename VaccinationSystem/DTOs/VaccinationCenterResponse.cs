@@ -10,21 +10,21 @@ namespace VaccinationSystem.DTOs
     public class VaccinationCenterResponse
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         [Required]
         [MinLength(1)]
-        public string Name { get; set; }
+        public string name { get; set; }
         [Required]
         [MinLength(1)]
-        public string City { get; set; }
+        public string city { get; set; }
         [Required]
         [MinLength(1)]
-        public string Street { get; set; }
+        public string street { get; set; }
         [Required]
-        public List<Vaccine> Vaccines { get; set; } = new List<Vaccine>();
+        public List<Vaccine> vaccines { get; set; } = new List<Vaccine>();
         [Required]
-        public OpeningHoursDays[] OpeningHoursDays { get; set; } = new OpeningHoursDays[7];
+        public OpeningHoursDays[] openingHoursDays { get; set; } = new OpeningHoursDays[7];
         [Required]
-        public bool Active { get; set; }
+        public bool active { get; set; }
     }
 }

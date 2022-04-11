@@ -13,7 +13,7 @@ namespace VaccinationSystem.Models
         public Guid id { get; set; }
         [Required]
         [StringLength(11)]
-        public string pesel { get; set; }
+        public string PESEL { get; set; }
 
         [Required]
         public string firstName { get; set; }

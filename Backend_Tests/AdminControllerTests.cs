@@ -214,12 +214,12 @@ namespace Backend_Tests
 
             centers.Add(new VaccinationCenterResponse()
             {
-                Id = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
-                Name = "Punkt Szczepień Populacyjnych",
-                City = "Warszawa",
-                Street = "Żwirki i Wigury 95/97",
-                Active = true,
-                OpeningHoursDays = new[]
+                id = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
+                name = "Punkt Szczepień Populacyjnych",
+                city = "Warszawa",
+                street = "Żwirki i Wigury 95/97",
+                active = true,
+                openingHoursDays = new[]
                  {
                         new OpeningHoursDays()
                         {
@@ -258,7 +258,7 @@ namespace Backend_Tests
                         }
 
                     },
-                Vaccines = new List<Vaccine>()
+                vaccines = new List<Vaccine>()
                     {
                         new Vaccine()
                         {
@@ -288,11 +288,11 @@ namespace Backend_Tests
             });
             centers.Add(new VaccinationCenterResponse()
             {
-                Id = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
-                Name = "Apteczny Punkt Szczepień",
-                City = "Warszawa",
-                Street = "Mokotowska 27/Lok.1 i 4",
-                OpeningHoursDays = new[]
+                id = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
+                name = "Apteczny Punkt Szczepień",
+                city = "Warszawa",
+                street = "Mokotowska 27/Lok.1 i 4",
+                openingHoursDays = new[]
                  {
                         new OpeningHoursDays()
                         {
@@ -331,7 +331,7 @@ namespace Backend_Tests
                         }
 
                     },
-                Vaccines = new List<Vaccine>()
+                vaccines = new List<Vaccine>()
                     {
                         new Vaccine()
                         {
@@ -368,10 +368,10 @@ namespace Backend_Tests
         {
             return new AddVaccinationCenterRequest
             {
-                Name = "Punkt Szczepień Populacyjnych",
-                City = "Warszawa",
-                Street = "Żwirki i Wigury 95/97",
-                Active = true,
+                name = "Punkt Szczepień Populacyjnych",
+                city = "Warszawa",
+                street = "Żwirki i Wigury 95/97",
+                active = true,
                 openingHoursDays = new[]
                  {
                         new OpeningHoursDays()
@@ -411,7 +411,7 @@ namespace Backend_Tests
                         }
 
                     },
-                VaccineIds = new List<Guid>()
+                vaccineIds = new List<Guid>()
                     {
                         new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
                         new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f")
@@ -423,11 +423,11 @@ namespace Backend_Tests
         {
             return new EditedVaccinationCenter
             {
-                Id = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
-                Name = "Punkt Szczepień Populacyjnych",
-                City = "Warszawa",
-                Street = "Żwirki i Wigury 95/97",
-                Active = true,
+                id = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
+                name = "Punkt Szczepień Populacyjnych",
+                city = "Warszawa",
+                street = "Żwirki i Wigury 95/97",
+                active = true,
                 openingHoursDays = new[]
                  {
                         new OpeningHoursDays()
@@ -467,7 +467,7 @@ namespace Backend_Tests
                         }
 
                     },
-                VaccineIds = new List<Guid>()
+                vaccineIds = new List<Guid>()
                     {
                         new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f"),
                                 new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f")
@@ -484,7 +484,7 @@ namespace Backend_Tests
                 firstName = "Jan",
                 lastName = "Nowakowy",
                 dateOfBirth = new DateTime(1982, 12, 12),
-                pesel = "82121211111",
+                PESEL = "82121211111",
                 mail = "j.nowak@zmienionymail.com",
                 phoneNumber = "+48555221331",
                 active = true
@@ -591,7 +591,7 @@ namespace Backend_Tests
                 firstName = "Robert",
                 lastName = "Weide",
                 dateOfBirth = new DateTime(1959, 6, 20),
-                pesel = "59062011333",
+                PESEL = "59062011333",
                 mail = "robert.b.weide@mail.com",
                 phoneNumber = "+48125200331",
                 vaccinationCenterId = new Guid("56B289F4-FF8F-41D6-50B2-08DA13EF879D")
@@ -601,7 +601,7 @@ namespace Backend_Tests
         {
             return new RegisteringDoctor
             {
-                pesel = "88101023232",
+                PESEL = "88101023232",
                 firstName = "Alojzy",
                 lastName = "Prus",
                 dateOfBirth = new DateTime(1988, 10, 10),
@@ -780,7 +780,7 @@ namespace Backend_Tests
             doctors.Add(new DoctorResponse()
             {
                 id = new Guid("98A1B9A6-0E4E-46C7-443A-08DA1B08BAE6"),
-                pesel = "59062011333",
+                PESEL = "59062011333",
                 firstName = "Robert",
                 lastName = "Weide",
                 dateOfBirth = new DateTime(1959, 06, 20),
@@ -794,7 +794,7 @@ namespace Backend_Tests
             });
             doctors.Add(new DoctorResponse()
             {
-                pesel = "74011011111",
+                PESEL = "74011011111",
                 dateOfBirth = new DateTime(1974, 01, 10),
                 firstName = "Monika",
                 lastName = "Kowalska",
@@ -842,7 +842,7 @@ namespace Backend_Tests
             patients.Add(new PatientResponse()
             {
                 id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
-                pesel = "82121211111",
+                PESEL = "82121211111",
                 dateOfBirth = new DateTime(1982, 12, 12),
                 firstName = "Jan",
                 lastName = "Nowak",
@@ -853,7 +853,7 @@ namespace Backend_Tests
             patients.Add(new PatientResponse()
             {
                 id = new Guid("35D520DC-16AF-48E6-A309-08DA1B08BABF"),
-                pesel = "92120211122",
+                PESEL = "92120211122",
                 dateOfBirth = new DateTime(1992, 12, 02),
                 firstName = "Janina",
                 lastName = "Nowakowa",
@@ -903,7 +903,7 @@ namespace Backend_Tests
             return new PatientResponse()
             {
                 id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
-                pesel = "82121211111",
+                PESEL = "82121211111",
                 dateOfBirth = new DateTime(1982, 12, 12),
                 firstName = "Jan",
                 lastName = "Nowak",
@@ -950,15 +950,15 @@ namespace Backend_Tests
             {
                 new TimeSlotsResponse()
                 {
-                    Id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
-                    From = "2022-01-29T08:00",
-                    To = "2022-01-29T09:00"
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    from = "2022-01-29T08:00",
+                    to = "2022-01-29T09:00"
                 },
                 new TimeSlotsResponse()
                 {
-                    Id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
-                    From = "2022-01-29T09:00",
-                    To = "2022-01-29T10:00"
+                    id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
+                    from = "2022-01-29T09:00",
+                    to = "2022-01-29T10:00"
                 }
             };
             return timeSlots;

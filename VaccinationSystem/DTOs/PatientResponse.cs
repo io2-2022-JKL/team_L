@@ -11,7 +11,7 @@ namespace VaccinationSystem.Models
         [Key]
         public Guid id { get; set; }
         [Required]
-        public string pesel { get; set; }
+        public string PESEL { get; set; }
         [Required]
         public string firstName { get; set; }
         [Required]
