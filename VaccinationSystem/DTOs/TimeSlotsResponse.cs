@@ -9,13 +9,13 @@ namespace VaccinationSystem.DTOs
     public class TimeSlotsResponse
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         [Required]
-        public string From { get; set; }
+        public string from { get; set; }
         [Required]
-        public string To { get; set; }
+        public string to { get; set; }
         [Required]
-        public bool IsFree { get; set; }
+        public bool isFree { get; set; }
 
     }
 }

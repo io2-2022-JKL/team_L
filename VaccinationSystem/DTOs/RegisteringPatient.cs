@@ -15,18 +15,18 @@ namespace VaccinationSystem.Models
 
         [Required]
         [MinLength(1)]
-        public string Names { get; set; }
+        public string name { get; set; }
         [Required]
         [MinLength(1)]
-        public string Surname { get; set; }
+        public string surname { get; set; }
         [Required]
         [Mail]
-        public string Mail { get; set; }
+        public string mail { get; set; }
         [Required]
         [Password]
-        public string Password { get; set; }
+        public string password { get; set; }
         [Required]
         [MinLength(1)]
-        public string PhoneNumber { get; set; }
+        public string phoneNumber { get; set; }
     }
 }

@@ -193,15 +193,15 @@ namespace Backend_Tests
             {
                 new TimeSlotsResponse()
                 {
-                    Id = timeSlotID,
-                    From = "2022-01-29T08:00", 
-                    To = "2022-01-29T09:00"
+                    id = timeSlotID,
+                    from = "2022-01-29T08:00", 
+                    to = "2022-01-29T09:00"
                 },
                 new TimeSlotsResponse()
                 {
-                    Id = timeSlotID2,
-                    From = "2022-01-29T09:00",
-                    To = "2022-01-29T10:00"
+                    id = timeSlotID2,
+                    from = "2022-01-29T09:00",
+                    to = "2022-01-29T10:00"
                 }
             };
 
@@ -212,9 +212,9 @@ namespace Backend_Tests
         {
             return new CreateNewVisitRequest()
             {
-                From = DateTime.Parse("2022-01-29T08:00"),
-                To = DateTime.Parse("2022-01-29T09:00"),
-                TimeSlotDurationInMinutes = 15
+                from = DateTime.Parse("2022-01-29T08:00"),
+                to = DateTime.Parse("2022-01-29T09:00"),
+                timeSlotDurationInMinutes = 15
             };
         }
 
@@ -222,8 +222,8 @@ namespace Backend_Tests
         {
             return new EditedTimeSlot()
             {
-                From = DateTime.Parse("2022-01-29T08:00"),
-                To = DateTime.Parse("2022-01-29T09:00")
+                from = DateTime.Parse("2022-01-29T08:00"),
+                to = DateTime.Parse("2022-01-29T09:00")
             };
         }
     }
