@@ -343,7 +343,7 @@ namespace VaccinationSystem.Services
             var dbPatient = await dbContext.Patients.SingleAsync(pat => pat.id == patient.id);
             if (dbPatient != null)
             {
-                dbPatient.dateOfBirth = patient.dateOfBirth;
+                dbPatient.dateOfBirth = DateTime.Parse(patient.dateOfBirth);
                 dbPatient.firstName = patient.firstName;
                 dbPatient.lastName = patient.lastName;
                 dbPatient.mail = patient.mail;
@@ -351,6 +351,7 @@ namespace VaccinationSystem.Services
                 dbPatient.phoneNumber = patient.phoneNumber;
                 dbPatient.active = patient.active;
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -417,6 +418,7 @@ namespace VaccinationSystem.Services
                 dbDoctor.mail = doctor.mail;
                 dbDoctor.phoneNumber = doctor.phoneNumber;
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return false;
