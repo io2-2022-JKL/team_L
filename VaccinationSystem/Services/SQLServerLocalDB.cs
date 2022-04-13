@@ -89,15 +89,16 @@ namespace VaccinationSystem.Services
             Patient p = new Patient
             {
                 pesel = patient.PESEL,
-                firstName = patient.name,
-                lastName = patient.password,
+                firstName = patient.firstName,
+                lastName = patient.lastName,
                 mail = patient.mail,
                 password = patient.password,
                 phoneNumber = patient.phoneNumber,
                 active = true,
                 certificates = { },
                 vaccinationHistory = { },
-                futureVaccinations = { }
+                futureVaccinations = { },
+                dateOfBirth = DateTime.Parse(patient.dateOfBirth)
             };
 
 
