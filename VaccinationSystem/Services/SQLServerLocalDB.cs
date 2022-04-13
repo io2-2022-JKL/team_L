@@ -70,7 +70,7 @@ namespace VaccinationSystem.Services
                         PESEL = doctor.pesel,
                         firstName = doctor.firstName,
                         lastName = doctor.lastName,
-                        dateOfBirth = doctor.dateOfBirth,
+                        dateOfBirth = doctor.dateOfBirth.ToString("yyyy-MM-dd"),
                         mail = doctor.mail,
                         phoneNumber = doctor.phoneNumber,
                         active = doctor.active,
