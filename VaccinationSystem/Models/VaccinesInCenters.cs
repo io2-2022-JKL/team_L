@@ -7,17 +7,15 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public class Certificate
+    public class VaccinesInCenters
     {
         [Key]
         public Guid id { get; set; }
         [Required]
-        public string url { get; set; }
-        [Required]
         [ForeignKey("vaccineId")]
-        public Guid vaccineId { get; set; }
+        public Vaccine vaccine { get; set; }
         [Required]
-        [ForeignKey("patientId")]
-        public Guid patientId { get; set; }
+        [ForeignKey("vaccineCenterId")]
+        public VaccinationCenter vaccinationCenter { get; set; }
     }
 }

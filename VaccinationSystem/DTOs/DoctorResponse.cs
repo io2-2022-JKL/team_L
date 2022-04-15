@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public abstract class User
+    public class DoctorResponse
     {
         [Key]
         public Guid id { get; set; }
         [Required]
-        public string pesel { get; set; }
+        public string PESEL { get; set; }
         [Required]
         public string firstName { get; set; }
         [Required]
@@ -21,8 +21,17 @@ namespace VaccinationSystem.Models
         [Required]
         public string mail { get; set; }
         [Required]
-        public string password { get; set; }
-        [Required]
         public string phoneNumber { get; set; }
+        [Required]
+        public bool active { get; set; }
+        [Required]
+        public Guid vaccinationCenterId { get; set; }
+        [Required]
+        public string name { get; set; }
+        [Required]
+        public string city { get; set; }
+        [Required]
+        public string street { get; set; }
     }
 }
+
