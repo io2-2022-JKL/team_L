@@ -126,7 +126,7 @@ namespace Backend_Tests
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
-        /*[Fact]
+        [Fact]
         public async Task EditTimeSlotOk()
         {
             var mockDB = new Mock<IDatabase>();
@@ -139,9 +139,9 @@ namespace Backend_Tests
 
             Assert.IsType<OkObjectResult>(result);
 
-        }*/
+        }
 
-        /*[Fact]
+        [Fact]
         public async Task EditTimeSlotReturnsNotFound()
         {
             var mockDB = new Mock<IDatabase>();
@@ -154,7 +154,7 @@ namespace Backend_Tests
 
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(timeSlots);
             Assert.Equal("Data not found", notFoundResult.Value.ToString());
-        }*/
+        }
 
 
         [Fact]
