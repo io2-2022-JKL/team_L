@@ -28,8 +28,6 @@ namespace VaccinationSystem.Controllers
         [Route("vaccinationCenters")]
         public async Task<IActionResult> ShowVaccinationCenters()
         {
-
-
             List<VaccinationCenterResponse> centers;
             try
             {

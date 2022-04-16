@@ -515,5 +515,19 @@ namespace VaccinationSystem.Services
 
             return true;
         }
+
+        public Task<List<CertificatesResponse>> GetCertificates(Guid patientId)
+        {
+            var certs = dbContext.Certificates.Where(c => c.patientId == patientId).Select(c => new CertificatesResponse
+            {
+                id = c.id,
+                url = c.url,
+                vaccineCompany = dbContext.Vaccines.Where(v => v.id == c.vaccineId).Select(v => v.company).First(),
+                vaccineName = dbContext.Vaccines.Where(v => v.id == c.vaccineId).Select(v => v.name).First(),
+                virusType = dbContext.Vaccines.Where(v => v.id == c.vaccineId).Select(v => v.virus).First().ToString()
+            }).ToListAsync();
+
+            return certs;
+        }
     }
 }
