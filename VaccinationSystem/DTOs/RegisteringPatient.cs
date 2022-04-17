@@ -15,10 +15,10 @@ namespace VaccinationSystem.Models
 
         [Required]
         [MinLength(1)]
-        public string name { get; set; }
+        public string firstName { get; set; }
         [Required]
         [MinLength(1)]
-        public string surname { get; set; }
+        public string lastName { get; set; }
         [Required]
         [Mail]
         public string mail { get; set; }
@@ -28,5 +28,7 @@ namespace VaccinationSystem.Models
         [Required]
         [MinLength(1)]
         public string phoneNumber { get; set; }
+        [Required]
+        public string dateOfBirth { get; set; }
     }
 }

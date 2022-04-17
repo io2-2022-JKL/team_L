@@ -28,7 +28,7 @@ namespace VaccinationSystem.Services
                     PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
-                    dateOfBirth = patient.dateOfBirth,
+                    dateOfBirth = patient.dateOfBirth.ToString("yyyy-mm-dd"),
                     mail = patient.mail,
                     phoneNumber = patient.phoneNumber,
                     active = patient.active,
@@ -46,7 +46,7 @@ namespace VaccinationSystem.Services
                     PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
-                    dateOfBirth = patient.dateOfBirth,
+                    dateOfBirth = patient.dateOfBirth.ToString("yyyy-MM-dd"),
                     mail = patient.mail,
                     phoneNumber = patient.phoneNumber,
                     active = patient.active,
@@ -70,7 +70,7 @@ namespace VaccinationSystem.Services
                         PESEL = doctor.pesel,
                         firstName = doctor.firstName,
                         lastName = doctor.lastName,
-                        dateOfBirth = doctor.dateOfBirth,
+                        dateOfBirth = doctor.dateOfBirth.ToString("yyyy-MM-dd"),
                         mail = doctor.mail,
                         phoneNumber = doctor.phoneNumber,
                         active = doctor.active,
@@ -89,15 +89,16 @@ namespace VaccinationSystem.Services
             Patient p = new Patient
             {
                 pesel = patient.PESEL,
-                firstName = patient.name,
-                lastName = patient.password,
+                firstName = patient.firstName,
+                lastName = patient.lastName,
                 mail = patient.mail,
                 password = patient.password,
                 phoneNumber = patient.phoneNumber,
                 active = true,
                 certificates = { },
                 vaccinationHistory = { },
-                futureVaccinations = { }
+                futureVaccinations = { },
+                dateOfBirth = DateTime.Parse(patient.dateOfBirth)
             };
 
 
@@ -342,7 +343,7 @@ namespace VaccinationSystem.Services
             var dbPatient = await dbContext.Patients.SingleAsync(pat => pat.id == patient.id);
             if (dbPatient != null)
             {
-                dbPatient.dateOfBirth = patient.dateOfBirth;
+                dbPatient.dateOfBirth = DateTime.Parse(patient.dateOfBirth);
                 dbPatient.firstName = patient.firstName;
                 dbPatient.lastName = patient.lastName;
                 dbPatient.mail = patient.mail;
@@ -350,6 +351,7 @@ namespace VaccinationSystem.Services
                 dbPatient.phoneNumber = patient.phoneNumber;
                 dbPatient.active = patient.active;
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -416,6 +418,7 @@ namespace VaccinationSystem.Services
                 dbDoctor.mail = doctor.mail;
                 dbDoctor.phoneNumber = doctor.phoneNumber;
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return false;

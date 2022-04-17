@@ -57,7 +57,7 @@ namespace Backend_Tests
             {
                 id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
                 PESEL = "82121211111",
-                dateOfBirth = new DateTime(1982, 12, 12),
+                dateOfBirth = "1982-12-12",
                 firstName = "Jan",
                 lastName = "Nowak",
                 mail = "j.nowak@mail.com",

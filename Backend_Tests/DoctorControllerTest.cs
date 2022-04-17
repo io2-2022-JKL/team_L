@@ -10,6 +10,7 @@ using VaccinationSystem.Models;
 using VaccinationSystem.DTOs;
 using VaccinationSystem.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using VaccinationSystem.Contollers;
 
 namespace Backend_Tests
 {
@@ -24,7 +25,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ReturnsAsync(GetTimeSlots);
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var slots = await controller.GetTimeSlots(doctorID);
 
@@ -43,7 +44,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ReturnsAsync(new List<TimeSlotsResponse>());
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.GetTimeSlots(doctorID);
 
@@ -58,7 +59,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.GetTimeSlots(doctorID);
 
@@ -73,7 +74,7 @@ namespace Backend_Tests
             var mockSignIn = new Mock<IUserSignInManager>();
             var slots = GetCreateNewVisitRequest();
             mockDB.Setup(dB => dB.CreateTimeSlots(doctorID,slots));
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var result = await controller.CreateTimeSlots(doctorID, slots);
 
@@ -88,7 +89,7 @@ namespace Backend_Tests
             var mockSignIn = new Mock<IUserSignInManager>();
             var slots = GetCreateNewVisitRequest();
             mockDB.Setup(dB => dB.CreateTimeSlots(doctorID, slots)).ThrowsAsync(new ArgumentException());
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.CreateTimeSlots(doctorID, slots);
 
@@ -104,7 +105,7 @@ namespace Backend_Tests
             var mockSignIn = new Mock<IUserSignInManager>();
             var slots = GetCreateNewVisitRequest();
             mockDB.Setup(dB => dB.CreateTimeSlots(doctorID, slots)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.CreateTimeSlots(doctorID, slots);
 
@@ -118,7 +119,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             var slots = GetCreateNewVisitRequest();
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
             controller.ModelState.AddModelError("id", "Bad format");
 
             var result = await controller.CreateTimeSlots(doctorID, slots);
@@ -132,8 +133,8 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             var slot = GetEditedTimeSlot();
-            mockDB.Setup(dB => dB.EditTimeSlot(doctorID, timeSlotID, slot));
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            mockDB.Setup(dB => dB.EditTimeSlot(doctorID, timeSlotID, slot)).ReturnsAsync(()=>true);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var result = await controller.ModifyTimeSlot(doctorID, timeSlotID, slot);
 
@@ -142,18 +143,17 @@ namespace Backend_Tests
         }
 
         [Fact]
-        public async Task EditTimeSlotReturnsNotFound()
+        public async Task EditTimeSlotReturnsForbidden()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             var slot = GetEditedTimeSlot();
             mockDB.Setup(dB => dB.EditTimeSlot(doctorID, timeSlotID, slot)).ThrowsAsync(new ArgumentException());
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.ModifyTimeSlot(doctorID, timeSlotID, slot);
 
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(timeSlots);
-            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+            var notFoundResult = Assert.IsType<ForbidResult>(timeSlots);
         }
 
 
@@ -164,7 +164,7 @@ namespace Backend_Tests
             var mockSignIn = new Mock<IUserSignInManager>();
             var slot = GetEditedTimeSlot();
             mockDB.Setup(dB => dB.EditTimeSlot(doctorID, timeSlotID, slot)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.ModifyTimeSlot(doctorID, timeSlotID, slot);
 
@@ -178,7 +178,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             var slot = GetEditedTimeSlot();
-            var controller = new DoctorsController(mockSignIn.Object, mockDB.Object);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
             controller.ModelState.AddModelError("id", "Bad format");
 
             var result = await controller.ModifyTimeSlot(doctorID, timeSlotID, slot);
