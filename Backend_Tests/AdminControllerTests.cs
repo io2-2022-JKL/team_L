@@ -483,7 +483,7 @@ namespace Backend_Tests
                 id = patientID,
                 firstName = "Jan",
                 lastName = "Nowakowy",
-                dateOfBirth = new DateTime(1982, 12, 12),
+                dateOfBirth = "1982-12-12",
                 PESEL = "82121211111",
                 mail = "j.nowak@zmienionymail.com",
                 phoneNumber = "+48555221331",
@@ -783,7 +783,7 @@ namespace Backend_Tests
                 PESEL = "59062011333",
                 firstName = "Robert",
                 lastName = "Weide",
-                dateOfBirth = new DateTime(1959, 06, 20),
+                dateOfBirth = "1959-06-20",
                 mail = "robert.b.weide@mail.com",
                 phoneNumber = "+48125200331",
                 active = true,
@@ -795,7 +795,7 @@ namespace Backend_Tests
             doctors.Add(new DoctorResponse()
             {
                 PESEL = "74011011111",
-                dateOfBirth = new DateTime(1974, 01, 10),
+                dateOfBirth = "1974-01-10",
                 firstName = "Monika",
                 lastName = "Kowalska",
                 mail = "m.kowalska@mail.com",
@@ -843,7 +843,7 @@ namespace Backend_Tests
             {
                 id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
                 PESEL = "82121211111",
-                dateOfBirth = new DateTime(1982, 12, 12),
+                dateOfBirth = "1982-12-12",
                 firstName = "Jan",
                 lastName = "Nowak",
                 mail = "j.nowak@mail.com",
@@ -854,7 +854,7 @@ namespace Backend_Tests
             {
                 id = new Guid("35D520DC-16AF-48E6-A309-08DA1B08BABF"),
                 PESEL = "92120211122",
-                dateOfBirth = new DateTime(1992, 12, 02),
+                dateOfBirth = "1992-12-02",
                 firstName = "Janina",
                 lastName = "Nowakowa",
                 mail = "j.nowakowa@mail.com",
@@ -904,7 +904,7 @@ namespace Backend_Tests
             {
                 id = new Guid("522A0EC0-1727-44C9-A308-08DA1B08BABF"),
                 PESEL = "82121211111",
-                dateOfBirth = new DateTime(1982, 12, 12),
+                dateOfBirth = "1982-12-12",
                 firstName = "Jan",
                 lastName = "Nowak",
                 mail = "j.nowak@mail.com",

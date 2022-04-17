@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
+using VaccinationSystem.DTOs;
 
 namespace VaccinationSystem.Contollers
 {
@@ -30,6 +31,105 @@ namespace VaccinationSystem.Contollers
                 return Ok(patient);
             else
                 return NotFound("Data not found");
+        }
+        [HttpGet]
+        [Route("timeSlots/{doctorId}")]
+        public async Task<IActionResult> GetTimeSlots([FromRoute] Guid doctorId)
+        {
+            List<TimeSlotsResponse> timeSlots;
+            try
+            {
+                timeSlots = await dbManager.GetTimeSlots(doctorId);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (timeSlots == null || timeSlots.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(timeSlots);
+        }
+        [HttpPost]
+        [Route("timeSlots/create/{doctorId}")]
+        public async Task<IActionResult> CreateTimeSlots([FromRoute] Guid doctorId, [FromBody] CreateNewVisitRequest newVisit)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid model");
+
+            try
+            {
+                await dbManager.CreateTimeSlots(doctorId, newVisit);
+
+            }
+            catch (ArgumentException _)
+            {
+                return NotFound("Data not found");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return BadRequest("Something went wrong");
+            }
+
+
+            return Ok("TIme slot added");
+        }
+
+        [HttpPost]
+        [Route("timeSlots/delete/{doctorId}")]
+        public async Task<IActionResult> DeleteTimeSlot([FromRoute] Guid doctorId, [FromBody] List<DeleteTimeSlot> ids)
+        {
+
+            bool deleted = false;
+            try
+            {
+                deleted = await dbManager.DeleteTimeSlots(doctorId, ids);
+            }
+            catch (ArgumentException _)
+            {
+                return Forbid("Usr forbidden from deleting");
+            }
+            catch (Exception _)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (deleted)
+                return Ok("Time slots deleted");
+
+            return NotFound("Data not found");
+        }
+
+        [HttpPost]
+        [Route("timeSlots/modify/{doctorId}/{timeSlotId}")]
+        public async Task<IActionResult> ModifyTimeSlot([FromRoute] Guid doctorId, [FromRoute] Guid timeSlotId, [FromBody] EditedTimeSlot slot)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data");
+            }
+            bool deleted = false;
+            try
+            {
+                deleted = await dbManager.EditTimeSlot(doctorId, timeSlotId, slot);
+            }
+            catch (ArgumentException _)
+            {
+                return Forbid("Usr forbidden from modifying");
+            }
+            catch (Exception _)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (deleted)
+                return Ok("Time slots modified");
+
+            return NotFound("Data not found");
         }
     }
 }
