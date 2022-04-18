@@ -89,9 +89,9 @@ namespace VaccinationSystem.Contollers
             {
                 deleted = await dbManager.DeleteTimeSlots(doctorId, ids);
             }
-            catch (ArgumentException _)
+            catch (ArgumentException )
             {
-                return Forbid("Usr forbidden from deleting");
+                return StatusCode(403,"Usr forbidden from deleting");
             }
             catch (Exception)
             {
@@ -117,11 +117,11 @@ namespace VaccinationSystem.Contollers
             {
                 deleted = await dbManager.EditTimeSlot(doctorId, timeSlotId, slot);
             }
-            catch (ArgumentException _)
+            catch (ArgumentException)
             {
-                return Forbid("Usr forbidden from modifying");
+                return StatusCode(403,"Usr forbidden from modifying");
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return BadRequest("Something went wrong");
             }

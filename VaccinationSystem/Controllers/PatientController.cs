@@ -43,7 +43,7 @@ namespace VaccinationSystem.Controllers
             if (made)
                 return Ok("Booked a time slot");
 
-            return BadRequest("Data not found");
+            return NotFound("Data not found");
         }
     }
 }
