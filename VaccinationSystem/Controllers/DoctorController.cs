@@ -93,7 +93,7 @@ namespace VaccinationSystem.Contollers
             {
                 return Forbid("Usr forbidden from deleting");
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return BadRequest("Something went wrong");
             }

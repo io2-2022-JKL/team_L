@@ -518,5 +518,47 @@ namespace VaccinationSystem.Services
 
             return true;
         }
+
+        public async Task<TimeSlot> GetTimeSlot(Guid timeSlotId)
+        {
+            var timeSlot = await dbContext.TimeSlots.SingleOrDefaultAsync(t => t.id == timeSlotId);
+
+            return timeSlot;
+        }
+
+        public async Task<bool> MakeAppointment(Guid patientId, Guid timeSlotId, Guid vaccineID)
+        {
+            var timeSlot = await GetTimeSlot(timeSlotId);
+            var vaccine = await GetVaccine(vaccineID);
+            var patient = await dbContext.Patients.SingleOrDefaultAsync(p => p.id == patientId);
+
+            if (timeSlot == null || vaccine == null || patient == null)
+                return false;
+
+            await dbContext.Database.BeginTransactionAsync();
+            if(!timeSlot.isFree)
+            {
+                await dbContext.Database.RollbackTransactionAsync();
+                throw new ArgumentException();
+            }
+
+            timeSlot.isFree = false;
+            var appointment = new Appointment()
+            {
+                patient = patient,
+                timeSlot = timeSlot,
+                vaccine = vaccine,
+                state = AppointmentState.Planned,
+                whichDose = 1,
+            };
+
+            dbContext.Appointments.Add(appointment);
+
+            
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
+
+            return true;
+        }
     }
 }
