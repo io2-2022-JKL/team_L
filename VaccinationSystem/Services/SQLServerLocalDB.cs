@@ -109,23 +109,24 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail)==0).FirstOrDefault();
-            if (patient != null && patient.password.CompareTo(login.password) == 0)
+            var doctor = dbContext.Doctors.Where(d => d.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            if (doctor != null && doctor.password.CompareTo(login.password) == 0)
             {
-                return new LoginResponse() {
-                    userId = patient.id,
-                    userType = "patient"
+                return new LoginResponse()
+                {
+                    userId = doctor.id,
+                    userType = "doctor"
                 };
             }
             else
             {
-                var doctor = dbContext.Doctors.Where(d => d.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-                if (doctor != null && doctor.password.CompareTo(login.password) == 0)
+                var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                if (patient != null && patient.password.CompareTo(login.password) == 0)
                 {
                     return new LoginResponse()
                     {
-                        userId = doctor.id,
-                        userType = "doctor"
+                        userId = patient.id,
+                        userType = "patient"
                     };
                 }
                 else

@@ -74,8 +74,8 @@ namespace VaccinationSystem.Controllers
             else
                 return BadRequest("Bad arguments");
         }
-        [Route("/user/Logout/{userId}")]
-        [HttpPost]
+        [Route("/user/logout/{userId}")]
+        [HttpGet]
         public IActionResult Post([FromRoute] string userId)
         {
 
