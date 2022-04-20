@@ -76,11 +76,11 @@ namespace VaccinationSystem.Controllers
         }
         [Route("/user/logout/{userId}")]
         [HttpGet]
-        public IActionResult Post([FromRoute] string userId)
+        public IActionResult Logout([FromRoute] string userId)
         {
 
             //signInManager.SignOut(userId);
-            return Ok();
+            return Ok("OK, successfully logged out");
         }
 
     }
