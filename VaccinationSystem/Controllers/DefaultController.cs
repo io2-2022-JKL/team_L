@@ -74,13 +74,13 @@ namespace VaccinationSystem.Controllers
             else
                 return BadRequest("Bad arguments");
         }
-        [Route("/user/Logout/{userId}")]
-        [HttpPost]
-        public IActionResult Post([FromRoute] string userId)
+        [Route("/user/logout/{userId}")]
+        [HttpGet]
+        public IActionResult Logout([FromRoute] string userId)
         {
 
             //signInManager.SignOut(userId);
-            return Ok();
+            return Ok("OK, successfully logged out");
         }
 
     }
