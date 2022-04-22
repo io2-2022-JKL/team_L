@@ -45,5 +45,35 @@ namespace VaccinationSystem.Controllers
 
             return NotFound("Data not found");
         }
+
+        [HttpGet]
+        [Route("timeSlots/Filter")]
+        public async Task<IActionResult> GetTimeSlots(string city, string virus, string dateFrom, string dateTo)
+        {
+            var filter = new TimeSlotsFilter()
+            {
+                city = city,
+                virus = virus,
+                dateFrom = dateFrom,
+                dateTo = dateTo
+            };
+            List<FilterTimeSlotResponse> timeSlots;
+            try
+            {
+                timeSlots = await dbManager.GetTimeSlots(filter);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.Write(e.StackTrace);
+                return BadRequest("Something went wrong");
+            }
+
+            if (timeSlots == null || timeSlots.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(timeSlots);
+        }
     }
 }
