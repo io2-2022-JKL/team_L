@@ -24,7 +24,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.MakeAppointment(patientID,timeSlotID,vaccineID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.MakeAppointment(patientID, timeSlotID, vaccineID)).ReturnsAsync(() => true);
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
 
             var result = await controller.MakeAppointment(patientID, timeSlotID, vaccineID);
@@ -67,12 +67,51 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.MakeAppointment(patientID, timeSlotID, vaccineID)).ReturnsAsync(()=>false);
+            mockDB.Setup(dB => dB.MakeAppointment(patientID, timeSlotID, vaccineID)).ReturnsAsync(() => false);
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
 
             var timeSlots = await controller.MakeAppointment(patientID, timeSlotID, vaccineID);
 
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(timeSlots);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+
+        private List<CertificatesResponse> GetCertificates()
+        {
+            var certs = new List<CertificatesResponse>();
+            certs.Add(new CertificatesResponse
+            {
+                url = "placeholder",
+                vaccineName = "Pfeizer vaccine",
+                vaccineCompany = "Pfeizer",
+                virusType = "Coronavirus"
+            });
+            return certs;
+        }
+        [Fact]
+        public async Task GetCertificatesReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetCertificates(patientID)).ReturnsAsync(GetCertificates);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var certs = await controller.GetCertificates(patientID);
+
+            var okResult = Assert.IsType<OkObjectResult>(certs);
+            var returnValue = Assert.IsType<List<CertificatesResponse>>(okResult.Value);
+            Assert.Single(returnValue); // zamiast Assert.Equal(1, returnValue.Count)
+        }
+
+        [Fact]
+        public async Task GetCertificatesReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetCertificates(patientID)).ReturnsAsync(new List<CertificatesResponse>());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var certs = await controller.GetCertificates(patientID);
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(certs);
             Assert.Equal("Data not found", notFoundResult.Value.ToString());
         }
 
