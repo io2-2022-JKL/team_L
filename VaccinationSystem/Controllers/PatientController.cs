@@ -47,7 +47,7 @@ namespace VaccinationSystem.Controllers
         }
 
         [Route("certificates/{patientId}")]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> GetCertificates([FromRoute] Guid patientId)
         {
             List<CertificatesResponse> certs;
