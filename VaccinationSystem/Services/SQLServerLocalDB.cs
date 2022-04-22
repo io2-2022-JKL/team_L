@@ -28,7 +28,7 @@ namespace VaccinationSystem.Services
                     PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
-                    dateOfBirth = patient.dateOfBirth,
+                    dateOfBirth = patient.dateOfBirth.ToString("yyyy-mm-dd"),
                     mail = patient.mail,
                     phoneNumber = patient.phoneNumber,
                     active = patient.active,
@@ -46,7 +46,7 @@ namespace VaccinationSystem.Services
                     PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
-                    dateOfBirth = patient.dateOfBirth,
+                    dateOfBirth = patient.dateOfBirth.ToString("yyyy-MM-dd"),
                     mail = patient.mail,
                     phoneNumber = patient.phoneNumber,
                     active = patient.active,
@@ -70,7 +70,7 @@ namespace VaccinationSystem.Services
                         PESEL = doctor.pesel,
                         firstName = doctor.firstName,
                         lastName = doctor.lastName,
-                        dateOfBirth = doctor.dateOfBirth,
+                        dateOfBirth = doctor.dateOfBirth.ToString("yyyy-MM-dd"),
                         mail = doctor.mail,
                         phoneNumber = doctor.phoneNumber,
                         active = doctor.active,
@@ -89,15 +89,16 @@ namespace VaccinationSystem.Services
             Patient p = new Patient
             {
                 pesel = patient.PESEL,
-                firstName = patient.name,
-                lastName = patient.password,
+                firstName = patient.firstName,
+                lastName = patient.lastName,
                 mail = patient.mail,
                 password = patient.password,
                 phoneNumber = patient.phoneNumber,
                 active = true,
                 certificates = { },
                 vaccinationHistory = { },
-                futureVaccinations = { }
+                futureVaccinations = { },
+                dateOfBirth = DateTime.Parse(patient.dateOfBirth)
             };
 
 
@@ -108,23 +109,24 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail)==0).FirstOrDefault();
-            if (patient != null && patient.password.CompareTo(login.password) == 0)
+            var doctor = dbContext.Doctors.Where(d => d.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            if (doctor != null && doctor.password.CompareTo(login.password) == 0)
             {
-                return new LoginResponse() {
-                    userId = patient.id,
-                    userType = "patient"
+                return new LoginResponse()
+                {
+                    userId = doctor.id,
+                    userType = "doctor"
                 };
             }
             else
             {
-                var doctor = dbContext.Doctors.Where(d => d.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-                if (doctor != null && doctor.password.CompareTo(login.password) == 0)
+                var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                if (patient != null && patient.password.CompareTo(login.password) == 0)
                 {
                     return new LoginResponse()
                     {
-                        userId = doctor.id,
-                        userType = "doctor"
+                        userId = patient.id,
+                        userType = "patient"
                     };
                 }
                 else
@@ -342,7 +344,7 @@ namespace VaccinationSystem.Services
             var dbPatient = await dbContext.Patients.SingleAsync(pat => pat.id == patient.id);
             if (dbPatient != null)
             {
-                dbPatient.dateOfBirth = patient.dateOfBirth;
+                dbPatient.dateOfBirth = DateTime.Parse(patient.dateOfBirth);
                 dbPatient.firstName = patient.firstName;
                 dbPatient.lastName = patient.lastName;
                 dbPatient.mail = patient.mail;
@@ -350,6 +352,7 @@ namespace VaccinationSystem.Services
                 dbPatient.phoneNumber = patient.phoneNumber;
                 dbPatient.active = patient.active;
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -416,6 +419,7 @@ namespace VaccinationSystem.Services
                 dbDoctor.mail = doctor.mail;
                 dbDoctor.phoneNumber = doctor.phoneNumber;
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -512,6 +516,48 @@ namespace VaccinationSystem.Services
             }
 
             await dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<TimeSlot> GetTimeSlot(Guid timeSlotId)
+        {
+            var timeSlot = await dbContext.TimeSlots.SingleOrDefaultAsync(t => t.id == timeSlotId);
+
+            return timeSlot;
+        }
+
+        public async Task<bool> MakeAppointment(Guid patientId, Guid timeSlotId, Guid vaccineID)
+        {
+            var timeSlot = await GetTimeSlot(timeSlotId);
+            var vaccine = await GetVaccine(vaccineID);
+            var patient = await dbContext.Patients.SingleOrDefaultAsync(p => p.id == patientId);
+
+            if (timeSlot == null || vaccine == null || patient == null)
+                return false;
+
+            await dbContext.Database.BeginTransactionAsync();
+            if(!timeSlot.isFree)
+            {
+                await dbContext.Database.RollbackTransactionAsync();
+                throw new ArgumentException();
+            }
+
+            timeSlot.isFree = false;
+            var appointment = new Appointment()
+            {
+                patient = patient,
+                timeSlot = timeSlot,
+                vaccine = vaccine,
+                state = AppointmentState.Planned,
+                whichDose = 1,
+            };
+
+            dbContext.Appointments.Add(appointment);
+
+            
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
 
             return true;
         }

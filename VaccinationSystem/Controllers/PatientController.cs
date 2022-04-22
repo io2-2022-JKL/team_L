@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,28 +10,24 @@ using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
+using VaccinationSystem.DTOs;
 
 namespace VaccinationSystem.Controllers
 {
     [Route("patient")]
     [ApiController]
-    public class PatientController : Controller
+    public class PatientController : ControllerBase
     {
+        private IUserSignInManager signInManager;
         private IDatabase dbManager;
 
         public PatientController(IUserSignInManager signInManager, IDatabase db)
         {
+            this.signInManager = signInManager;
             dbManager = db;
         }
-        [Route("certificates/{patientId}")]
-        [HttpGet]
-        public async Task<IActionResult> GetCertificates([FromRoute] Guid patientId)
         {
-            var certificates = await dbManager.GetCertificates(patientId);
-            if (certificates != null && certificates.Count != 0)
-                return Ok(certificates);
-            else
-                return NotFound("Data not found");
+            return NotFound("Data not found");
         }
     }
 }

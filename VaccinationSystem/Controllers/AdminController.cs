@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.Data;
 using VaccinationSystem.Models;
-using VaccinationSystem.Repositories;
 using VaccinationSystem.Services;
-using VaccinationSystem.Services;
-using VaccinationSystem.Models;
 using VaccinationSystem.DTOs;
 
 namespace VaccinationSystem.Controllers

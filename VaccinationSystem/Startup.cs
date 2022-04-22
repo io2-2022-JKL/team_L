@@ -27,6 +27,8 @@ namespace VaccinationSystem
                        .AllowAnyMethod()
                        .AllowAnyHeader();
             }));
+            services.AddControllers()
+            .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
             services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
