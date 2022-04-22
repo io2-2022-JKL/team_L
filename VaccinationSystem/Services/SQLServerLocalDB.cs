@@ -566,7 +566,6 @@ namespace VaccinationSystem.Services
         {
             var certs = dbContext.Certificates.Where(c => c.patientId == patientId).Select(c => new CertificatesResponse
             {
-                id = c.id,
                 url = c.url,
                 vaccineCompany = dbContext.Vaccines.Where(v => v.id == c.vaccineId).Select(v => v.company).First(),
                 vaccineName = dbContext.Vaccines.Where(v => v.id == c.vaccineId).Select(v => v.name).First(),

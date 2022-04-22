@@ -10,8 +10,6 @@ namespace VaccinationSystem.DTOs
     public class CertificatesResponse
     {
         [Required]
-        public Guid id { get; set; }
-        [Required]
         public string url { get; set; }
         [Required]
         public string vaccineName { get; set; }
