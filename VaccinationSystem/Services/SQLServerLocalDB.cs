@@ -352,6 +352,19 @@ namespace VaccinationSystem.Services
                 dbPatient.phoneNumber = patient.phoneNumber;
                 dbPatient.active = patient.active;
 
+                var doctor = await dbContext.Doctors.Include(d => d.patientAccount).SingleOrDefaultAsync(d => d.patientAccount.id == dbPatient.id);
+                if(doctor != null)
+                {
+                    doctor.dateOfBirth = DateTime.Parse(patient.dateOfBirth);
+                    doctor.firstName = patient.firstName;
+                    doctor.lastName = patient.lastName;
+                    doctor.mail = patient.mail;
+                    doctor.pesel = patient.PESEL;
+                    doctor.phoneNumber = patient.phoneNumber;
+                    if(!patient.active)
+                        doctor.active = patient.active;
+                }
+
                 await dbContext.SaveChangesAsync();
                 return true;
             }
