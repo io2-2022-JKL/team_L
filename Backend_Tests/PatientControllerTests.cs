@@ -94,7 +94,7 @@ namespace Backend_Tests
 
 
             var returnValue = Assert.IsType<FilterTimeSlotsControllerResponse>(okResult.Value);
-            Assert.Equal(1, returnValue.data.Count);
+            Assert.Single(returnValue.data);
 
         }
 

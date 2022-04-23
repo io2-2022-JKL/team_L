@@ -72,7 +72,6 @@ namespace VaccinationSystem.Controllers
                 return BadRequest("Something went wrong");
             }
 
-            System.IO.File.WriteAllText("C:\\Users\\agowo\\Desktop\\file.txt", timeSlots.Count.ToString());
 
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");
