@@ -562,6 +562,60 @@ namespace VaccinationSystem.Services
             return true;
         }
 
+        public async Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter)
+        {
+            var timeSlots = new List<FilterTimeSlotResponse>();
+            foreach(var tS in dbContext.TimeSlots.Include(tS=>tS.doctor).Include(ts=>ts.doctor.vaccinationCenter))
+            {
+                if (tS.from < DateTime.Parse(filter.dateFrom) || tS.to > DateTime.Parse(filter.dateTo)||!tS.isFree)
+                    continue;
+
+                var doctor = tS.doctor;
+                if (doctor == null)
+                    continue;
+
+                var vC = doctor.vaccinationCenter;
+
+                if (vC.city != filter.city)
+                    continue;
+
+                var vaccs = await GetVaccinesFromVaccinationCenter(vC.id);
+
+                var vaccies = vaccs.Where(v=> (Virus)Enum.Parse(typeof(Virus), filter.virus) == v.virus)
+                    .Select(v =>
+                new SimplifiedVaccine()
+                {
+                    id = v.id,
+                    maxDaysBetweenDoses = v.maxDaysBetweenDoses,
+                    company = v.company,
+                    maxPatientAge = v.maxPatientAge,
+                    minPatientAge = v.minPatientAge,
+                    minDaysBetweenDoses = v.minDaysBetweenDoses,
+                    name = v.name,
+                    numberOfDoses = v.numberOfDoses,
+                    virus = v.virus.ToString()
+                }).ToList();
+
+                if (vaccies == null || vaccies.Count() == 0)
+                    continue;
+
+                timeSlots.Add(new FilterTimeSlotResponse()
+                {
+                    id = tS.id,
+                    @from = tS.from.ToString("dd-MM-yyyy"),
+                    to = tS.to.ToString("dd-MM-yyyy"),
+                    vaccinationCenterName = vC.name,
+                    vaccinationCenterCity = vC.city,
+                    vaccinationCenterStreet = vC.address,
+                    openingHours = GetOpeningHoursFromVaccinationCenter(vC.id).Result,
+                    availableVaccines = vaccies,
+                    doctorFirstName = doctor.firstName,
+                    doctorLastName = doctor.firstName,
+                });
+            }
+
+            return timeSlots;
+        }
         public Task<List<CertificatesResponse>> GetCertificates(Guid patientId)
         {
             var certs = dbContext.Certificates.Where(c => c.patientId == patientId).Select(c => new CertificatesResponse
@@ -575,4 +629,5 @@ namespace VaccinationSystem.Services
             return certs;
         }
     }
+
 }

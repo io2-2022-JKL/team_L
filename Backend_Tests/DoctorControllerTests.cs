@@ -20,7 +20,7 @@ namespace Backend_Tests
         private Guid timeSlotID2 = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5");
         private Guid doctorID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
         [Fact]
-        public async Task GetTimeSlotsReturnsCenters()
+        public async Task GetTimeSlotsReturnsTImeSlots()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();

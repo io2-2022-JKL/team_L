@@ -76,6 +76,81 @@ namespace Backend_Tests
             Assert.Equal("Data not found", notFoundResult.Value.ToString());
         }
 
+        [Fact]
+        public async Task GetTimeSlotsReturnsTimeSlots()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var response = GetFilterTimeSlotResponse();
+            if (response == null)
+                throw new ArgumentException();
+
+            mockDB.Setup(dB => dB.GetTimeSlotsWithFiltration(It.IsAny<TimeSlotsFilter>())).ReturnsAsync(()=>response);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+
+            var slots = await controller.GetTimeSlots(city: "Warszawa",virus: "Coronavirus",dateFrom: "12-12-2022", dateTo: "22-12-2022");
+
+            var okResult = Assert.IsType<OkObjectResult>(slots);
+
+
+            var returnValue = Assert.IsType<FilterTimeSlotsControllerResponse>(okResult.Value);
+            Assert.Single(returnValue.data);
+
+        }
+
+        [Fact]
+        public async Task GetTimeSlotsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetTimeSlotsWithFiltration(It.IsAny<TimeSlotsFilter>())).ReturnsAsync(new List<FilterTimeSlotResponse>());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+
+            var slots = await controller.GetTimeSlots("Warszawa", "Coronavirus", "12-12-2022", "22-12-2022");
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(slots);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+
+
+        [Fact]
+        public async Task GetTimeSlotsReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetTimeSlotsWithFiltration(It.IsAny<TimeSlotsFilter>())).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+
+            var slots = await controller.GetTimeSlots("Warszawa", "Coronavirus", "12-12-2022", "22-12-2022");
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(slots);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        
+
+        private List<FilterTimeSlotResponse> GetFilterTimeSlotResponse()
+        {
+            var tS = new FilterTimeSlotResponse()
+            {
+                availableVaccines = new List<SimplifiedVaccine>(),
+                doctorLastName = "BBB",
+                doctorFirstName = "AAA",
+                from = "12-12-2000",
+                to = "12-12-3000",
+                id = new Guid(),
+                openingHours = new List<OpeningHoursDays>(),
+                vaccinationCenterCity = "Warszawa",
+                vaccinationCenterName = "ABC",
+                vaccinationCenterStreet = "askskaks"
+       
+            };
+
+            var list = new List<FilterTimeSlotResponse>();
+            list.Add(tS);
+
+            return list;
+        }
+
         private List<CertificatesResponse> GetCertificates()
         {
             var certs = new List<CertificatesResponse>();

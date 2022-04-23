@@ -46,6 +46,40 @@ namespace VaccinationSystem.Controllers
             return NotFound("Data not found");
         }
 
+        [HttpGet]
+        [Route("timeSlots/Filter")]
+        public async Task<IActionResult> GetTimeSlots(string city, string virus, string dateFrom, string dateTo)
+        {
+            if (city == null || virus == null || dateFrom == null || dateTo == null)
+                return BadRequest("Invalid model");
+
+            var filter = new TimeSlotsFilter()
+            {
+                city = city,
+                virus = virus,
+                dateFrom = dateFrom,
+                dateTo = dateTo
+            };
+            List<FilterTimeSlotResponse> timeSlots;
+            try
+            {
+                timeSlots = await dbManager.GetTimeSlotsWithFiltration(filter);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return BadRequest("Something went wrong");
+            }
+
+
+            if (timeSlots == null || timeSlots.Count == 0)
+                return NotFound("Data not found");
+
+            var response = new FilterTimeSlotsControllerResponse() { data = timeSlots };
+            return Ok(response);
+        }
+
         [Route("certificates/{patientId}")]
         [HttpGet]
         public async Task<IActionResult> GetCertificates([FromRoute] Guid patientId)
