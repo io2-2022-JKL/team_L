@@ -33,7 +33,7 @@ namespace VaccinationSystem.Controllers
             }
             catch (ArgumentException)
             {
-                return StatusCode(403,"User forbidden from booking");
+                return StatusCode(403, "User forbidden from booking");
             }
             catch (Exception)
             {
@@ -78,6 +78,27 @@ namespace VaccinationSystem.Controllers
 
             var response = new FilterTimeSlotsControllerResponse() { data = timeSlots };
             return Ok(response);
+        }
+
+        [Route("certificates/{patientId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetCertificates([FromRoute] Guid patientId)
+        {
+            List<CertificatesResponse> certs;
+            try
+            {
+                certs = await dbManager.GetCertificates(patientId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (certs == null || certs.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(certs);
         }
     }
 }
