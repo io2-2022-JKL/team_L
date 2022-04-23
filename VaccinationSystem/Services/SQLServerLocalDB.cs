@@ -420,7 +420,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> EditDoctor(EditedDoctor doctor)
         {
-            var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.id == doctor.id);
+            var dbDoctor = await dbContext.Doctors.Include(d=>d.patientAccount).SingleAsync(doc => doc.id == doctor.id);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             if (dbDoctor != null)
             {
@@ -428,9 +428,20 @@ namespace VaccinationSystem.Services
                 dbDoctor.firstName = doctor.firstName;
                 dbDoctor.lastName = doctor.lastName;
                 dbDoctor.vaccinationCenter = center;
-                dbDoctor.dateOfBirth = doctor.dateOfBirth;
+                dbDoctor.dateOfBirth = DateTime.Parse(doctor.dateOfBirth);
                 dbDoctor.mail = doctor.mail;
                 dbDoctor.phoneNumber = doctor.phoneNumber;
+
+                var patient = await dbContext.Patients.SingleOrDefaultAsync(p => p.id == dbDoctor.patientAccount.id);
+                if(patient!=null)
+                {
+                    patient.pesel = doctor.PESEL;
+                    patient.firstName = doctor.firstName;
+                    patient.lastName = doctor.lastName;
+                    patient.dateOfBirth = DateTime.Parse(doctor.dateOfBirth);
+                    patient.mail = doctor.mail;
+                    patient.phoneNumber = doctor.phoneNumber;
+                }
 
                 await dbContext.SaveChangesAsync();
                 return true;
@@ -580,7 +591,7 @@ namespace VaccinationSystem.Services
             var timeSlots = new List<FilterTimeSlotResponse>();
             foreach(var tS in dbContext.TimeSlots.Include(tS=>tS.doctor).Include(ts=>ts.doctor.vaccinationCenter))
             {
-                if (tS.from < DateTime.Parse(filter.dateFrom) || tS.to > DateTime.Parse(filter.dateTo)||!tS.isFree)
+                if (tS.from < DateTime.Parse(filter.dateFrom) || tS.to > DateTime.Parse(filter.dateTo)||!tS.isFree||!tS.active)
                     continue;
 
                 var doctor = tS.doctor;
