@@ -562,9 +562,8 @@ namespace VaccinationSystem.Services
             return true;
         }
 
-        public async Task<List<FilterTimeSlotResponse>> GetTimeSlots(TimeSlotsFilter filter)
+        public async Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter)
         {
-
             var timeSlots = new List<FilterTimeSlotResponse>();
             foreach(var tS in dbContext.TimeSlots.Include(tS=>tS.doctor).Include(ts=>ts.doctor.vaccinationCenter))
             {
@@ -580,8 +579,9 @@ namespace VaccinationSystem.Services
                 if (vC.city != filter.city)
                     continue;
 
-                var vaccies = GetVaccinesFromVaccinationCenter(vC.id).Result
-                    .Where(v=> (Virus)Enum.Parse(typeof(Virus), filter.virus) == v.virus)
+                var vaccs = await GetVaccinesFromVaccinationCenter(vC.id);
+
+                var vaccies = vaccs.Where(v=> (Virus)Enum.Parse(typeof(Virus), filter.virus) == v.virus)
                     .Select(v =>
                 new SimplifiedVaccine()
                 {

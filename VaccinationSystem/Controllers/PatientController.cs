@@ -50,6 +50,9 @@ namespace VaccinationSystem.Controllers
         [Route("timeSlots/Filter")]
         public async Task<IActionResult> GetTimeSlots(string city, string virus, string dateFrom, string dateTo)
         {
+            if (city == null || virus == null || dateFrom == null || dateTo == null)
+                return BadRequest("Invalid model");
+
             var filter = new TimeSlotsFilter()
             {
                 city = city,
@@ -60,20 +63,22 @@ namespace VaccinationSystem.Controllers
             List<FilterTimeSlotResponse> timeSlots;
             try
             {
-                timeSlots = await dbManager.GetTimeSlots(filter);
+                timeSlots = await dbManager.GetTimeSlotsWithFiltration(filter);
 
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                Console.Write(e.StackTrace);
+                Console.WriteLine(e.StackTrace);
                 return BadRequest("Something went wrong");
             }
+
+            System.IO.File.WriteAllText("C:\\Users\\agowo\\Desktop\\file.txt", timeSlots.Count.ToString());
 
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");
 
-            return Ok(timeSlots);
+            var response = new FilterTimeSlotsControllerResponse() { data = timeSlots };
+            return Ok(response);
         }
     }
 }
