@@ -590,7 +590,7 @@ namespace Backend_Tests
                 id = doctorID,
                 firstName = "Robert",
                 lastName = "Weide",
-                dateOfBirth = new DateTime(1959, 6, 20),
+                dateOfBirth = "1959-06-20",
                 PESEL = "59062011333",
                 mail = "robert.b.weide@mail.com",
                 phoneNumber = "+48125200331",
