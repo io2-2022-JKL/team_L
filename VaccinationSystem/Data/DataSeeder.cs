@@ -386,7 +386,7 @@ namespace VaccinationSystem.Data
                     {
                         from = new DateTime(2022, 03, 25, 12, 30, 00),
                         to = new DateTime(2022, 03, 25, 12, 45, 00),
-                        isFree = true,
+                        isFree = false,
                         active = true,
                         doctor = doctorWeide
                     },
@@ -394,7 +394,7 @@ namespace VaccinationSystem.Data
                     {
                         from = new DateTime(2022, 04, 23, 12, 30, 00),
                         to = new DateTime(2022, 04, 23, 12, 45, 00),
-                        isFree = true,
+                        isFree = false,
                         active = true,
                         doctor = doctorWeide
                     },
@@ -402,7 +402,7 @@ namespace VaccinationSystem.Data
                     {
                         from = new DateTime(2022, 04, 23, 13, 30, 00),
                         to = new DateTime(2022, 04, 23, 13, 45, 00),
-                        isFree = true,
+                        isFree = false,
                         active = true,
                         doctor = doctorWeide
                     },
@@ -410,7 +410,7 @@ namespace VaccinationSystem.Data
                     {
                         from = new DateTime(2022, 05, 25, 12, 45, 00),
                         to = new DateTime(2022, 05, 25, 13, 00, 00),
-                        isFree = true,
+                        isFree = false,
                         active = true,
                         doctor = doctorWeide
                     },
@@ -445,13 +445,204 @@ namespace VaccinationSystem.Data
                         isFree = false,
                         active = false,
                         doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 9, 15, 00),
+                        to = new DateTime(2022, 05, 20, 9, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 9, 30, 00),
+                        to = new DateTime(2022, 05, 20, 9, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                     new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 10, 15, 00),
+                        to = new DateTime(2022, 05, 20, 10, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 10, 30, 00),
+                        to = new DateTime(2022, 05, 20, 10, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 9, 15, 00),
+                        to = new DateTime(2022, 05, 20, 9, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 9, 30, 00),
+                        to = new DateTime(2022, 05, 20, 9, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                     new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 10, 15, 00),
+                        to = new DateTime(2022, 05, 20, 10, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 20, 10, 30, 00),
+                        to = new DateTime(2022, 05, 20, 10, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 9, 15, 00),
+                        to = new DateTime(2022, 05, 30, 9, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 9, 30, 00),
+                        to = new DateTime(2022, 05, 30, 9, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                     new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 10, 15, 00),
+                        to = new DateTime(2022, 05, 30, 10, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 10, 30, 00),
+                        to = new DateTime(2022, 05, 30, 10, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 9, 15, 00),
+                        to = new DateTime(2022, 05, 30, 9, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 9, 30, 00),
+                        to = new DateTime(2022, 05, 30, 9, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                     new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 10, 15, 00),
+                        to = new DateTime(2022, 05, 30, 10, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 05, 30, 10, 30, 00),
+                        to = new DateTime(2022, 05, 30, 10, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 9, 15, 00),
+                        to = new DateTime(2022, 06, 20, 9, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 9, 30, 00),
+                        to = new DateTime(2022, 06, 20, 9, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                     new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 10, 15, 00),
+                        to = new DateTime(2022, 06, 20, 10, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 10, 30, 00),
+                        to = new DateTime(2022, 06, 20, 10, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorKowalska
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 9, 15, 00),
+                        to = new DateTime(2022, 06, 20, 9, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 9, 30, 00),
+                        to = new DateTime(2022, 06, 20, 9, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                     new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 10, 15, 00),
+                        to = new DateTime(2022, 06, 20, 10, 30, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 06, 20, 10, 30, 00),
+                        to = new DateTime(2022, 06, 20, 10, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
                     }
                 };
                 context.TimeSlots.AddRange(listSlots);
                 context.SaveChanges();
 
                 List<TimeSlot> slotsList = context.TimeSlots.Where(slot => slot.isFree == false).ToList();
-                //powinno byc ich 4, przy czym 4 jest juz wykonany
 
                 List<Appointment> list = new List<Appointment>() {
                     new Appointment
@@ -483,7 +674,7 @@ namespace VaccinationSystem.Data
                     },
                     new Appointment
                     {
-                        whichDose = 1,
+                        whichDose = 2,
                         timeSlot = slotsList[3],
                         patient = context.Patients.Where(patient => patient.pesel == "92120211122").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
