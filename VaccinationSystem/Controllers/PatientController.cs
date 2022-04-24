@@ -141,7 +141,7 @@ namespace VaccinationSystem.Controllers
 
             return Ok(formApps);
         }
-        [Route("appointments/incomingAppointments/canselAppointments/{patientId}/{appointmentId}")]
+        [Route("appointments/incomingAppointments/cancelAppointments/{patientId}/{appointmentId}")]
         [HttpDelete]
         public async Task<IActionResult> DeleteIncomingAppointment([FromRoute] Guid patientId,
                                 [FromRoute] Guid appointmentId)
