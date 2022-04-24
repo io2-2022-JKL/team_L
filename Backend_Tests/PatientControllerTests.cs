@@ -246,5 +246,63 @@ namespace Backend_Tests
                 });
             return incApps;
         }
+        [Fact]
+        public async Task GetFormerAppointmentsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetFormerAppointments(patientID)).ReturnsAsync(GetFormerAppointments);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var formApps = await controller.GetFormerAppointments(patientID);
+            var okResult = Assert.IsType<OkObjectResult>(formApps);
+            var returnValue = Assert.IsType<List<FormerAppointmentResponse>>(okResult.Value);
+            Assert.Single(returnValue);
+        }
+        [Fact]
+        public async Task GetFormerAppointmentsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetFormerAppointments(patientID)).ReturnsAsync(new List<FormerAppointmentResponse>());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var formApps = await controller.GetFormerAppointments(patientID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(formApps);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetFormerAppointmentsReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetFormerAppointments(patientID)).
+                                    ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var formApps = await controller.GetFormerAppointments(patientID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(formApps);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
+
+        }
+        private List<FormerAppointmentResponse> GetFormerAppointments()
+        {
+            var formApps = new List<FormerAppointmentResponse>();
+            formApps.Add(
+                new FormerAppointmentResponse()
+                {
+                    vaccineName = "Pfeizer vaccine",
+                    vaccineCompany = "Pfeizer",
+                    vaccineVirus = "Coronavirus",
+                    whichVaccineDose = 2,
+                    appointmentId = new Guid("91b8d82a-75d7-4791-d2c8-08da1b08bb0d"),
+                    windowBegin = "3/20/2022 9:15:00 AM",
+                    windowEnd = "3/20/2022 9:30:00 AM",
+                    vaccinationCenterName = "Apteczny Punkt Szczepien",
+                    vaccinationCenterCity = "Warszawa",
+                    vaccinationCenterStreet = "Mokotowska 27/Lok.1 i 4",
+                    doctorFirstName = "Monika",
+                    doctorLastName = "Kowalska",
+                    visitState = "Finished",
+                });
+            return formApps;
+        }
     }
 }
