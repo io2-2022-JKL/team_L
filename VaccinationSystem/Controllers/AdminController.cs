@@ -9,11 +9,13 @@ using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
     [Route("admin")]
     [ApiController]
+    [Authorize(Roles="Admin")]
     public class AdminController : ControllerBase
     {
         private IDatabase dbManager;
