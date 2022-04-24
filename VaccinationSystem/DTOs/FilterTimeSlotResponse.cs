@@ -9,7 +9,7 @@ namespace VaccinationSystem.DTOs
 {
     public class FilterTimeSlotResponse
     {
-        public Guid id { get; set; }
+        public Guid timeSlotId { get; set; }
         public string from { get; set; }
         public string to { get; set; }
         public string vaccinationCenterName { get; set; }

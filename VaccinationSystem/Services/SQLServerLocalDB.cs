@@ -625,9 +625,9 @@ namespace VaccinationSystem.Services
 
                 timeSlots.Add(new FilterTimeSlotResponse()
                 {
-                    id = tS.id,
-                    @from = tS.from.ToString("dd-MM-yyyy"),
-                    to = tS.to.ToString("dd-MM-yyyy"),
+                    timeSlotId = tS.id,
+                    @from = tS.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = tS.to.ToString("dd-MM-yyyy HH:mm"),
                     vaccinationCenterName = vC.name,
                     vaccinationCenterCity = vC.city,
                     vaccinationCenterStreet = vC.address,

@@ -137,7 +137,7 @@ namespace Backend_Tests
                 doctorFirstName = "AAA",
                 from = "12-12-2000",
                 to = "12-12-3000",
-                id = new Guid(),
+                timeSlotId = new Guid(),
                 openingHours = new List<OpeningHoursDays>(),
                 vaccinationCenterCity = "Warszawa",
                 vaccinationCenterName = "ABC",
