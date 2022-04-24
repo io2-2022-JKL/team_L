@@ -6,24 +6,29 @@ using System.Threading.Tasks;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.Data;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace VaccinationSystem.Controllers
 {
     [Route("")]
     [ApiController]
+    [Authorize]
     public class DefaultController : ControllerBase
     {
         private IUserSignInManager signInManager;
         private IDatabase dbManager;
+        //private UserManager<User> userManager;
         public DefaultController(IUserSignInManager signInManager, IDatabase db)
         {
             this.signInManager = signInManager;
             dbManager = db;
+            //userManager = userMgr;
         }
 
         [Route("/register")]
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult Register([FromBody] RegisteringPatient patient)
         {
             if (ModelState.IsValid)
@@ -49,6 +54,7 @@ namespace VaccinationSystem.Controllers
         }
         [Route("/signin")]
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult SignIn([FromBody] Login login) 
         {
             if (ModelState.IsValid)
@@ -58,9 +64,10 @@ namespace VaccinationSystem.Controllers
                 try
                 {
                     lR = dbManager.AreCredentialsValid(login);
+                    
                     //Console.WriteLine(userId);
-                    //if(userId!=Guid.Empty)
-                      //  token = signInManager.SignIn(login.mail, login.password);
+                    if(lR.userId!=Guid.Empty)
+                        token = signInManager.SignIn(login.mail, login.password);
                 }
                 catch (Exception e)
                 {

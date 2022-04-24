@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VaccinationSystem.Data;
+//using VaccinationSystem.Models;//
 using VaccinationSystem.Repositories;
 using VaccinationSystem.Services;
 
@@ -38,6 +39,21 @@ namespace VaccinationSystem
                 options.AddPolicy("RequireAdminRole",
                      policy => policy.RequireRole("Admin"));
             });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequirePatientRole",
+                     policy => policy.RequireRole("Patient"));
+            });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireDoctorRole",
+                     policy => policy.RequireRole("Doctor"));
+            });
+
+            //
+            //UserManager<User> usermgr = new UserManager<User>();
+            //RoleManager<User>
+            //
 
             services.AddControllers().
                 AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);

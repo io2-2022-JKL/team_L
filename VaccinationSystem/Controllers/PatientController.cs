@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
     [Route("patient")]
     [ApiController]
+    [Authorize(Roles = "Patient")]
     public class PatientController : ControllerBase
     {
         private IUserSignInManager signInManager;
