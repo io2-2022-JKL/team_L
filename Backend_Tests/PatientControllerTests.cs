@@ -229,21 +229,25 @@ namespace Backend_Tests
         {
             var formApps = new List<FormerAppointmentResponse>();
             formApps.Add(
-                new FormerAppointmentResponse(){
-                vaccineName= "Pfeizer vaccine",
-                    vaccineCompany= "Pfeizer",
-                    vaccineVirus= "Coronavirus",whichVaccineDose= 2,
-                    appointmentId= new Guid("91b8d82a-75d7-4791-d2c8-08da1b08bb0d"),
-                    windowBegin= "3/20/2022 9:15:00 AM",
-                    windowEnd= "3/20/2022 9:30:00 AM",
-                    vaccinationCenterName= "Apteczny Punkt Szczepien",
-                    vaccinationCenterCity= "Warszawa",
-                    vaccinationCenterStreet ="Mokotowska 27/Lok.1 i 4",
-                    doctorFirstName= "Monika",
-                    doctorLastName= "Kowalska",
-                    visitState= "Finished",
+                new FormerAppointmentResponse()
+                {
+                    vaccineName = "Pfeizer vaccine",
+                    vaccineCompany = "Pfeizer",
+                    vaccineVirus = "Coronavirus",
+                    whichVaccineDose = 2,
+                    appointmentId = new Guid("91b8d82a-75d7-4791-d2c8-08da1b08bb0d"),
+                    windowBegin = "3/20/2022 9:15:00 AM",
+                    windowEnd = "3/20/2022 9:30:00 AM",
+                    vaccinationCenterName = "Apteczny Punkt Szczepien",
+                    vaccinationCenterCity = "Warszawa",
+                    vaccinationCenterStreet = "Mokotowska 27/Lok.1 i 4",
+                    doctorFirstName = "Monika",
+                    doctorLastName = "Kowalska",
+                    visitState = "Finished",
                 });
             return formApps;
+        }
+        [Fact]
         public async Task GetIncomingAppointmentsReturnsOk()
         {
             var mockDB = new Mock<IDatabase>();

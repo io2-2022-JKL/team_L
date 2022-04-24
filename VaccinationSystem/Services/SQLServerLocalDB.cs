@@ -704,7 +704,6 @@ namespace VaccinationSystem.Services
                     vaccinationCenterStreet = app.timeSlot.doctor.vaccinationCenter.address,
                     doctorFirstName = app.timeSlot.doctor.firstName,
                     doctorLastName = app.timeSlot.doctor.lastName,
-
                 };
                 incApps.Add(incAppointment);
             }
