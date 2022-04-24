@@ -143,13 +143,13 @@ namespace VaccinationSystem.Controllers
         }
         [Route("appointments/incomingAppointments/cancelAppointments/{patientId}/{appointmentId}")]
         [HttpDelete]
-        public async Task<IActionResult> DeleteIncomingAppointment([FromRoute] Guid patientId,
+        public async Task<IActionResult> CancelIncomingAppointment([FromRoute] Guid patientId,
                                 [FromRoute] Guid appointmentId)
         {
             bool deleted = false;
             try
             {
-                deleted = await dbManager.DeleteIncomingAppointment(patientId,appointmentId);
+                deleted = await dbManager.CancelIncomingAppointment(patientId,appointmentId);
             }
             catch (Exception e)
             {

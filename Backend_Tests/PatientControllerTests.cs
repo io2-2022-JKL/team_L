@@ -306,37 +306,37 @@ namespace Backend_Tests
             return formApps;
         }
         [Fact]
-        public async Task DeleteIncomingAppointmentReturnsOk()
+        public async Task CancelIncomingAppointmentReturnsOk()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.DeleteIncomingAppointment(patientID, appointmentID))
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
                             .ReturnsAsync(true);
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
-            var deleted = await controller.DeleteIncomingAppointment(patientID, appointmentID);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
             Assert.IsType<OkObjectResult>(deleted);
         }
         [Fact]
-        public async Task DeleteIncomingAppointmentReturnsNotFound()
+        public async Task CancelIncomingAppointmentReturnsNotFound()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.DeleteIncomingAppointment(patientID, appointmentID))
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
                             .ReturnsAsync(false);
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
-            var deleted = await controller.DeleteIncomingAppointment(patientID, appointmentID);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(deleted);
             Assert.Equal("Data not found", notFoundResult.Value.ToString());
         }
         [Fact]
-        public async Task DeleteIncomingAppointmentReturnsBadRequestDatabaseException()
+        public async Task CancelIncomingAppointmentReturnsBadRequestDatabaseException()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.DeleteIncomingAppointment(patientID, appointmentID))
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
                             .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
-            var deleted = await controller.DeleteIncomingAppointment(patientID, appointmentID);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
             var badResult = Assert.IsType<BadRequestObjectResult>(deleted);
             Assert.Equal("Something went wrong", badResult.Value.ToString());
         }
