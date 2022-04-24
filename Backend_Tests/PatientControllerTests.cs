@@ -227,8 +227,8 @@ namespace Backend_Tests
         }
         private List<FormerAppointmentResponse> GetFormerAppointments()
         {
-            var incApps = new List<FormerAppointmentResponse>();
-            incApps.Add(
+            var formApps = new List<FormerAppointmentResponse>();
+            formApps.Add(
                 new FormerAppointmentResponse()
                 {
                     vaccineName= "Pfeizer vaccine",
@@ -245,7 +245,7 @@ namespace Backend_Tests
                     doctorLastName= "Kowalska",
                     visitState= "Finished",
                 });
-            return incApps;
+            return formApps;
         }
     }
 }
