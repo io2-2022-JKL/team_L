@@ -28,7 +28,7 @@ namespace VaccinationSystem.Services
                     PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
-                    dateOfBirth = patient.dateOfBirth.ToString("yyyy-mm-dd"),
+                    dateOfBirth = patient.dateOfBirth.ToString("dd-mm-yyyy"),
                     mail = patient.mail,
                     phoneNumber = patient.phoneNumber,
                     active = patient.active,
@@ -46,7 +46,7 @@ namespace VaccinationSystem.Services
                     PESEL = patient.pesel,
                     firstName = patient.firstName,
                     lastName = patient.lastName,
-                    dateOfBirth = patient.dateOfBirth.ToString("yyyy-MM-dd"),
+                    dateOfBirth = patient.dateOfBirth.ToString("dd-mm-yyyy"),
                     mail = patient.mail,
                     phoneNumber = patient.phoneNumber,
                     active = patient.active,
@@ -70,7 +70,7 @@ namespace VaccinationSystem.Services
                         PESEL = doctor.pesel,
                         firstName = doctor.firstName,
                         lastName = doctor.lastName,
-                        dateOfBirth = doctor.dateOfBirth.ToString("yyyy-MM-dd"),
+                        dateOfBirth = doctor.dateOfBirth.ToString("dd-mm-yyyy"),
                         mail = doctor.mail,
                         phoneNumber = doctor.phoneNumber,
                         active = doctor.active,
@@ -634,7 +634,7 @@ namespace VaccinationSystem.Services
                     openingHours = GetOpeningHoursFromVaccinationCenter(vC.id).Result,
                     availableVaccines = vaccies,
                     doctorFirstName = doctor.firstName,
-                    doctorLastName = doctor.firstName,
+                    doctorLastName = doctor.lastName,
                 });
             }
 
@@ -668,8 +668,8 @@ namespace VaccinationSystem.Services
                     vaccineVirus = app.vaccine.virus.ToString(),
                     whichVaccineDose = app.whichDose,
                     appointmentId = app.id,
-                    windowBegin = app.timeSlot.from.ToString("s"),
-                    windowEnd = app.timeSlot.to.ToString("s"),
+                    windowBegin = app.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
+                    windowEnd = app.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
                     vaccinationCenterName = app.timeSlot.doctor.vaccinationCenter.name,
                     vaccinationCenterCity = app.timeSlot.doctor.vaccinationCenter.city,
                     vaccinationCenterStreet = app.timeSlot.doctor.vaccinationCenter.address,
@@ -683,7 +683,8 @@ namespace VaccinationSystem.Services
         public async Task<List<FormerAppointmentResponse>> GetFormerAppointments(Guid patientId)
         {
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
-               .Where(a => a.state == AppointmentState.Finished).Include(a => a.vaccine).Include(a => a.timeSlot)
+               .Where(a => a.state == AppointmentState.Finished || a.state==AppointmentState.Cancelled)
+               .Include(a => a.vaccine).Include(a => a.timeSlot)
                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
             var formerApps = new List<FormerAppointmentResponse>();
             FormerAppointmentResponse formAppointment;
@@ -696,14 +697,14 @@ namespace VaccinationSystem.Services
                     vaccineVirus = app.vaccine.virus.ToString(),
                     whichVaccineDose = app.whichDose,
                     appointmentId = app.id,
-                    windowBegin = app.timeSlot.from.ToString("s"),
-                    windowEnd = app.timeSlot.to.ToString("s"),
+                    windowBegin = app.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
+                    windowEnd = app.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
                     vaccinationCenterName = app.timeSlot.doctor.vaccinationCenter.name,
                     vaccinationCenterCity = app.timeSlot.doctor.vaccinationCenter.city,
                     vaccinationCenterStreet = app.timeSlot.doctor.vaccinationCenter.address,
                     doctorFirstName = app.timeSlot.doctor.firstName,
                     doctorLastName = app.timeSlot.doctor.lastName,
-                    visitState = "Finished",
+                    visitState = app.state.ToString(),
                 };
                 formerApps.Add(formAppointment);
             }
