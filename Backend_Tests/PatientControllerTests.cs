@@ -229,12 +229,10 @@ namespace Backend_Tests
         {
             var formApps = new List<FormerAppointmentResponse>();
             formApps.Add(
-                new FormerAppointmentResponse()
-                {
-                    vaccineName= "Pfeizer vaccine",
+                new FormerAppointmentResponse(){
+                vaccineName= "Pfeizer vaccine",
                     vaccineCompany= "Pfeizer",
-                    vaccineVirus= "Coronavirus",
-                    whichVaccineDose= 2,
+                    vaccineVirus= "Coronavirus",whichVaccineDose= 2,
                     appointmentId= new Guid("91b8d82a-75d7-4791-d2c8-08da1b08bb0d"),
                     windowBegin= "3/20/2022 9:15:00 AM",
                     windowEnd= "3/20/2022 9:30:00 AM",
@@ -246,6 +244,61 @@ namespace Backend_Tests
                     visitState= "Finished",
                 });
             return formApps;
+        public async Task GetIncomingAppointmentsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetIncomingAppointments(patientID)).ReturnsAsync(GetIncomingAppointments);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var incApps = await controller.GetIncomingAppointments(patientID);
+            var okResult = Assert.IsType<OkObjectResult>(incApps);
+            var returnValue = Assert.IsType<List<IncomingAppointmentResponse>>(okResult.Value);
+            Assert.Single(returnValue);
+        }
+        [Fact]
+        public async Task GetIncomingAppointmentsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetIncomingAppointments(patientID)).ReturnsAsync(new List<IncomingAppointmentResponse>());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var incApps = await controller.GetIncomingAppointments(patientID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(incApps);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetIncomingAppointmentsReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB=>dB.GetIncomingAppointments(patientID)).
+                                    ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var incApps = await controller.GetIncomingAppointments(patientID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(incApps);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
+
+        }
+        private List<IncomingAppointmentResponse> GetIncomingAppointments()
+        {
+            var incApps = new List<IncomingAppointmentResponse>();
+            incApps.Add(
+                new IncomingAppointmentResponse()
+                {
+                    vaccineName= "Pfeizer vaccine",
+                    vaccineCompany= "Pfeizer",
+                    vaccineVirus= "Coronavirus",
+                    whichVaccineDose= 1,
+                    appointmentId= new Guid("0a7f23ee-99e6-4358-d2c5-08da1b08bb0d"),
+                    windowBegin= "4/25/2022 12:30:00 PM",
+                    windowEnd= "4/25/2022 12:45:00 PM",
+                    vaccinationCenterName = "Apteczny Punkt Szczepien",
+                    vaccinationCenterCity= "Warszawa",
+                    vaccinationCenterStreet= "Mokotowska 27/Lok.1 i 4",
+                    doctorFirstName= "Monika",
+                    doctorLastName= "Kowalska",
+                });
+            return incApps;
         }
     }
 }

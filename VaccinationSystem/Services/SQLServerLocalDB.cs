@@ -659,10 +659,8 @@ namespace VaccinationSystem.Services
                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
             var formerApps = new List<FormerAppointmentResponse>();
             FormerAppointmentResponse formAppointment;
-            //Doctor doctor;
             foreach (var app in apps)
             {
-                //doctor = await dbContext.Doctors.FindAsync(app.timeSlot.doctorId);
                 formAppointment = new FormerAppointmentResponse()
                 {
                     vaccineName = app.vaccine.name,
@@ -683,6 +681,34 @@ namespace VaccinationSystem.Services
             }
             return formerApps;
         }
-    }
+        public async Task<List<IncomingAppointmentResponse>> GetIncomingAppointments(Guid patientId)
+        {
+            var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
+                .Where(a => a.state == AppointmentState.Planned).Include(a => a.vaccine).Include(a => a.timeSlot)
+                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
+            var incApps = new List<IncomingAppointmentResponse>();
+            IncomingAppointmentResponse incAppointment;
+            foreach (var app in apps)
+            {
+                incAppointment = new IncomingAppointmentResponse()
+                {
+                    vaccineName = app.vaccine.name,
+                    vaccineCompany = app.vaccine.company,
+                    vaccineVirus = app.vaccine.virus.ToString(),
+                    whichVaccineDose = app.whichDose,
+                    appointmentId = app.id,
+                    windowBegin = app.timeSlot.from.ToString("s"),
+                    windowEnd = app.timeSlot.to.ToString("s"),
+                    vaccinationCenterName = app.timeSlot.doctor.vaccinationCenter.name,
+                    vaccinationCenterCity = app.timeSlot.doctor.vaccinationCenter.city,
+                    vaccinationCenterStreet = app.timeSlot.doctor.vaccinationCenter.address,
+                    doctorFirstName = app.timeSlot.doctor.firstName,
+                    doctorLastName = app.timeSlot.doctor.lastName,
 
+                };
+                incApps.Add(incAppointment);
+            }
+            return incApps;
+        }
+    }
 }

@@ -121,5 +121,25 @@ namespace VaccinationSystem.Controllers
             return Ok(formApps);
         }
 
+        [Route("appointments/incomingAppointments/{patientId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetIncomingAppointments([FromRoute] Guid patientId)
+        {
+            List<IncomingAppointmentResponse> incApps;
+            try
+            {
+                incApps = await dbManager.GetIncomingAppointments(patientId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (incApps == null || incApps.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(incApps);
+        }
     }
 }
