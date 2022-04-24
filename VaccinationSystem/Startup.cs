@@ -34,26 +34,6 @@ namespace VaccinationSystem
 
             services.AddAuthentication().AddCookie();
             services.ConfigureApplicationCookie(opts => opts.LoginPath = "/signin");
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequireAdminRole",
-                     policy => policy.RequireRole("Admin"));
-            });
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequirePatientRole",
-                     policy => policy.RequireRole("Patient"));
-            });
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequireDoctorRole",
-                     policy => policy.RequireRole("Doctor"));
-            });
-
-            //
-            //UserManager<User> usermgr = new UserManager<User>();
-            //RoleManager<User>
-            //
 
             services.AddControllers().
                 AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);

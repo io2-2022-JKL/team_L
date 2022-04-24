@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,8 +9,9 @@ namespace VaccinationSystem.Data
 {
     public class DataSeeder
     {
-        public static void SeedData(AppDBContext context)
+        public static void SeedData(AppDBContext context)// UserManager<User> userMgr)
         {
+            //UserManager<User> userMgr = new UserManager<User>()
             if (!context.Admins.Any())
             {
                 var admin = new Admin
@@ -22,6 +24,7 @@ namespace VaccinationSystem.Data
                     phoneNumber = "+48111222333",
                     password = "superadmin!23"
                 };
+                //userMgr.AddToRoleAsync(admin, "Admin");
                 context.Add(admin);
                 context.SaveChanges();
             }
@@ -272,6 +275,8 @@ namespace VaccinationSystem.Data
                         active = true
                     }
                 };
+                //foreach (Patient p in patientList)
+                    //userMgr.AddToRoleAsync(p, "Patient");
                 context.AddRange(patientList);
                 context.SaveChanges();
 
@@ -350,6 +355,8 @@ namespace VaccinationSystem.Data
                 vaccCenter1.doctors = new List<Doctor>() { doctorWeide };
                 vaccCenter2.doctors = new List<Doctor>() { doctorKowalska };
 
+                //userMgr.AddToRoleAsync(doctorWeide, "Doctor");
+                //userMgr.AddToRoleAsync(doctorKowalska, "Doctor");
                 context.Doctors.Add(doctorWeide);
                 context.Doctors.Add(doctorKowalska);
                 context.SaveChanges();

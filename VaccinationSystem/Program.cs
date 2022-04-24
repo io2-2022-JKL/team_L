@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Data;
+using VaccinationSystem.Models;
 
 namespace VaccinationSystem
 {
@@ -20,6 +22,7 @@ namespace VaccinationSystem
             {
                 var services = scope.ServiceProvider;
                 var context = scope.ServiceProvider.GetService<AppDBContext>();
+                //var userMgr = new UserManager<User>();
                 DataSeeder.SeedData(context);
             }
 

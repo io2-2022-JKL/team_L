@@ -6,12 +6,14 @@ using VaccinationSystem.Models;
 using VaccinationSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace VaccinationSystem.Services
 {
     public class SQLServerLocalDB:IDatabase
     {
         private AppDBContext dbContext;
+        private UserManager<User> userManager;
         public SQLServerLocalDB(AppDBContext context)
         {
             dbContext = context;
@@ -101,7 +103,7 @@ namespace VaccinationSystem.Services
                 dateOfBirth = DateTime.Parse(patient.dateOfBirth)
             };
 
-
+            userManager.AddToRoleAsync(p, "Patient");
             dbContext.Patients.Add(p);
             dbContext.SaveChanges();
 
@@ -397,6 +399,7 @@ namespace VaccinationSystem.Services
                 patientAccount = patient
             };
 
+            _ = userManager.AddToRoleAsync(doc, "Doctor");
             dbContext.Doctors.Add(doc);
             var saved = dbContext.SaveChanges();
             if (saved > 0)

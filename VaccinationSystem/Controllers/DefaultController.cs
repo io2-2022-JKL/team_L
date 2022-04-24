@@ -18,6 +18,7 @@ namespace VaccinationSystem.Controllers
     {
         private IUserSignInManager signInManager;
         private IDatabase dbManager;
+        //private RoleManager<User> roleManager;
         //private UserManager<User> userManager;
         public DefaultController(IUserSignInManager signInManager, IDatabase db)
         {
@@ -36,7 +37,10 @@ namespace VaccinationSystem.Controllers
                 try
                 {
                     if (!dbManager.IsUserInDatabase(patient.mail))
+                    {
                         dbManager.AddPatient(patient);
+                        //userManager.AddToRoleAsync(patient, "Patient");
+                    }
                     else
                         return BadRequest("Patient already exists");
                 }
