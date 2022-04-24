@@ -37,5 +37,6 @@ namespace VaccinationSystem.Services
         public Task<bool> MakeAppointment(Guid patientId, Guid timeSlotId, Guid vaccineID);
         public Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter);
         public Task<List<CertificatesResponse>> GetCertificates(Guid patientId);
+        public Task<List<FormerAppointmentResponse>> GetFormerAppointments(Guid patientId);
     }
 }
