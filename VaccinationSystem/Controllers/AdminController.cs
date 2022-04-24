@@ -224,6 +224,7 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 return BadRequest("Something went wrong");
             }
 
