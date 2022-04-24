@@ -609,7 +609,7 @@ namespace VaccinationSystem.Services
                     .Select(v =>
                 new SimplifiedVaccine()
                 {
-                    id = v.id,
+                    vaccineId = v.id,
                     maxDaysBetweenDoses = v.maxDaysBetweenDoses,
                     company = v.company,
                     maxPatientAge = v.maxPatientAge,

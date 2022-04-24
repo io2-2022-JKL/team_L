@@ -8,7 +8,7 @@ namespace VaccinationSystem.DTOs
 {
     public class SimplifiedVaccine
     {
-        public Guid id { get; set; }
+        public Guid vaccineId { get; set; }
         public string company { get; set; }
         public string name { get; set; }
         public int numberOfDoses { get; set; }
