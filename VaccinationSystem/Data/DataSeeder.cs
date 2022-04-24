@@ -277,6 +277,8 @@ namespace VaccinationSystem.Data
 
                 var patientWeide = context.Patients.Where(patient => patient.lastName == "Weide").ToList().First();//Find("Weide");
                 var patientKowalska = context.Patients.Where(patient => patient.lastName == "Kowalska").ToList().First();
+                var patientNowak = context.Patients.Where(patient => patient.lastName == "Nowak").ToList().First();
+                var patientNowakowa = context.Patients.Where(patient => patient.lastName == "Nowakowa").ToList().First();
                 var vaccinePfeizer = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First();
 
                 var certificateW = new Certificate
@@ -291,8 +293,15 @@ namespace VaccinationSystem.Data
                     patientId = patientKowalska.id,
                     vaccineId = vaccinePfeizer.id
                 };
-                patientWeide.certificates = new Certificate[] { certificateW };//patientWeide.certificates.Append(certificateW);
+                var certificateN = new Certificate
+                {
+                    url = "placeholder",
+                    patientId = patientNowak.id,
+                    vaccineId = vaccinePfeizer.id
+                };
+                patientWeide.certificates = new Certificate[] { certificateW };
                 patientKowalska.certificates = new Certificate[] { certificateK };
+                patientNowak.certificates = new Certificate[] { certificateN };
 
                 List<VaccinationCount> count = new List<VaccinationCount>()
                 {
@@ -307,11 +316,24 @@ namespace VaccinationSystem.Data
                         patient = patientKowalska,
                         virus = Virus.Coronavirus,
                         count = 2
+                    },
+                    new VaccinationCount
+                    {
+                        patient = patientNowak,
+                        virus = Virus.Coronavirus,
+                        count = 2
+                    },
+                    new VaccinationCount
+                    {
+                        patient = patientNowakowa,
+                        virus = Virus.Coronavirus,
+                        count = 1
                     }
                 };
 
                 context.Certificates.Add(certificateW);
                 context.Certificates.Add(certificateK);
+                context.Certificates.Add(certificateN);
                 context.VaccinationCounts.AddRange(count);
                 context.SaveChanges();
             }
@@ -362,8 +384,24 @@ namespace VaccinationSystem.Data
                 {
                     new TimeSlot
                     {
-                        from = new DateTime(2022, 05, 25, 12, 30, 00),
-                        to = new DateTime(2022, 05, 25, 12, 45, 00),
+                        from = new DateTime(2022, 03, 25, 12, 30, 00),
+                        to = new DateTime(2022, 03, 25, 12, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 04, 23, 12, 30, 00),
+                        to = new DateTime(2022, 04, 23, 12, 45, 00),
+                        isFree = true,
+                        active = true,
+                        doctor = doctorWeide
+                    },
+                    new TimeSlot
+                    {
+                        from = new DateTime(2022, 04, 23, 13, 30, 00),
+                        to = new DateTime(2022, 04, 23, 13, 45, 00),
                         isFree = true,
                         active = true,
                         doctor = doctorWeide
@@ -422,13 +460,31 @@ namespace VaccinationSystem.Data
                         timeSlot = slotsList[0],
                         patient = context.Patients.Where(patient => patient.pesel == "82121211111").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
-                        state = AppointmentState.Planned,
+                        state = AppointmentState.Finished,
+                        vaccineBatchNumber = "AB-123-nie-wiem"
+                    },
+                    new Appointment
+                    {
+                        whichDose = 2,
+                        timeSlot = slotsList[1],
+                        patient = context.Patients.Where(patient => patient.pesel == "82121211111").ToList().First(),
+                        vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
+                        state = AppointmentState.Finished,
                         vaccineBatchNumber = "AB-123-nie-wiem"
                     },
                     new Appointment
                     {
                         whichDose = 1,
-                        timeSlot = slotsList[1],
+                        timeSlot = slotsList[2],
+                        patient = context.Patients.Where(patient => patient.pesel == "92120211122").ToList().First(),
+                        vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
+                        state = AppointmentState.Finished,
+                        vaccineBatchNumber = "AB-123-nie-wiem"
+                    },
+                    new Appointment
+                    {
+                        whichDose = 1,
+                        timeSlot = slotsList[3],
                         patient = context.Patients.Where(patient => patient.pesel == "92120211122").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
                         state = AppointmentState.Planned,
@@ -437,7 +493,7 @@ namespace VaccinationSystem.Data
                     new Appointment
                     {
                         whichDose = 1,
-                        timeSlot = slotsList[2],
+                        timeSlot = slotsList[4],
                         patient = context.Patients.Where(patient => patient.pesel == "82121211133").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Johnson and Johnson").ToList().First(),
                         state = AppointmentState.Planned,
@@ -446,7 +502,7 @@ namespace VaccinationSystem.Data
                     new Appointment
                     {
                         whichDose = 2,
-                        timeSlot = slotsList[3],
+                        timeSlot = slotsList[5],
                         patient = context.Patients.Where(patient => patient.pesel == "59062011333").ToList().First(), // doctorWeide szczepil sie u doctorKowalska :)
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
                         state = AppointmentState.Finished,
