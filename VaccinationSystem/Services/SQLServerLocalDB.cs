@@ -709,5 +709,22 @@ namespace VaccinationSystem.Services
             }
             return formerApps;
         }
+        public async Task<bool> CancelIncomingAppointment(Guid patientId, Guid appointmentId)
+        {
+            var dbAppointment = await dbContext.Appointments.Include(a => a.patient).Include(a=>a.timeSlot)
+                .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId && a.patient.id == patientId);
+            if (dbAppointment != null)
+            {
+                dbAppointment.state = AppointmentState.Cancelled;
+                if(dbAppointment.timeSlot!=null)
+                {
+                    var timeslot = await dbContext.TimeSlots.SingleAsync(t=>t.id == dbAppointment.timeSlot.id);
+                    timeslot.isFree = true;
+                }
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

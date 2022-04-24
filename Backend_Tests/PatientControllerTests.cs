@@ -19,6 +19,7 @@ namespace Backend_Tests
         private Guid timeSlotID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
         private Guid patientID = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5");
         private Guid vaccineID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
+        private Guid appointmentID = new Guid("CDE69AA2-149D-463F-D2C7-08DA1B08BB0D");
         [Fact]
         public async Task MakeAppointmentReturnsOk()
         {
@@ -85,10 +86,10 @@ namespace Backend_Tests
             if (response == null)
                 throw new ArgumentException();
 
-            mockDB.Setup(dB => dB.GetTimeSlotsWithFiltration(It.IsAny<TimeSlotsFilter>())).ReturnsAsync(()=>response);
+            mockDB.Setup(dB => dB.GetTimeSlotsWithFiltration(It.IsAny<TimeSlotsFilter>())).ReturnsAsync(() => response);
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
 
-            var slots = await controller.GetTimeSlots(city: "Warszawa",virus: "Coronavirus",dateFrom: "12-12-2022", dateTo: "22-12-2022");
+            var slots = await controller.GetTimeSlots(city: "Warszawa", virus: "Coronavirus", dateFrom: "12-12-2022", dateTo: "22-12-2022");
 
             var okResult = Assert.IsType<OkObjectResult>(slots);
 
@@ -126,7 +127,7 @@ namespace Backend_Tests
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(slots);
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
-        
+
 
         private List<FilterTimeSlotResponse> GetFilterTimeSlotResponse()
         {
@@ -142,7 +143,7 @@ namespace Backend_Tests
                 vaccinationCenterCity = "Warszawa",
                 vaccinationCenterName = "ABC",
                 vaccinationCenterStreet = "askskaks"
-       
+
             };
 
             var list = new List<FilterTimeSlotResponse>();
@@ -217,7 +218,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB=>dB.GetIncomingAppointments(patientID)).
+            mockDB.Setup(dB => dB.GetIncomingAppointments(patientID)).
                                     ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
             var controller = new PatientController(mockSignIn.Object, mockDB.Object);
             var incApps = await controller.GetIncomingAppointments(patientID);
@@ -231,18 +232,18 @@ namespace Backend_Tests
             incApps.Add(
                 new IncomingAppointmentResponse()
                 {
-                    vaccineName= "Pfeizer vaccine",
-                    vaccineCompany= "Pfeizer",
-                    vaccineVirus= "Coronavirus",
-                    whichVaccineDose= 1,
-                    appointmentId= new Guid("0a7f23ee-99e6-4358-d2c5-08da1b08bb0d"),
-                    windowBegin= "4/25/2022 12:30:00 PM",
-                    windowEnd= "4/25/2022 12:45:00 PM",
+                    vaccineName = "Pfeizer vaccine",
+                    vaccineCompany = "Pfeizer",
+                    vaccineVirus = "Coronavirus",
+                    whichVaccineDose = 1,
+                    appointmentId = new Guid("0a7f23ee-99e6-4358-d2c5-08da1b08bb0d"),
+                    windowBegin = "4/25/2022 12:30:00 PM",
+                    windowEnd = "4/25/2022 12:45:00 PM",
                     vaccinationCenterName = "Apteczny Punkt Szczepien",
-                    vaccinationCenterCity= "Warszawa",
-                    vaccinationCenterStreet= "Mokotowska 27/Lok.1 i 4",
-                    doctorFirstName= "Monika",
-                    doctorLastName= "Kowalska",
+                    vaccinationCenterCity = "Warszawa",
+                    vaccinationCenterStreet = "Mokotowska 27/Lok.1 i 4",
+                    doctorFirstName = "Monika",
+                    doctorLastName = "Kowalska",
                 });
             return incApps;
         }
@@ -303,6 +304,41 @@ namespace Backend_Tests
                     visitState = "Finished",
                 });
             return formApps;
+        }
+        [Fact]
+        public async Task CancelIncomingAppointmentReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
+                            .ReturnsAsync(true);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
+            Assert.IsType<OkObjectResult>(deleted);
+        }
+        [Fact]
+        public async Task CancelIncomingAppointmentReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
+                            .ReturnsAsync(false);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(deleted);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task CancelIncomingAppointmentReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
+                            .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(deleted);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
         }
     }
 }
