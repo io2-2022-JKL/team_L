@@ -39,5 +39,6 @@ namespace VaccinationSystem.Services
         public Task<List<CertificatesResponse>> GetCertificates(Guid patientId);
         public Task<List<FormerAppointmentResponse>> GetFormerAppointments(Guid patientId);
         public Task<List<IncomingAppointmentResponse>> GetIncomingAppointments(Guid patientId);
+        public Task<bool> DeleteIncomingAppointment(Guid patientId, Guid appointmentId);
     }
 }

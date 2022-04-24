@@ -709,5 +709,17 @@ namespace VaccinationSystem.Services
             }
             return formerApps;
         }
+        public async Task<bool> DeleteIncomingAppointment(Guid patientId, Guid appointmentId)
+        {
+            var appointment = await dbContext.Appointments.Include(a => a.patient)
+                .SingleAsync(a => a.id == appointmentId && a.patient.id == patientId);
+            if (appointment != null)
+            {
+                dbContext.Appointments.Remove(appointment);
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -141,5 +141,26 @@ namespace VaccinationSystem.Controllers
 
             return Ok(formApps);
         }
+        [Route("appointments/incomingAppointments/canselAppointments/{patientId}/{appointmentId}")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteIncomingAppointment([FromRoute] Guid patientId,
+                                [FromRoute] Guid appointmentId)
+        {
+            bool deleted = false;
+            try
+            {
+                deleted = await dbManager.DeleteIncomingAppointment(patientId,appointmentId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (deleted)
+                return Ok("Appointment deleted");
+
+            return NotFound("Data not found");
+        }
     }
 }
