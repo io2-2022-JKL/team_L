@@ -99,7 +99,7 @@ namespace VaccinationSystem.Services
                 certificates = { },
                 vaccinationHistory = { },
                 futureVaccinations = { },
-                dateOfBirth = DateTime.Parse(patient.dateOfBirth)
+                dateOfBirth = DateTime.ParseExact(patient.dateOfBirth, "dd-MM-yyyy", null)
             };
 
 
@@ -592,7 +592,7 @@ namespace VaccinationSystem.Services
             var timeSlots = new List<FilterTimeSlotResponse>();
             foreach(var tS in dbContext.TimeSlots.Include(tS=>tS.doctor).Include(ts=>ts.doctor.vaccinationCenter).ToList())
             {
-                if (tS.from < DateTime.Parse(filter.dateFrom) || tS.to > DateTime.Parse(filter.dateTo)||!tS.isFree||!tS.active)
+                if (tS.from < DateTime.ParseExact(filter.dateFrom,"dd-MM-yyyy hh:mm",null) || tS.to > DateTime.ParseExact(filter.dateTo,"dd-MM-yyyy hh:mm",null)||!tS.isFree||!tS.active)
                     continue;
 
                 var doctor = tS.doctor;
