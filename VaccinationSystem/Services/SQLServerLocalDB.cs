@@ -7,6 +7,7 @@ using VaccinationSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.DTOs;
 
+
 namespace VaccinationSystem.Services
 {
     public class SQLServerLocalDB:IDatabase
@@ -98,7 +99,7 @@ namespace VaccinationSystem.Services
                 certificates = { },
                 vaccinationHistory = { },
                 futureVaccinations = { },
-                dateOfBirth = DateTime.Parse(patient.dateOfBirth)
+                dateOfBirth = DateTime.ParseExact(patient.dateOfBirth, "dd-MM-yyyy", null)
             };
 
 
@@ -212,13 +213,13 @@ namespace VaccinationSystem.Services
                 }
 
                 var hours = dbContext.OpeningHours.Where(h => h.vaccinationCenter.id == dbCenter.id);
-                foreach(var h in hours)
+                foreach(var h in hours.ToList())
                 {
                     dbContext.OpeningHours.Remove(h);
                 }
 
                 int dayOfWeek = 0;
-                foreach(var h in center.openingHoursDays)
+                foreach(var h in center.openingHoursDays.ToList())
                 {
                     dbContext.OpeningHours.Add(new OpeningHours()
                     {
@@ -273,9 +274,9 @@ namespace VaccinationSystem.Services
 
         public async Task<List<Vaccine>> GetVaccinesFromVaccinationCenter(Guid vaccinationCenterId)
         {
-            var vaccines = await dbContext.VaccinesInCenters.Where(vic => vic.vaccinationCenter.id == vaccinationCenterId).Select(v=>v.vaccine).ToListAsync();
+            var vaccines = dbContext.VaccinesInCenters.Include(v => v.vaccinationCenter).Include(v=>v.vaccine).Where(vic => vic.vaccinationCenter.id == vaccinationCenterId);
 
-            return vaccines;
+            return await vaccines.Select(v=>v.vaccine).ToListAsync();
         }
 
         public async Task<List<OpeningHoursDays>> GetOpeningHoursFromVaccinationCenter(Guid vaccinationCenterId)
@@ -589,9 +590,9 @@ namespace VaccinationSystem.Services
         public async Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter)
         {
             var timeSlots = new List<FilterTimeSlotResponse>();
-            foreach(var tS in dbContext.TimeSlots.Include(tS=>tS.doctor).Include(ts=>ts.doctor.vaccinationCenter))
+            foreach(var tS in dbContext.TimeSlots.Include(tS=>tS.doctor).Include(ts=>ts.doctor.vaccinationCenter).ToList())
             {
-                if (tS.from < DateTime.Parse(filter.dateFrom) || tS.to > DateTime.Parse(filter.dateTo)||!tS.isFree||!tS.active)
+                if (tS.from < DateTime.ParseExact(filter.dateFrom,"dd-MM-yyyy hh:mm",null) || tS.to > DateTime.ParseExact(filter.dateTo,"dd-MM-yyyy hh:mm",null)||!tS.isFree||!tS.active)
                     continue;
 
                 var doctor = tS.doctor;
@@ -603,8 +604,10 @@ namespace VaccinationSystem.Services
                 if (vC.city != filter.city)
                     continue;
 
+                //return null;
                 var vaccs = await GetVaccinesFromVaccinationCenter(vC.id);
 
+                //prev
                 var vaccies = vaccs.Where(v=> (Virus)Enum.Parse(typeof(Virus), filter.virus) == v.virus)
                     .Select(v =>
                 new SimplifiedVaccine()
@@ -659,7 +662,7 @@ namespace VaccinationSystem.Services
                 .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
             var incApps = new List<IncomingAppointmentResponse>();
             IncomingAppointmentResponse incAppointment;
-            foreach (var app in apps)
+            foreach (var app in apps.ToList())
             {
                 incAppointment = new IncomingAppointmentResponse()
                 {
@@ -688,7 +691,7 @@ namespace VaccinationSystem.Services
                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
             var formerApps = new List<FormerAppointmentResponse>();
             FormerAppointmentResponse formAppointment;
-            foreach (var app in apps)
+            foreach (var app in apps.ToList())
             {
                 formAppointment = new FormerAppointmentResponse()
                 {

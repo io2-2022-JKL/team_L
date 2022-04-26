@@ -21,6 +21,7 @@ namespace VaccinationSystem
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSwaggerGen();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.WithOrigins("http://localhost:3000")
@@ -44,6 +45,7 @@ namespace VaccinationSystem
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
+            app.UseSwagger();
             app.UseCors("MyPolicy");
 
             if (env.IsDevelopment())
