@@ -21,12 +21,15 @@ namespace VaccinationSystem
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSwaggerGen();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.WithOrigins("http://localhost:3000")
                        .AllowAnyMethod()
                        .AllowAnyHeader();
             }));
+            services.AddControllers()
+            .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
             services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
@@ -42,6 +45,7 @@ namespace VaccinationSystem
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
+            app.UseSwagger();
             app.UseCors("MyPolicy");
 
             if (env.IsDevelopment())

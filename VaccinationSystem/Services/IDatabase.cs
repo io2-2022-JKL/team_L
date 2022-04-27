@@ -33,5 +33,12 @@ namespace VaccinationSystem.Services
         public Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest);
         public Task<bool> EditTimeSlot(Guid doctorId, Guid slotId, EditedTimeSlot timeSlot);
         public Task<bool> DeleteTimeSlots(Guid doctorId, List<DeleteTimeSlot> timeSlotsIds);
+        public Task<TimeSlot> GetTimeSlot(Guid timeSlotId);
+        public Task<bool> MakeAppointment(Guid patientId, Guid timeSlotId, Guid vaccineID);
+        public Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter);
+        public Task<List<CertificatesResponse>> GetCertificates(Guid patientId);
+        public Task<List<FormerAppointmentResponse>> GetFormerAppointments(Guid patientId);
+        public Task<List<IncomingAppointmentResponse>> GetIncomingAppointments(Guid patientId);
+        public Task<bool> CancelIncomingAppointment(Guid patientId, Guid appointmentId);
     }
 }

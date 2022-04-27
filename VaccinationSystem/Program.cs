@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VaccinationSystem.Data;
+using System.Threading;
+using System.Globalization;
 
 namespace VaccinationSystem
 {
@@ -15,6 +17,7 @@ namespace VaccinationSystem
     {
         public static void Main(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("pl-PL");
             var host = CreateHostBuilder(args).Build();
             using (var scope = host.Services.CreateScope())
             {

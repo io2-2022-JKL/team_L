@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.Data;
 using VaccinationSystem.Models;
-using VaccinationSystem.Repositories;
 using VaccinationSystem.Services;
-using VaccinationSystem.Services;
-using VaccinationSystem.Models;
 using VaccinationSystem.DTOs;
 
 namespace VaccinationSystem.Controllers
@@ -28,8 +25,6 @@ namespace VaccinationSystem.Controllers
         [Route("vaccinationCenters")]
         public async Task<IActionResult> ShowVaccinationCenters()
         {
-
-
             List<VaccinationCenterResponse> centers;
             try
             {
@@ -229,6 +224,7 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 return BadRequest("Something went wrong");
             }
 
