@@ -17,11 +17,15 @@ namespace VaccinationSystem.Contollers
     public class DoctorController : ControllerBase
     {
         private IDatabase dbManager;
+        private ICertificateGenerator certGenerator;
 
-        public DoctorController(IUserSignInManager signInManager, IDatabase db)
+        public DoctorController(IUserSignInManager signInManager, IDatabase db, ICertificateGenerator certificateGenerator = null)
         {
             dbManager = db;
+            certGenerator = certificateGenerator;
         }
+
+
         [Route("patients/{patientId}")]
         [HttpGet]
         public async Task<IActionResult> GetPatient([FromRoute] Guid patientId)
@@ -128,6 +132,42 @@ namespace VaccinationSystem.Contollers
 
             if (deleted)
                 return Ok("Time slots modified");
+
+            return NotFound("Data not found");
+        }
+
+        [HttpPost]
+        [Route("/doctor/vaccinate/certify/{doctorId}/{appointmentId}")]
+        public async Task<IActionResult> Certify([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId)
+        {
+
+            bool created;
+            try
+            {
+                var a = await dbManager.GetAppointment(appointmentId);
+                var d = await dbManager.GetDoctor(doctorId);
+
+                if (a == null || d == null)
+                    return NotFound("Data not found");
+
+                var p = a.patient;
+                var vc = d.vaccinationCenter;
+
+                string url = await certGenerator.Generate(p.firstName + " " + p.lastName, p.dateOfBirth, p.pesel, vc.name, vc.city + " " 
+                    + vc.address, a.vaccine.name, a.whichDose, a.vaccineBatchNumber);
+                created = await dbManager.CreateCertificate(doctorId, appointmentId, url);
+            }
+            catch (ArgumentException e)
+            {
+                return StatusCode(403, "User forbidden from creating vaccine certification");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (created)
+                return Ok("Certificate created");
 
             return NotFound("Data not found");
         }
