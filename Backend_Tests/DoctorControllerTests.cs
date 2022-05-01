@@ -342,7 +342,6 @@ namespace Backend_Tests
                 active = true,
             };
         }
-
         private Appointment GetAppointment()
         {
             return new Appointment()
@@ -402,8 +401,52 @@ namespace Backend_Tests
                 active = true
             };
         }
-
-
-
+        [Fact]
+        public async Task GetDoctorInfoReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorInfo(doctorID)).ReturnsAsync(GetDoctorInfo);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var doctorInfo = await controller.GetDoctorInfo(doctorID);
+            var okResult = Assert.IsType<OkObjectResult>(doctorInfo);
+            var returnValue = Assert.IsType<DoctorInfoResponse>(okResult.Value);
+            Assert.Equal(returnValue.patientAccountId, GetDoctorInfo().patientAccountId);
+        }
+        [Fact]
+        public async Task GetDoctorInfoReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            DoctorInfoResponse nullDoctorInfo = null;
+            mockDB.Setup(dB => dB.GetDoctorInfo(doctorID)).ReturnsAsync(nullDoctorInfo);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var doctorInfo = await controller.GetDoctorInfo(doctorID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(doctorInfo);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetDoctorInfoReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorInfo(doctorID))
+                    .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var patientInfo = await controller.GetDoctorInfo(doctorID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(patientInfo);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
+        }
+        private DoctorInfoResponse GetDoctorInfo()
+        {
+            return new DoctorInfoResponse()
+            {
+                vaccinationCenterId = new Guid("0D96A825-F68A-44CA-ADD8-08DA262423E7"),
+                vaccinationCenterName = "Punkt Szczepień Populacyjnych",
+                vaccinationCenterCity = "Warszawa",
+                vaccinationCenterStreet = "Żwirki i Wigury 95/97",
+                patientAccountId = new Guid("F70AA1AD-7E62-44CE-EAE5-08DA26242413"),
+            };
+        }
     }
 }

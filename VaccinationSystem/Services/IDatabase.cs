@@ -43,5 +43,7 @@ namespace VaccinationSystem.Services
         public Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url);
         public Task<Appointment> GetAppointment(Guid appointmentId);
         public Task<Doctor> GetDoctor(Guid doctorId);
+        public Task<PatientInfoResponse> GetPatientInfo(Guid patientId);
+        public Task<DoctorInfoResponse> GetDoctorInfo(Guid doctorId);
     }
 }

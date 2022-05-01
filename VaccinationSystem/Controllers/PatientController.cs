@@ -162,5 +162,23 @@ namespace VaccinationSystem.Controllers
 
             return NotFound("Data not found");
         }
+        [Route("info/{patientId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPatientInfo([FromRoute] Guid patientId)
+        {
+            PatientInfoResponse patientInfo;
+            try
+            {
+                patientInfo = await dbManager.GetPatientInfo(patientId);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (patientInfo != null)
+                return Ok(patientInfo);
+            return NotFound("Data not found");
+        }
     }
 }
