@@ -40,6 +40,9 @@ namespace VaccinationSystem.Services
         public Task<List<FormerAppointmentResponse>> GetFormerAppointments(Guid patientId);
         public Task<List<IncomingAppointmentResponse>> GetIncomingAppointments(Guid patientId);
         public Task<bool> CancelIncomingAppointment(Guid patientId, Guid appointmentId);
+        public Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url);
+        public Task<Appointment> GetAppointment(Guid appointmentId);
+        public Task<Doctor> GetDoctor(Guid doctorId);
         public Task<PatientInfoResponse> GetPatientInfo(Guid patientId);
         public Task<DoctorInfoResponse> GetDoctorInfo(Guid doctorId);
     }

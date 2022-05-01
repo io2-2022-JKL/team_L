@@ -38,7 +38,9 @@ namespace VaccinationSystem
             services.AddScoped<IDoctorRepository, DoctorRepository>();
             services.AddScoped<IDatabase, SQLServerLocalDB>();
             services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
+            services.AddSingleton<ICertificateGenerator, VaccinationCertificateGenerator>();
             services.AddControllers();
+            MyFontResolver.Apply();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
