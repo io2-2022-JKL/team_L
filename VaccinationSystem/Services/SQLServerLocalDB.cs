@@ -731,9 +731,9 @@ namespace VaccinationSystem.Services
             }
             return false;
         }
-        public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
+       public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
         {
-            var doctor = await dbContext.Doctors.Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.id == doctorId);
+            var doctor = await dbContext.Doctors.Include(d=>d.vaccinationCenter).SingleOrDefaultAsync(d => d.id == doctorId);
             var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
             if (appointment.state != AppointmentState.Finished)
                 return false;
@@ -764,7 +764,6 @@ namespace VaccinationSystem.Services
 
             return doctor;
         }
-
         public async Task<PatientInfoResponse> GetPatientInfo(Guid patientId)
         {
             var patient = await dbContext.Patients.SingleOrDefaultAsync(p => p.id == patientId);
