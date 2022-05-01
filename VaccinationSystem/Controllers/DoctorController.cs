@@ -135,7 +135,6 @@ namespace VaccinationSystem.Contollers
 
             return NotFound("Data not found");
         }
-        
         [Route("info/{doctorId}")]
         [HttpGet]
         public async Task<IActionResult> GetDoctorInfo([FromRoute] Guid doctorId)

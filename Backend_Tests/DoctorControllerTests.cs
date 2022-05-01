@@ -482,7 +482,6 @@ namespace Backend_Tests
         var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
         var badResult = Assert.IsType<BadRequestObjectResult>(incApps);
         Assert.Equal("Something went wrong", badResult.Value.ToString());
-
     }
     private List<DoctorIncomingAppResponse> GetDoctorIncomingAppointments()
     {
