@@ -123,7 +123,7 @@ namespace VaccinationSystem.Contollers
             }
             catch (ArgumentException)
             {
-                return StatusCode(403,"Usr forbidden from modifying");
+                return StatusCode(403, "Usr forbidden from modifying");
             }
             catch (Exception)
             {
@@ -187,6 +187,43 @@ namespace VaccinationSystem.Contollers
             if (created)
                 return Ok("Certificate created");
             return NotFound("Data not found");
+        }
+        [Route("incomingAppointments/{doctorId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctorIncomingAppointments([FromRoute] Guid doctorId)
+        {
+            List<DoctorIncomingAppResponse> incApps;
+            try
+            {
+                incApps = await dbManager.GetDoctorIncomingAppointments(doctorId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (incApps == null || incApps.Count == 0)
+                return NotFound("Data not found");
+            return Ok(incApps);
+        }
+        [Route("formerAppointments/{doctorId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctorFormerAppointments([FromRoute] Guid doctorId)
+        {
+            List<DoctorFormerAppResponse> formerApps;
+            try
+            {
+                formerApps = await dbManager.GetDoctorFormerAppointments(doctorId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (formerApps == null || formerApps.Count == 0)
+                return NotFound("Data not found");
+            return Ok(formerApps);
         }
     }
 }

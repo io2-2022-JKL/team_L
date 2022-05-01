@@ -45,5 +45,7 @@ namespace VaccinationSystem.Services
         public Task<Doctor> GetDoctor(Guid doctorId);
         public Task<PatientInfoResponse> GetPatientInfo(Guid patientId);
         public Task<DoctorInfoResponse> GetDoctorInfo(Guid doctorId);
+        public Task<List<DoctorIncomingAppResponse>> GetDoctorIncomingAppointments(Guid doctoId);
+        public Task<List<DoctorFormerAppResponse>> GetDoctorFormerAppointments(Guid doctoId);
     }
 }
