@@ -730,5 +730,39 @@ namespace VaccinationSystem.Services
             }
             return false;
         }
+        public async Task<PatientInfoResponse> GetPatientInfo(Guid patientId)
+        {
+            var patient = await dbContext.Patients.SingleOrDefaultAsync(p => p.id == patientId);
+            PatientInfoResponse info = null;
+            if(patient!=null)
+            {
+                info = new PatientInfoResponse() {
+                    firstName = patient.firstName,
+                    lastName = patient.lastName,
+                    PESEL = patient.pesel,
+                    dateOfBirth = patient.dateOfBirth.ToString("dd-MM-yyyy"),
+                    mail = patient.mail,
+                    phoneNumber = patient.phoneNumber,
+                };
+            }
+            return info;
+        }
+        public async Task<DoctorInfoResponse> GetDoctorInfo(Guid doctorId)
+        {
+            var doctor = await dbContext.Doctors.Include(d => d.patientAccount)
+                .Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.id == doctorId);
+            DoctorInfoResponse info = null;
+            if(doctor!=null)
+            {
+                info = new DoctorInfoResponse() { 
+                    vaccinationCenterId = doctor.vaccinationCenter.id,
+                    vaccinationCenterName = doctor.vaccinationCenter.name,
+                    vaccinationCenterCity = doctor.vaccinationCenter.city,
+                    vaccinationCenterStreet = doctor.vaccinationCenter.address,
+                    patientAccountId = doctor.patientAccount.id,
+                };
+            }
+            return info;
+        }
     }
 }

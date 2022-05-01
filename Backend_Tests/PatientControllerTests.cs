@@ -340,5 +340,53 @@ namespace Backend_Tests
             var badResult = Assert.IsType<BadRequestObjectResult>(deleted);
             Assert.Equal("Something went wrong", badResult.Value.ToString());
         }
+        [Fact]
+        public async Task GetPatientInfoReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetPatientInfo(patientID)).ReturnsAsync(GetPatientInfo);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var patientInfo = await controller.GetPatientInfo(patientID);
+            var okResult = Assert.IsType<OkObjectResult>(patientInfo);
+            var returnValue = Assert.IsType<PatientInfoResponse>(okResult.Value);
+            Assert.Equal(returnValue.PESEL,GetPatientInfo().PESEL);
+        }
+        [Fact]
+        public async Task GetPatientInfoReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            PatientInfoResponse nullPatienInfo = null;
+            mockDB.Setup(dB => dB.GetPatientInfo(patientID)).ReturnsAsync(nullPatienInfo);
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var patientInfo = await controller.GetPatientInfo(patientID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(patientInfo);
+            Assert.Equal("Data not found",notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetPatientInfoReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetPatientInfo(patientID))
+                    .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var patientInfo = await controller.GetPatientInfo(patientID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(patientInfo);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
+        }
+        private PatientInfoResponse GetPatientInfo()
+        {
+            return new PatientInfoResponse()
+            {
+                firstName = "Jan",
+                lastName = "Nowak",
+                PESEL = "82121211111",
+                dateOfBirth = "12-12-1982",
+                mail = "j.nowak@mail.com",
+                phoneNumber = "+48555221331",
+            };
+        }
     }
 }
