@@ -730,5 +730,63 @@ namespace VaccinationSystem.Services
             }
             return false;
         }
+        public async Task<List<DoctorIncomingAppResponse>> GetDoctorIncomingAppointments(Guid doctorId)
+        {
+            var apps = dbContext.Appointments.Where(a => a.state == AppointmentState.Planned)
+                .Include(a => a.timeSlot).Include(a => a.timeSlot.doctor)
+                .Where(a=> a.timeSlot.doctor.id == doctorId).Include(a => a.patient)
+                .Include(a => a.vaccine).ToList();
+            var incApps = new List<DoctorIncomingAppResponse>();
+            DoctorIncomingAppResponse incAppointment;
+            foreach (var app in apps.ToList())
+            {
+                incAppointment = new DoctorIncomingAppResponse()
+                {
+                    vaccineName = app.vaccine.name,
+                    vaccineCompany = app.vaccine.company,
+                    vaccineVirus = app.vaccine.virus.ToString(),
+                    whichVaccineDose = app.whichDose,
+                    appointmentId = app.id,
+                    from = app.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = app.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
+                    patientFirstName = app.patient.firstName,
+                    patientLastName = app.patient.lastName,
+                };
+                incApps.Add(incAppointment);
+            }
+            return incApps;
+        }
+        public async Task<List<DoctorFormerAppResponse>> GetDoctorFormerAppointments(Guid doctorId)
+        {
+            var apps = dbContext.Appointments.Where(a => a.state == AppointmentState.Finished 
+                                                || a.state == AppointmentState.Cancelled
+                                                // || a.state == AppointmentState.Expired
+                                                )
+                .Include(a => a.timeSlot).Include(a => a.timeSlot.doctor)
+                .Where(a => a.timeSlot.doctor.id == doctorId).Include(a => a.patient)
+                .Include(a => a.vaccine).ToList();
+            var formerApps = new List<DoctorFormerAppResponse>();
+            DoctorFormerAppResponse formerAppointment;
+            foreach (var app in apps.ToList())
+            {
+                formerAppointment = new DoctorFormerAppResponse()
+                {
+                    vaccineName = app.vaccine.name,
+                    vaccineCompany = app.vaccine.company,
+                    vaccineVirus = app.vaccine.virus.ToString(),
+                    whichVaccineDose = app.whichDose,
+                    appointmentId = app.id,
+                    from = app.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = app.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
+                    patientFirstName = app.patient.firstName,
+                    patientLastName = app.patient.lastName,
+                    batchNumber = app.vaccineBatchNumber,
+                    PESEL = app.patient.pesel,
+                    state = app.state.ToString(),
+                };
+                formerApps.Add(formerAppointment);
+            }
+            return formerApps;
+        }
     }
 }
