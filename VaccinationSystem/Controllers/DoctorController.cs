@@ -155,9 +155,10 @@ namespace VaccinationSystem.Contollers
 
                 string url = await certGenerator.Generate(p.firstName + " " + p.lastName, p.dateOfBirth, p.pesel, vc.name, vc.city + " " 
                     + vc.address, a.vaccine.name, a.whichDose, a.vaccineBatchNumber);
+
                 created = await dbManager.CreateCertificate(doctorId, appointmentId, url);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 return StatusCode(403, "User forbidden from creating vaccine certification");
             }
