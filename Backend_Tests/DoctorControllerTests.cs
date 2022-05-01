@@ -19,6 +19,8 @@ namespace Backend_Tests
         private Guid timeSlotID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
         private Guid timeSlotID2 = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5");
         private Guid doctorID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
+        private Guid appointmentID = new Guid("33E18E13-8F45-4766-A0C0-08DA13EF5847");
+        private string url = "jakistamurl";
         [Fact]
         public async Task GetTimeSlotsReturnsTImeSlots()
         {
@@ -262,6 +264,70 @@ namespace Backend_Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(patientFromController);
             Assert.Equal("Data not found", notFoundResult.Value.ToString());
         }
+        [Fact]
+        public async Task CertifyReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var mockCertGen = new Mock<ICertificateGenerator>();
+
+            mockDB.Setup(dB => dB.CreateCertificate(It.IsAny<Guid>(),It.IsAny<Guid>(),It.IsAny<string>())).ReturnsAsync(()=>true);
+            mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
+            mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
+            mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(),It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
+
+
+            var result = await controller.Certify(doctorID, appointmentID);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+
+        }
+        
+        [Fact]
+        public async Task CertifyReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var mockCertGen = new Mock<ICertificateGenerator>();
+
+            mockDB.Setup(dB => dB.CreateCertificate(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(() => false);
+            mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
+            mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
+            mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
+
+
+            var result = await controller.Certify(doctorID, appointmentID);
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("Data not found", notFoundResult.Value);
+        }
+
+
+        [Fact]
+        public async Task CertifyReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var mockCertGen = new Mock<ICertificateGenerator>();
+
+            mockDB.Setup(dB => dB.CreateCertificate(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>()))
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
+            mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
+            mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
+
+
+            var result = await controller.Certify(doctorID, appointmentID);
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
         private PatientResponse GetPatient()
         {
             return new PatientResponse()
@@ -276,6 +342,68 @@ namespace Backend_Tests
                 active = true,
             };
         }
+
+        private Appointment GetAppointment()
+        {
+            return new Appointment()
+            {
+                id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                whichDose = 1,
+                timeSlot = It.IsAny<TimeSlot>(),
+                patient = new Patient
+                {
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    pesel = "82121211111",
+                    dateOfBirth = new DateTime(1982, 12, 12),
+                    firstName = "Jan",
+                    lastName = "Nowak",
+                    mail = "j.nowak@mail.com",
+                    phoneNumber = "+48555221331",
+                    password = "password123()",
+                    active = true
+                },
+                vaccine = new Vaccine
+                {
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    company = "Moderna",
+                    name = "Moderna vaccine",
+                    numberOfDoses = 2,
+                    minDaysBetweenDoses = 30,
+                    minPatientAge = 18,
+                    maxPatientAge = 99,
+                    virus = Virus.Coronavirus,
+                    active = true
+                },
+                state = AppointmentState.Finished,
+                vaccineBatchNumber = "AB-123-nie-wiem"
+            };
+        }
+        private Doctor GetDoctor()
+        {
+            return new Doctor
+            {
+                id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                pesel = "59062011333",
+                dateOfBirth = new DateTime(1959, 06, 20),
+                firstName = "Robert",
+                lastName = "Weide",
+                mail = "robert.b.weide@mail.com",
+                phoneNumber = "+48125200331",
+                password = "123abc!@#",
+                patientAccount = It.IsAny<Patient>(),
+                vaccinationCenter = new VaccinationCenter
+                {
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    name = "Punkt Szczepień Populacyjnych",
+                    city = "Warszawa",
+                    address = "Żwirki i Wigury 95/97",
+                    active = true
+                },
+                active = true
+            };
+        }
+
+
 
     }
 }

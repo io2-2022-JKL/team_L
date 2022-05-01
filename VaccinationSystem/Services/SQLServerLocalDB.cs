@@ -730,5 +730,39 @@ namespace VaccinationSystem.Services
             }
             return false;
         }
+
+        public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
+        {
+            var doctor = await dbContext.Doctors.Include(d=>d.vaccinationCenter).SingleOrDefaultAsync(d => d.id == doctorId);
+            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
+            if (appointment.state != AppointmentState.Finished)
+                return false;
+
+            var certificate = new Certificate()
+            {
+                patientId = appointment.patient.id,
+                vaccineId = appointment.vaccine.id,
+                url = url
+            };
+
+            await dbContext.Certificates.AddAsync(certificate);
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<Appointment> GetAppointment(Guid appointmentId)
+        {
+            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
+
+            return appointment;
+        }
+
+        public Task<Doctor> GetDoctor(Guid doctorId)
+        {
+            var doctor = dbContext.Doctors.Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.id == doctorId);
+
+            return doctor;
+        }
     }
 }
