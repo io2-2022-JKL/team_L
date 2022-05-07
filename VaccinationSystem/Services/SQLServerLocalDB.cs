@@ -104,7 +104,7 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var doctor = dbContext.Doctors.Where(d => d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
             if (doctor != null && doctor.patientAccount.password.CompareTo(login.password) == 0)
             {
                 return new LoginResponse()
@@ -566,7 +566,7 @@ namespace VaccinationSystem.Services
         public async Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter)
         {
             var timeSlots = new List<FilterTimeSlotResponse>();
-            foreach (var tS in dbContext.TimeSlots.Include(tS => tS.doctor).Include(ts => ts.doctor.vaccinationCenter).ToList())
+            foreach (var tS in dbContext.TimeSlots.Include(tS => tS.doctor).Include(ts => ts.doctor.vaccinationCenter).Include(ts=>ts.doctor.patientAccount).ToList())
             {
                 if (tS.from < DateTime.ParseExact(filter.dateFrom, "dd-MM-yyyy hh:mm", null) || tS.to > DateTime.ParseExact(filter.dateTo, "dd-MM-yyyy hh:mm", null) || !tS.isFree || !tS.active)
                     continue;
@@ -635,7 +635,7 @@ namespace VaccinationSystem.Services
         {
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
                 .Where(a => a.state == AppointmentState.Planned).Include(a => a.vaccine).Include(a => a.timeSlot)
-                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
+                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter). Include(a=>a.timeSlot.doctor.patientAccount).ToList();
             var incApps = new List<IncomingAppointmentResponse>();
             IncomingAppointmentResponse incAppointment;
             foreach (var app in apps.ToList())
@@ -664,7 +664,7 @@ namespace VaccinationSystem.Services
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
                .Where(a => a.state == AppointmentState.Finished || a.state == AppointmentState.Cancelled)
                .Include(a => a.vaccine).Include(a => a.timeSlot)
-               .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).ToList();
+               .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a=>a.timeSlot.doctor.patientAccount).ToList();
             var formerApps = new List<FormerAppointmentResponse>();
             FormerAppointmentResponse formAppointment;
             foreach (var app in apps.ToList())
@@ -735,7 +735,7 @@ namespace VaccinationSystem.Services
 
         public Task<Doctor> GetDoctor(Guid doctorId)
         {
-            var doctor = dbContext.Doctors.Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
+            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
 
             return doctor;
         }
