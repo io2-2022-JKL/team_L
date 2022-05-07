@@ -94,8 +94,8 @@ namespace Backend_Tests
             var okResult = Assert.IsType<OkObjectResult>(slots);
 
 
-            var returnValue = Assert.IsType<FilterTimeSlotsControllerResponse>(okResult.Value);
-            Assert.Single(returnValue.data);
+            var returnValue = Assert.IsType<List<FilterTimeSlotResponse>>(okResult.Value);
+            Assert.Single(returnValue);
 
         }
 

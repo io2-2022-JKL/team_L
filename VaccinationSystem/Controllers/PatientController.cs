@@ -76,8 +76,7 @@ namespace VaccinationSystem.Controllers
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");
 
-            var response = new FilterTimeSlotsControllerResponse() { data = timeSlots };
-            return Ok(response);
+            return Ok(timeSlots);
         }
 
         [Route("certificates/{patientId}")]
