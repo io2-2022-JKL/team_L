@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.Models
 {
-    public class Doctor : User
+    public class Doctor
     {
-
+        [Key]
+        public Guid doctorId { get; set; }
         [ForeignKey("vaccinationCenterId")]
         public VaccinationCenter vaccinationCenter { get; set; }
         public IEnumerable<Appointment> vaccinationsArchive { get; set; }
