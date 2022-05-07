@@ -345,26 +345,12 @@ namespace VaccinationSystem.Data
                 var vaccCenter2 = context.VaccinationCenters.Where(center => center.name == "Apteczny Punkt Szczepień").ToList().First();
                 var doctorWeide = new Doctor
                 {
-                    pesel = "59062011333",
-                    dateOfBirth = new DateTime(1959, 06, 20),
-                    firstName = "Robert",
-                    lastName = "Weide",
-                    mail = "robert.b.weide@mail.com",
-                    phoneNumber = "+48125200331",
-                    password = "123abc!@#",
                     patientAccount = patientWeide,
                     vaccinationCenter = vaccCenter1,
                     active = true
                 };
                 var doctorKowalska = new Doctor
                 {
-                    pesel = "74011011111",
-                    dateOfBirth = new DateTime(1974, 01, 10),
-                    firstName = "Monika",
-                    lastName = "Kowalska",
-                    mail = "m.kowalska@mail.com",
-                    phoneNumber = "+48349824991",
-                    password = "wasd1234lkj098",
                     patientAccount = patientKowalska,
                     vaccinationCenter = vaccCenter2,
                     active = true
@@ -378,8 +364,8 @@ namespace VaccinationSystem.Data
             }
             if (!context.Appointments.Any())
             {
-                var doctorWeide = context.Doctors.Where(patient => patient.lastName == "Weide").ToList().First();
-                var doctorKowalska = context.Doctors.Where(patient => patient.lastName == "Kowalska").ToList().First();
+                var doctorWeide = context.Doctors.Where(d => d.patientAccount.lastName == "Weide").ToList().First();
+                var doctorKowalska = context.Doctors.Where(d => d.patientAccount.lastName == "Kowalska").ToList().First();
                 List<TimeSlot> listSlots = new List<TimeSlot>()
                 {
                     new TimeSlot

@@ -381,14 +381,7 @@ namespace Backend_Tests
         {
             return new Doctor
             {
-                id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
-                pesel = "59062011333",
-                dateOfBirth = new DateTime(1959, 06, 20),
-                firstName = "Robert",
-                lastName = "Weide",
-                mail = "robert.b.weide@mail.com",
-                phoneNumber = "+48125200331",
-                password = "123abc!@#",
+                doctorId = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
                 patientAccount = It.IsAny<Patient>(),
                 vaccinationCenter = new VaccinationCenter
                 {
