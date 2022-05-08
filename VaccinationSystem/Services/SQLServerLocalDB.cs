@@ -833,5 +833,15 @@ namespace VaccinationSystem.Services
             }
             return formerApps;
         }
+
+        public Task<bool> UpdateVaccinationCount(Guid appointmentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateBatchInAppointment(Guid appointmentId, string batchId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

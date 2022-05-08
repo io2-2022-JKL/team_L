@@ -225,5 +225,32 @@ namespace VaccinationSystem.Contollers
                 return NotFound("Data not found");
             return Ok(formerApps);
         }
+        [HttpPost]
+        [Route("/doctor/vaccinate/confirmVaccination/{doctorId}/{appointmentId}/{batchId}")]
+        public async Task<IActionResult> ConfirmVaccination([FromRoute] Guid doctorId, [FromRoute] Guid appoinmentId, [FromRoute] string batchId)
+        {
+            bool success = false;
+            try
+            {
+                var successVCount = await dbManager.UpdateVaccinationCount(appoinmentId);
+                if (!successVCount)
+                    return BadRequest("Updating vaccination count failed");
+                var successApp = await dbManager.UpdateBatchInAppointment(appoinmentId, batchId);
+                if (!successApp)
+                    return BadRequest("Updating batch number failed");
+                success = true;
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from confirming vaccination");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+            if (success)
+                return Ok("Information updated");
+            return NotFound("Data not found");
+        }
     }
 }
