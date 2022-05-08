@@ -461,12 +461,12 @@ namespace VaccinationSystem.Services
 
         public async Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest)
         {
-            DateTime date = visitRequest.from;
+            DateTime date = visitRequest.windowBegin;
             Doctor doctor = await dbContext.Doctors.SingleOrDefaultAsync(d => d.doctorId == doctorId);
             if (doctor == null)
                 throw new ArgumentException();
 
-            while (date.AddMinutes(visitRequest.timeSlotDurationInMinutes) <= visitRequest.to)
+            while (date.AddMinutes(visitRequest.timeSlotDurationInMinutes) <= visitRequest.windowEnd)
             {
                 await dbContext.TimeSlots.AddAsync(new TimeSlot
                 {

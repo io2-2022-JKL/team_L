@@ -215,8 +215,8 @@ namespace Backend_Tests
         {
             return new CreateNewVisitRequest()
             {
-                from = DateTime.Parse("2022-01-29T08:00"),
-                to = DateTime.Parse("2022-01-29T09:00"),
+                windowBegin = DateTime.Parse("2022-01-29T08:00"),
+                windowEnd = DateTime.Parse("2022-01-29T09:00"),
                 timeSlotDurationInMinutes = 15
             };
         }
