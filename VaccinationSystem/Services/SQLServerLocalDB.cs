@@ -865,6 +865,13 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> UpdateBatchInAppointment(Guid appointmentId, string batchId)
         {
+            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            if (appointment == null)
+                return false;
+            appointment.vaccineBatchNumber = batchId;
+
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
             return true;
         }
     }
