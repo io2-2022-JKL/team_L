@@ -834,11 +834,14 @@ namespace VaccinationSystem.Services
             return formerApps;
         }
 
-        public async Task<bool> UpdateVaccinationCount(Guid appointmentId)
+        public async Task<bool> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
             var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
             if (appointment == null)
                 return false;
+
+            if (appointment.timeSlot.doctor.doctorId != doctorId)
+                throw new ArgumentException();
 
             if (appointment.whichDose == 1)
             {
@@ -863,11 +866,14 @@ namespace VaccinationSystem.Services
             return true;
         }
 
-        public async Task<bool> UpdateBatchInAppointment(Guid appointmentId, string batchId)
+        public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
         {
             var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
             if (appointment == null)
                 return false;
+            if (appointment.timeSlot.doctor.doctorId != doctorId)
+                throw new ArgumentException();
+
             appointment.vaccineBatchNumber = batchId;
 
             await dbContext.SaveChangesAsync();
