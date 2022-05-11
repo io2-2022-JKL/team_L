@@ -154,7 +154,7 @@ namespace VaccinationSystem.Contollers
             return NotFound("Data not found");
         }
         [HttpPost]
-        [Route("/doctor/vaccinate/certify/{doctorId}/{appointmentId}")]
+        [Route("vaccinate/certify/{doctorId}/{appointmentId}")]
         public async Task<IActionResult> Certify([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId)
         {
 
@@ -226,7 +226,7 @@ namespace VaccinationSystem.Contollers
             return Ok(formerApps);
         }
         [HttpPost]
-        [Route("/doctor/vaccinate/confirmVaccination/{doctorId}/{appointmentId}/{batchId}")]
+        [Route("vaccinate/confirmVaccination/{doctorId}/{appointmentId}/{batchId}")]
         public async Task<IActionResult> ConfirmVaccination([FromRoute] Guid doctorId, [FromRoute] Guid appoinmentId, [FromRoute] string batchId)
         {
             bool success = false;
