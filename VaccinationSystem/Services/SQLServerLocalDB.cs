@@ -719,6 +719,7 @@ namespace VaccinationSystem.Services
                 vaccineId = appointment.vaccine.id,
                 url = url
             };
+            appointment.certifyState = CertificateState.Certified;
 
             await dbContext.Certificates.AddAsync(certificate);
             await dbContext.SaveChangesAsync();
