@@ -21,6 +21,7 @@ namespace Backend_Tests
         private Guid doctorID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
         private Guid appointmentID = new Guid("33E18E13-8F45-4766-A0C0-08DA13EF5847");
         private string url = "jakistamurl";
+        private string batch = "batch01234";
         [Fact]
         public async Task GetTimeSlotsReturnsTImeSlots()
         {
@@ -271,10 +272,10 @@ namespace Backend_Tests
             var mockSignIn = new Mock<IUserSignInManager>();
             var mockCertGen = new Mock<ICertificateGenerator>();
 
-            mockDB.Setup(dB => dB.CreateCertificate(It.IsAny<Guid>(),It.IsAny<Guid>(),It.IsAny<string>())).ReturnsAsync(()=>true);
+            mockDB.Setup(dB => dB.CreateCertificate(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(() => true);
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
-            mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(),It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
+            mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
@@ -284,7 +285,7 @@ namespace Backend_Tests
             var okResult = Assert.IsType<OkObjectResult>(result);
 
         }
-        
+
         [Fact]
         public async Task CertifyReturnsNotFound()
         {
@@ -305,7 +306,6 @@ namespace Backend_Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("Data not found", notFoundResult.Value);
         }
-
 
         [Fact]
         public async Task CertifyReturnsBadRequestDatabaseException()
@@ -441,95 +441,95 @@ namespace Backend_Tests
                 patientAccountId = new Guid("F70AA1AD-7E62-44CE-EAE5-08DA26242413"),
             };
         }
-    [Fact]
-    public async Task GetDoctorIncomingAppointmentsReturnsOk()
-    {
-        var mockDB = new Mock<IDatabase>();
-        var mockSignIn = new Mock<IUserSignInManager>();
-        mockDB.Setup(dB => dB.GetDoctorIncomingAppointments(doctorID)).ReturnsAsync(GetDoctorIncomingAppointments);
-        var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
-        var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
-        var okResult = Assert.IsType<OkObjectResult>(incApps);
-        var returnValue = Assert.IsType<List<DoctorIncomingAppResponse>>(okResult.Value);
-        Assert.Single(returnValue);
-    }
-    [Fact]
-    public async Task GetDoctorIncomingAppointmentsReturnsNotFound()
-    {
-        var mockDB = new Mock<IDatabase>();
-        var mockSignIn = new Mock<IUserSignInManager>();
-        mockDB.Setup(dB => dB.GetDoctorIncomingAppointments(doctorID)).ReturnsAsync(new List<DoctorIncomingAppResponse>());
-        var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
-        var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(incApps);
-        Assert.Equal("Data not found", notFoundResult.Value.ToString());
-    }
-    [Fact]
-    public async Task GetDoctorIncomingAppointmentsReturnsBadRequestDatabaseException()
-    {
-        var mockDB = new Mock<IDatabase>();
-        var mockSignIn = new Mock<IUserSignInManager>();
-        mockDB.Setup(dB => dB.GetDoctorIncomingAppointments(doctorID)).
-                                ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
-        var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
-        var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
-        var badResult = Assert.IsType<BadRequestObjectResult>(incApps);
-        Assert.Equal("Something went wrong", badResult.Value.ToString());
-    }
-    private List<DoctorIncomingAppResponse> GetDoctorIncomingAppointments()
-    {
-        var incApps = new List<DoctorIncomingAppResponse>();
-        incApps.Add(
-            new DoctorIncomingAppResponse()
-            {
-                vaccineName = "Pfeizer vaccine",
-                vaccineCompany = "Pfeizer",
-                vaccineVirus = "Coronavirus",
-                whichVaccineDose = 1,
-                appointmentId = new Guid("12b6f4f2-24f5-4c65-0746-08da26242468"),
-                from = "24-04-2022 12:30",
-                to = "24-04-2022 12:45",
-                patientFirstName = "Janina",
-                patientLastName = "Nowakowa"
-            });
-        return incApps;
-    }
-    [Fact]
-    public async Task GetDoctorFormerAppointmentsReturnsOk()
-    {
-        var mockDB = new Mock<IDatabase>();
-        var mockSignIn = new Mock<IUserSignInManager>();
-        mockDB.Setup(dB => dB.GetDoctorFormerAppointments(doctorID)).ReturnsAsync(GetDoctorFormerAppointments);
-        var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
-        var formApps = await controller.GetDoctorFormerAppointments(doctorID);
-        var okResult = Assert.IsType<OkObjectResult>(formApps);
-        var returnValue = Assert.IsType<List<DoctorFormerAppResponse>>(okResult.Value);
-        Assert.Single(returnValue);
-    }
-    [Fact]
-    public async Task GetDoctorFormerAppointmentsReturnsNotFound()
-    {
-        var mockDB = new Mock<IDatabase>();
-        var mockSignIn = new Mock<IUserSignInManager>();
-        mockDB.Setup(dB => dB.GetDoctorFormerAppointments(doctorID)).ReturnsAsync(new List<DoctorFormerAppResponse>());
-        var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
-        var formApps = await controller.GetDoctorFormerAppointments(doctorID);
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(formApps);
-        Assert.Equal("Data not found", notFoundResult.Value.ToString());
-    }
-    [Fact]
-    public async Task GetDoctorFormerAppointmentsReturnsBadRequestDatabaseException()
-    {
-        var mockDB = new Mock<IDatabase>();
-        var mockSignIn = new Mock<IUserSignInManager>();
-        mockDB.Setup(dB => dB.GetDoctorFormerAppointments(doctorID)).
-                                ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
-        var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
-        var formApps = await controller.GetDoctorFormerAppointments(doctorID);
-        var badResult = Assert.IsType<BadRequestObjectResult>(formApps);
-        Assert.Equal("Something went wrong", badResult.Value.ToString());
+        [Fact]
+        public async Task GetDoctorIncomingAppointmentsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorIncomingAppointments(doctorID)).ReturnsAsync(GetDoctorIncomingAppointments);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
+            var okResult = Assert.IsType<OkObjectResult>(incApps);
+            var returnValue = Assert.IsType<List<DoctorIncomingAppResponse>>(okResult.Value);
+            Assert.Single(returnValue);
+        }
+        [Fact]
+        public async Task GetDoctorIncomingAppointmentsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorIncomingAppointments(doctorID)).ReturnsAsync(new List<DoctorIncomingAppResponse>());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(incApps);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetDoctorIncomingAppointmentsReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorIncomingAppointments(doctorID)).
+                                    ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var incApps = await controller.GetDoctorIncomingAppointments(doctorID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(incApps);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
+        }
+        private List<DoctorIncomingAppResponse> GetDoctorIncomingAppointments()
+        {
+            var incApps = new List<DoctorIncomingAppResponse>();
+            incApps.Add(
+                new DoctorIncomingAppResponse()
+                {
+                    vaccineName = "Pfeizer vaccine",
+                    vaccineCompany = "Pfeizer",
+                    vaccineVirus = "Coronavirus",
+                    whichVaccineDose = 1,
+                    appointmentId = new Guid("12b6f4f2-24f5-4c65-0746-08da26242468"),
+                    from = "24-04-2022 12:30",
+                    to = "24-04-2022 12:45",
+                    patientFirstName = "Janina",
+                    patientLastName = "Nowakowa"
+                });
+            return incApps;
+        }
+        [Fact]
+        public async Task GetDoctorFormerAppointmentsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorFormerAppointments(doctorID)).ReturnsAsync(GetDoctorFormerAppointments);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var formApps = await controller.GetDoctorFormerAppointments(doctorID);
+            var okResult = Assert.IsType<OkObjectResult>(formApps);
+            var returnValue = Assert.IsType<List<DoctorFormerAppResponse>>(okResult.Value);
+            Assert.Single(returnValue);
+        }
+        [Fact]
+        public async Task GetDoctorFormerAppointmentsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorFormerAppointments(doctorID)).ReturnsAsync(new List<DoctorFormerAppResponse>());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var formApps = await controller.GetDoctorFormerAppointments(doctorID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(formApps);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetDoctorFormerAppointmentsReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetDoctorFormerAppointments(doctorID)).
+                                    ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var formApps = await controller.GetDoctorFormerAppointments(doctorID);
+            var badResult = Assert.IsType<BadRequestObjectResult>(formApps);
+            Assert.Equal("Something went wrong", badResult.Value.ToString());
 
-    }
+        }
         private List<DoctorFormerAppResponse> GetDoctorFormerAppointments()
         {
             var formApps = new List<DoctorFormerAppResponse>();
@@ -550,6 +550,86 @@ namespace Backend_Tests
                     batchNumber = "AB-123-nie-wiem"
                 });
             return formApps;
+        }
+
+        [Fact]
+        public async Task ConfirmVaccinationOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ReturnsAsync(() => true);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task ConfirmVaccinationForbiddenOnUpdateVCount()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ThrowsAsync(new ArgumentException());
+            mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ReturnsAsync(() => true);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var confirm = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
+            var result = Assert.IsType<ObjectResult>(confirm);
+            Assert.Equal(403, result.StatusCode);
+        }
+        [Fact]
+        public async Task ConfirmVaccinationForbiddenOnUpdateBatch()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ThrowsAsync(new ArgumentException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var confirm = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
+            var result = Assert.IsType<ObjectResult>(confirm);
+            Assert.Equal(403, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task ConfirmVaccinationExceptionOnUpdateVCount()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ReturnsAsync(() => true);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var confirm = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(confirm);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task ConfirmVaccinationExceptionOnUpdateBatch()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var confirm = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(confirm);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+
+        [Fact]
+        public async Task ConfirmVaccinationBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            controller.ModelState.AddModelError("id", "Bad format");
+
+            var result = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
+            Assert.IsType<BadRequestObjectResult>(result);
         }
     }
 }

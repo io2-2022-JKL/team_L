@@ -833,5 +833,52 @@ namespace VaccinationSystem.Services
             }
             return formerApps;
         }
+
+        public async Task<bool> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
+        {
+            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            if (appointment == null)
+                return false;
+
+            if (appointment.timeSlot.doctor.doctorId != doctorId)
+                throw new ArgumentException();
+
+            if (appointment.whichDose == 1)
+            {
+                var newCount = new VaccinationCount()
+                {
+                    virus = appointment.vaccine.virus,
+                    count = 1,
+                    patient = appointment.patient
+                };
+                dbContext.VaccinationCounts.Add(newCount);
+            }
+            else
+            {
+                var count = await dbContext.VaccinationCounts.SingleAsync(c => c.patient == appointment.patient && c.virus == appointment.vaccine.virus);
+                if (count == null)
+                    return false;
+                count.count++;
+            }
+
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
+        {
+            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            if (appointment == null)
+                return false;
+            if (appointment.timeSlot.doctor.doctorId != doctorId)
+                throw new ArgumentException();
+
+            appointment.vaccineBatchNumber = batchId;
+
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
+            return true;
+        }
     }
 }
