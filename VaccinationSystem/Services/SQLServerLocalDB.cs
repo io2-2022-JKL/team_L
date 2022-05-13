@@ -552,6 +552,7 @@ namespace VaccinationSystem.Services
                 vaccine = vaccine,
                 state = AppointmentState.Planned,
                 whichDose = 1,
+                certifyState = vaccine.numberOfDoses == 1 ? CertificateState.LastNotCertified : CertificateState.NotLast
             };
 
             dbContext.Appointments.Add(appointment);
