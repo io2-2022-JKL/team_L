@@ -837,9 +837,11 @@ namespace VaccinationSystem.Services
         public async Task<bool> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
             var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
                 return false;
-
+            if (doctor.active == false)
+                return false;
             if (appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
@@ -869,7 +871,10 @@ namespace VaccinationSystem.Services
         public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
         {
             var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
+                return false;
+            if (doctor.active == false)
                 return false;
             if (appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();

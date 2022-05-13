@@ -265,5 +265,45 @@ namespace VaccinationSystem.Contollers
                 return Ok("Information updated");
             return NotFound("Data not found");
         }
+        [HttpPost]
+        [Route("vaccinate/vaccinationDidNotHappen/{doctorId}/{appointmentId}")]
+        public async Task<IActionResult> VaccinationDidNotHappen([FromRoute] Guid doctorId, [FromRoute] Guid appoinmentId)
+        {
+            bool success = false;
+            try
+            {
+                var successVCount = await dbManager.UpdateVaccinationCount(doctorId, appoinmentId);
+                if (!successVCount)
+                    return BadRequest("Updating vaccination count failed");
+
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from confirming vaccination");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+            try
+            {
+                var successApp = await dbManager.UpdateBatchInAppointment(doctorId, appoinmentId, batchId);
+                if (!successApp)
+                    return BadRequest("Updating batch number failed");
+                success = true;
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from confirming vaccination");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (success)
+                return Ok("Information updated");
+            return NotFound("Data not found");
+        }
     }
 }
