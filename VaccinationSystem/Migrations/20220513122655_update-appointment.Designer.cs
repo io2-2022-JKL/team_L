@@ -10,8 +10,8 @@ using VaccinationSystem.Data;
 namespace VaccinationSystem.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20220507104816_updateddoc")]
-    partial class updateddoc
+    [Migration("20220513122655_update-appointment")]
+    partial class updateappointment
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -67,6 +67,9 @@ namespace VaccinationSystem.Migrations
 
                     b.Property<Guid?>("Patientid1")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("certifyState")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("doctorId")
                         .HasColumnType("uniqueidentifier");
