@@ -374,7 +374,8 @@ namespace Backend_Tests
                     active = true
                 },
                 state = AppointmentState.Finished,
-                vaccineBatchNumber = "AB-123-nie-wiem"
+                vaccineBatchNumber = "AB-123-nie-wiem",
+                certifyState = CertificateState.NotLast
             };
         }
         private Doctor GetDoctor()
