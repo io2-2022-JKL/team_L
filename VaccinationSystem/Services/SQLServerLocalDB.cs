@@ -545,13 +545,14 @@ namespace VaccinationSystem.Services
             }
 
             timeSlot.isFree = false;
+            var vaccineCount = await dbContext.VaccinationCounts.SingleOrDefaultAsync(c => c.patient.id == patientId && c.virus == vaccine.virus);
             var appointment = new Appointment()
             {
                 patient = patient,
                 timeSlot = timeSlot,
                 vaccine = vaccine,
                 state = AppointmentState.Planned,
-                whichDose = 1,
+                whichDose = vaccineCount == null ? 1 : (vaccineCount.count+1),
                 certifyState = vaccine.numberOfDoses == 1 ? CertificateState.LastNotCertified : CertificateState.NotLast
             };
 
