@@ -285,21 +285,6 @@ namespace VaccinationSystem.Contollers
             {
                 return BadRequest("Something went wrong");
             }
-            try
-            {
-                var successApp = await dbManager.UpdateBatchInAppointment(doctorId, appoinmentId, batchId);
-                if (!successApp)
-                    return BadRequest("Updating batch number failed");
-                success = true;
-            }
-            catch (ArgumentException)
-            {
-                return StatusCode(403, "User forbidden from confirming vaccination");
-            }
-            catch (Exception)
-            {
-                return BadRequest("Something went wrong");
-            }
 
             if (success)
                 return Ok("Information updated");
