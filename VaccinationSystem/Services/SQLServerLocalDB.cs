@@ -451,8 +451,8 @@ namespace VaccinationSystem.Services
                 .Select(s => new TimeSlotsResponse
                 {
                     id = s.id,
-                    from = s.from.ToString("s"),
-                    to = s.to.ToString("s"),
+                    from = s.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = s.to.ToString("dd-MM-yyyy HH:mm"),
                     isFree = s.isFree
                 }).ToListAsync();
 
