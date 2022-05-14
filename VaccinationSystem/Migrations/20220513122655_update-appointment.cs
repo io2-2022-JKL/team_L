@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VaccinationSystem.Migrations
 {
-    public partial class updateddoc : Migration
+    public partial class updateappointment : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -231,6 +231,7 @@ namespace VaccinationSystem.Migrations
                     vaccineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     state = table.Column<int>(type: "int", nullable: false),
                     vaccineBatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    certifyState = table.Column<int>(type: "int", nullable: false),
                     Patientid1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     doctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     doctorId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)

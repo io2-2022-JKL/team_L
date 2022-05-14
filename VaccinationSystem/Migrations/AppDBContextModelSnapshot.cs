@@ -66,6 +66,9 @@ namespace VaccinationSystem.Migrations
                     b.Property<Guid?>("Patientid1")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("certifyState")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("doctorId")
                         .HasColumnType("uniqueidentifier");
 
