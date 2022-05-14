@@ -888,5 +888,24 @@ namespace VaccinationSystem.Services
             await dbContext.Database.CommitTransactionAsync();
             return true;
         }
+
+        public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
+        {
+            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
+            if (appointment == null)
+                return false;
+            if (doctor.active == false)
+                return false;
+            if (appointment.timeSlot.doctor.doctorId != doctorId)
+                throw new ArgumentException();
+
+            appointment.certifyState = CertificateState.NotLast;
+            appointment.vaccineBatchNumber = "";
+
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
+            return true;
+        }
     }
 }

@@ -272,14 +272,15 @@ namespace VaccinationSystem.Contollers
             bool success = false;
             try
             {
-                var successVCount = await dbManager.UpdateVaccinationCount(doctorId, appoinmentId);
+                var successVCount = await dbManager.UpdateAppointmentVaccinationDidNotHappen(doctorId, appoinmentId);
                 if (!successVCount)
-                    return BadRequest("Updating vaccination count failed");
+                    return BadRequest("Updating appointment information failed");
+                success = true;
 
             }
             catch (ArgumentException)
             {
-                return StatusCode(403, "User forbidden from confirming vaccination");
+                return StatusCode(403, "User forbidden from not confirming vaccination");
             }
             catch (Exception)
             {
