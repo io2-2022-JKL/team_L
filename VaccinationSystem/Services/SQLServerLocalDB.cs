@@ -461,12 +461,15 @@ namespace VaccinationSystem.Services
 
         public async Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest)
         {
-            DateTime date = visitRequest.from;
+            DateTime date = DateTime.ParseExact(visitRequest.windowBegin, "dd-MM-yyyy HH:mm", null);
+            DateTime dateTo = DateTime.ParseExact(visitRequest.windowEnd, "dd-MM-yyyy HH:mm", null);
+
+
             Doctor doctor = await dbContext.Doctors.SingleOrDefaultAsync(d => d.doctorId == doctorId);
             if (doctor == null)
                 throw new ArgumentException();
 
-            while (date.AddMinutes(visitRequest.timeSlotDurationInMinutes) <= visitRequest.to)
+            while (date.AddMinutes(visitRequest.timeSlotDurationInMinutes) <= dateTo)
             {
                 await dbContext.TimeSlots.AddAsync(new TimeSlot
                 {
@@ -492,8 +495,8 @@ namespace VaccinationSystem.Services
             if (slot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
-            slot.from = timeSlot.from;
-            slot.to = timeSlot.to;
+            slot.from = DateTime.ParseExact(timeSlot.timeFrom, "dd-MM-yyyy HH:mm", null);
+            slot.to = DateTime.ParseExact(timeSlot.timeTo, "dd-MM-yyyy HH:mm", null);
 
             await dbContext.SaveChangesAsync();
 

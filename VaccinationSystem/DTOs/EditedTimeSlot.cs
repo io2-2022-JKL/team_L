@@ -7,7 +7,7 @@ namespace VaccinationSystem.DTOs
 {
     public class EditedTimeSlot
     {
-        public DateTime from { get; set; }
-        public DateTime to { get; set; }
+        public string timeFrom { get; set; }
+        public string timeTo { get; set; }
     }
 }
