@@ -632,5 +632,72 @@ namespace Backend_Tests
             var result = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
             Assert.IsType<BadRequestObjectResult>(result);
         }
+        [Fact]
+        public async Task StartVaccinationReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetStartedAppointmentInfo(doctorID, appointmentID)).ReturnsAsync(GetStartedAppInfo);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var info = await controller.StartVaccination(doctorID,appointmentID);
+            var okResult = Assert.IsType<OkObjectResult>(info);
+            var returnValue = Assert.IsType<StartVaccinationResponse>(okResult.Value);
+        }
+        [Fact]
+        public async Task StartVaccinationReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            StartVaccinationResponse response = null;
+            mockDB.Setup(dB => dB.GetStartedAppointmentInfo(doctorID, appointmentID)).ReturnsAsync(response);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var info = await controller.StartVaccination(doctorID, appointmentID);
+            var notFound = Assert.IsType<NotFoundObjectResult>(info);
+            Assert.Equal("Data not found", notFound.Value.ToString());
+        }
+        [Fact]
+        public async Task StartVaccinationReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetStartedAppointmentInfo(doctorID, appointmentID))
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var info = await controller.StartVaccination(doctorID, appointmentID);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(info);
+            Assert.Equal("Something went wrong", badRequestResult.Value.ToString());
+        }
+        [Fact]
+        public async Task StartVaccinationReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetStartedAppointmentInfo(doctorID, appointmentID))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var info = await controller.StartVaccination(doctorID, appointmentID);
+            var forbiddentResult = Assert.IsType<ObjectResult>(info);
+            Assert.Equal(403, forbiddentResult.StatusCode);
+        }
+        private StartVaccinationResponse GetStartedAppInfo()
+        {
+            return new StartVaccinationResponse()
+            {
+                  vaccineName= "Pfeizer vaccine",
+                  vaccineCompany= "Pfeizer",
+                  numberOfDoses= 2,
+                  minDaysBetweenDoses= 30,
+                  maxDaysBetweenDoses= 100,
+                  virusName= "Coronavirus",
+                  minPatientAge= 12,
+                  maxPatientAge= 80,
+                  patientFirstName= "Janina",
+                  patientLastName= "Nowakowa",
+                  PESEL= "92120211122",
+                  dateOfBirth= "02-00-1992",
+                  from= "25-05-2022 12:45",
+                  to= "25-05-2022 13:00"
+            };
+        }
     }
 }
