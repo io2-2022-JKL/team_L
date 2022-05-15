@@ -265,5 +265,27 @@ namespace VaccinationSystem.Contollers
                 return Ok("Information updated");
             return NotFound("Data not found");
         }
+        [HttpGet]
+        [Route("vaccinate/{doctorId}/{appointmentId}")]
+        public async Task<IActionResult> StartVaccination([FromRoute]Guid doctorId, [FromRoute] Guid appointmentId)
+        {
+            StartVaccinationResponse vaccResponse;
+            try
+            {
+                vaccResponse = await dbManager.GetStartedAppointmentInfo(doctorId, appointmentId);
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from getting detailed info");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (vaccResponse != null)
+                return Ok(vaccResponse);
+            return NotFound("Data not found");
+        }
     }
 }
