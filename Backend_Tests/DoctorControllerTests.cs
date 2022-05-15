@@ -699,5 +699,53 @@ namespace Backend_Tests
                   to= "25-05-2022 13:00"
             };
         }
+
+        [Fact]
+        public async Task VaccinationDidNotHappenOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateAppointmentVaccinationDidNotHappen(doctorID, appointmentID)).ReturnsAsync(() => true);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.VaccinationDidNotHappen(doctorID, appointmentID);
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+        [Fact]
+        public async Task VaccinationDidNotHappenForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateAppointmentVaccinationDidNotHappen(doctorID, appointmentID)).ThrowsAsync(new ArgumentException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var confirm = await controller.VaccinationDidNotHappen(doctorID, appointmentID);
+            var result = Assert.IsType<ObjectResult>(confirm);
+            Assert.Equal(403, result.StatusCode);
+        }
+        [Fact]
+        public async Task VaccinationDidNotHappenException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.UpdateAppointmentVaccinationDidNotHappen(doctorID, appointmentID)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+
+            var confirm = await controller.VaccinationDidNotHappen(doctorID, appointmentID);
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(confirm);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task VaccinationDidNotHappenBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            controller.ModelState.AddModelError("id", "Bad format");
+
+            var result = await controller.VaccinationDidNotHappen(doctorID, appointmentID);
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
     }
 }
