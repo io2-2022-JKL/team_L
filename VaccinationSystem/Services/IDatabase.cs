@@ -51,5 +51,6 @@ namespace VaccinationSystem.Services
         public Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId);
         public Task<List<CityResponse>> GetCities();
         public Task<List<VirusResponse>> GetViruses();
+        public Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId);
     }
 }

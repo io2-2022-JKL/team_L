@@ -886,7 +886,36 @@ namespace VaccinationSystem.Services
             await dbContext.Database.CommitTransactionAsync();
             return true;
         }
-
+        public async Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId)
+        {
+            var appointment = dbContext.Appointments
+                .Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).Include(a => a.patient)
+                .Include(a => a.vaccine).SingleOrDefault(a=>a.id == appointmentId);
+            if(appointment.state!= AppointmentState.Planned || appointment.timeSlot.doctor.doctorId!=doctorId)
+                throw new ArgumentException();
+            StartVaccinationResponse response = null;
+            if(appointment!=null)
+            {
+                response = new StartVaccinationResponse()
+                {
+                    vaccineName = appointment.vaccine.name,
+                    vaccineCompany = appointment.vaccine.company,
+                    numberOfDoses = appointment.vaccine.numberOfDoses,
+                    minDaysBetweenDoses = appointment.vaccine.minDaysBetweenDoses,
+                    maxDaysBetweenDoses = appointment.vaccine.maxDaysBetweenDoses,
+                    virusName = appointment.vaccine.virus.ToString(),
+                    minPatientAge = appointment.vaccine.minPatientAge,
+                    maxPatientAge = appointment.vaccine.maxPatientAge,
+                    patientFirstName = appointment.patient.firstName,
+                    patientLastName = appointment.patient.lastName,
+                    PESEL = appointment.patient.pesel,
+                    dateOfBirth = appointment.patient.dateOfBirth.ToString("dd-mm-yyyy"),
+                    from = appointment.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = appointment.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
+                };
+            }
+            return response;
+        }
         public async Task<List<CityResponse>> GetCities()
         {
             var cityNames = await dbContext.VaccinationCenters.Select(vC => vC.city)
