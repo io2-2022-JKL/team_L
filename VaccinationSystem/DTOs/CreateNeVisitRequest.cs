@@ -7,8 +7,8 @@ namespace VaccinationSystem.DTOs
 {
     public class CreateNewVisitRequest
     {
-        public DateTime from { get; set; }
-        public DateTime to { get; set; }
+        public string windowBegin { get; set; }
+        public string windowEnd { get; set; }
         public int timeSlotDurationInMinutes { get; set; }
     }
 }

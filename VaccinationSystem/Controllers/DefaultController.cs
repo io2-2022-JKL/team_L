@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.Data;
+using VaccinationSystem.DTOs;
 
 
 namespace VaccinationSystem.Controllers
@@ -81,6 +82,46 @@ namespace VaccinationSystem.Controllers
 
             //signInManager.SignOut(userId);
             return Ok("OK, successfully logged out");
+        }
+
+        [Route("/cities")]
+        [HttpGet]
+        public async Task<IActionResult> GetCities()
+        {
+            List<CityResponse> cities;
+            try
+            {
+                cities = await dbManager.GetCities();
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (cities == null ||cities.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(cities);
+        }
+
+        [Route("/viruses")]
+        [HttpGet]
+        public async Task<IActionResult> GetViruses()
+        {
+            List<VirusResponse> viruses;
+            try
+            {
+                viruses = await dbManager.GetViruses();
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (viruses == null || viruses.Count == 0)
+                return NotFound("Data not found");
+
+            return Ok(viruses);
         }
 
     }

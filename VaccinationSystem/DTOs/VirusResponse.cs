@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace VaccinationSystem.DTOs
 {
-    public class EditedTimeSlot
+    public class VirusResponse
     {
-        public string timeFrom { get; set; }
-        public string timeTo { get; set; }
+        public string virus { get; set; }
     }
 }

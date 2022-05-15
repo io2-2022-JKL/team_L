@@ -451,8 +451,8 @@ namespace VaccinationSystem.Services
                 .Select(s => new TimeSlotsResponse
                 {
                     id = s.id,
-                    from = s.from.ToString("s"),
-                    to = s.to.ToString("s"),
+                    from = s.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = s.to.ToString("dd-MM-yyyy HH:mm"),
                     isFree = s.isFree
                 }).ToListAsync();
 
@@ -461,12 +461,15 @@ namespace VaccinationSystem.Services
 
         public async Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest)
         {
-            DateTime date = visitRequest.from;
+            DateTime date = DateTime.ParseExact(visitRequest.windowBegin, "dd-MM-yyyy HH:mm", null);
+            DateTime dateTo = DateTime.ParseExact(visitRequest.windowEnd, "dd-MM-yyyy HH:mm", null);
+
+
             Doctor doctor = await dbContext.Doctors.SingleOrDefaultAsync(d => d.doctorId == doctorId);
             if (doctor == null)
                 throw new ArgumentException();
 
-            while (date.AddMinutes(visitRequest.timeSlotDurationInMinutes) <= visitRequest.to)
+            while (date.AddMinutes(visitRequest.timeSlotDurationInMinutes) <= dateTo)
             {
                 await dbContext.TimeSlots.AddAsync(new TimeSlot
                 {
@@ -492,8 +495,8 @@ namespace VaccinationSystem.Services
             if (slot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
-            slot.from = timeSlot.from;
-            slot.to = timeSlot.to;
+            slot.from = DateTime.ParseExact(timeSlot.timeFrom, "dd-MM-yyyy HH:mm", null);
+            slot.to = DateTime.ParseExact(timeSlot.timeTo, "dd-MM-yyyy HH:mm", null);
 
             await dbContext.SaveChangesAsync();
 
@@ -887,6 +890,50 @@ namespace VaccinationSystem.Services
             await dbContext.SaveChangesAsync();
             await dbContext.Database.CommitTransactionAsync();
             return true;
+        }
+        public async Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId)
+        {
+            var appointment = dbContext.Appointments
+                .Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).Include(a => a.patient)
+                .Include(a => a.vaccine).SingleOrDefault(a=>a.id == appointmentId);
+            if(appointment.state!= AppointmentState.Planned || appointment.timeSlot.doctor.doctorId!=doctorId)
+                throw new ArgumentException();
+            StartVaccinationResponse response = null;
+            if(appointment!=null)
+            {
+                response = new StartVaccinationResponse()
+                {
+                    vaccineName = appointment.vaccine.name,
+                    vaccineCompany = appointment.vaccine.company,
+                    numberOfDoses = appointment.vaccine.numberOfDoses,
+                    minDaysBetweenDoses = appointment.vaccine.minDaysBetweenDoses,
+                    maxDaysBetweenDoses = appointment.vaccine.maxDaysBetweenDoses,
+                    virusName = appointment.vaccine.virus.ToString(),
+                    minPatientAge = appointment.vaccine.minPatientAge,
+                    maxPatientAge = appointment.vaccine.maxPatientAge,
+                    patientFirstName = appointment.patient.firstName,
+                    patientLastName = appointment.patient.lastName,
+                    PESEL = appointment.patient.pesel,
+                    dateOfBirth = appointment.patient.dateOfBirth.ToString("dd-mm-yyyy"),
+                    from = appointment.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = appointment.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
+                };
+            }
+            return response;
+        }
+        public async Task<List<CityResponse>> GetCities()
+        {
+            var cityNames = await dbContext.VaccinationCenters.Select(vC => vC.city)
+                .Distinct().Select(city => new CityResponse() { city = city }).ToListAsync();
+
+            return cityNames;
+        }
+
+        public async Task<List<VirusResponse>> GetViruses()
+        {
+            var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
+
+            return virusesNames;
         }
 
         public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
