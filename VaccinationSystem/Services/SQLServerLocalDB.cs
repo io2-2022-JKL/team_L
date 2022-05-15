@@ -58,16 +58,24 @@ namespace VaccinationSystem.Services
         }
         public async Task<List<DoctorResponse>> GetDoctors()
         {
-            var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter).ToList();
+            var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter).Include(d=>d.patientAccount).ToList();
             var doctorsResponse = new List<DoctorResponse>();
             VaccinationCenter center;
+            Patient patientAcc;
             DoctorResponse dR;
             foreach (var doctor in doctors)
             {
                 center = await dbContext.VaccinationCenters.FindAsync(doctor.vaccinationCenter.id);
+                patientAcc = await dbContext.Patients.FindAsync(doctor.patientAccount.id);
                 dR = new DoctorResponse()
                 {
                     id = doctor.doctorId,
+                    PESEL = patientAcc.pesel,
+                    firstName = patientAcc.firstName,
+                    lastName = patientAcc.lastName,
+                    dateOfBirth = patientAcc.dateOfBirth.ToString("dd-MM-yyyy"),
+                    mail = patientAcc.mail,
+                    phoneNumber = patientAcc.phoneNumber,
                     active = doctor.active,
                     vaccinationCenterId = doctor.vaccinationCenter.id,
                     city = center.city,
@@ -340,7 +348,7 @@ namespace VaccinationSystem.Services
             var dbPatient = await dbContext.Patients.SingleAsync(pat => pat.id == patient.id);
             if (dbPatient != null)
             {
-                dbPatient.dateOfBirth = DateTime.Parse(patient.dateOfBirth);
+                dbPatient.dateOfBirth = DateTime.ParseExact(patient.dateOfBirth, "dd-MM-yyyy", null);
                 dbPatient.firstName = patient.firstName;
                 dbPatient.lastName = patient.lastName;
                 dbPatient.mail = patient.mail;
@@ -415,7 +423,7 @@ namespace VaccinationSystem.Services
                     patient.pesel = doctor.PESEL;
                     patient.firstName = doctor.firstName;
                     patient.lastName = doctor.lastName;
-                    patient.dateOfBirth = DateTime.Parse(doctor.dateOfBirth);
+                    patient.dateOfBirth = DateTime.ParseExact(doctor.dateOfBirth, "dd-MM-yyyy", null);
                     patient.mail = doctor.mail;
                     patient.phoneNumber = doctor.phoneNumber;
                 }
@@ -914,7 +922,7 @@ namespace VaccinationSystem.Services
                     patientFirstName = appointment.patient.firstName,
                     patientLastName = appointment.patient.lastName,
                     PESEL = appointment.patient.pesel,
-                    dateOfBirth = appointment.patient.dateOfBirth.ToString("dd-mm-yyyy"),
+                    dateOfBirth = appointment.patient.dateOfBirth.ToString("dd-MM-yyyy"),
                     from = appointment.timeSlot.from.ToString("dd-MM-yyyy HH:mm"),
                     to = appointment.timeSlot.to.ToString("dd-MM-yyyy HH:mm"),
                 };
