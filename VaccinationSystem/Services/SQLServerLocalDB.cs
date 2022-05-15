@@ -556,7 +556,7 @@ namespace VaccinationSystem.Services
                 vaccine = vaccine,
                 state = AppointmentState.Planned,
                 whichDose = vaccineCount == null ? 1 : (vaccineCount.count+1),
-                certifyState = vaccine.numberOfDoses == 1 ? CertificateState.LastNotCertified : CertificateState.NotLast
+                certifyState = vaccine.numberOfDoses == (vaccineCount.count+1) ? CertificateState.LastNotCertified : CertificateState.NotLast
             };
 
             dbContext.Appointments.Add(appointment);
@@ -842,10 +842,12 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
                 return false;
-
+            if (doctor.active == false)
+                return false;
             if (appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
@@ -874,8 +876,11 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
         {
-            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
+                return false;
+            if (doctor.active == false)
                 return false;
             if (appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
@@ -929,6 +934,26 @@ namespace VaccinationSystem.Services
             var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
 
             return virusesNames;
+        }
+
+        public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
+        {
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
+            if (appointment == null)
+                return false;
+            if (doctor.active == false)
+                return false;
+            if (appointment.timeSlot.doctor.doctorId != doctorId)
+                throw new ArgumentException();
+
+            appointment.certifyState = CertificateState.NotLast;
+            appointment.state = AppointmentState.Cancelled;
+            appointment.vaccineBatchNumber = "";
+
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
+            return true;
         }
     }
 }
