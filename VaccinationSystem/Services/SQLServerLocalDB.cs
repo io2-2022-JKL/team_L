@@ -839,7 +839,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
             var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
                 return false;
@@ -873,7 +873,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
         {
-            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
             var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
                 return false;
@@ -891,7 +891,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
             var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
                 return false;
@@ -901,6 +901,7 @@ namespace VaccinationSystem.Services
                 throw new ArgumentException();
 
             appointment.certifyState = CertificateState.NotLast;
+            appointment.state = AppointmentState.Cancelled;
             appointment.vaccineBatchNumber = "";
 
             await dbContext.SaveChangesAsync();
