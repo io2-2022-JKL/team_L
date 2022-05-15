@@ -11,7 +11,8 @@ namespace VaccinationSystem.Models
     {
         Cancelled,
         Planned,
-        Finished
+        Finished,
+        Expired
     }
     public enum CertificateState
     {
