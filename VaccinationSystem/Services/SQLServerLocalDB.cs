@@ -886,5 +886,20 @@ namespace VaccinationSystem.Services
             await dbContext.Database.CommitTransactionAsync();
             return true;
         }
+
+        public async Task<List<CityResponse>> GetCities()
+        {
+            var cityNames = await dbContext.VaccinationCenters.Select(vC => vC.city)
+                .Distinct().Select(city => new CityResponse() { city = city }).ToListAsync();
+
+            return cityNames;
+        }
+
+        public async Task<List<VirusResponse>> GetViruses()
+        {
+            var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
+
+            return virusesNames;
+        }
     }
 }
