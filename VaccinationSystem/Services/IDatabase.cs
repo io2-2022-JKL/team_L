@@ -49,6 +49,8 @@ namespace VaccinationSystem.Services
         public Task<List<DoctorFormerAppResponse>> GetDoctorFormerAppointments(Guid doctoId);
         public Task<bool> UpdateVaccinationCount(Guid doctorId, Guid appointmentId);
         public Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId);
+        public Task<List<CityResponse>> GetCities();
+        public Task<List<VirusResponse>> GetViruses();
         public Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId);
     }
 }
