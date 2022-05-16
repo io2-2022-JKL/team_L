@@ -638,7 +638,7 @@ namespace VaccinationSystem.Data
                         patient = context.Patients.Where(patient => patient.pesel == "82121211111").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
                         state = AppointmentState.Finished,
-                        vaccineBatchNumber = "",
+                        vaccineBatchNumber = "abcd",
                         certifyState = CertificateState.NotLast
                     },
                     new Appointment
@@ -648,7 +648,7 @@ namespace VaccinationSystem.Data
                         patient = context.Patients.Where(patient => patient.pesel == "82121211111").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
                         state = AppointmentState.Finished,
-                        vaccineBatchNumber = "",
+                        vaccineBatchNumber = "abcd",
                         certifyState = CertificateState.Certified
                     },
                     new Appointment
@@ -658,7 +658,7 @@ namespace VaccinationSystem.Data
                         patient = context.Patients.Where(patient => patient.pesel == "92120211122").ToList().First(),
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
                         state = AppointmentState.Finished,
-                        vaccineBatchNumber = "",
+                        vaccineBatchNumber = "abcd",
                         certifyState = CertificateState.NotLast
                     },
                     new Appointment
@@ -688,7 +688,7 @@ namespace VaccinationSystem.Data
                         patient = context.Patients.Where(patient => patient.pesel == "59062011333").ToList().First(), // doctorWeide szczepil sie u doctorKowalska :)
                         vaccine = context.Vaccines.Where(vaccine => vaccine.company == "Pfeizer").ToList().First(),
                         state = AppointmentState.Finished,
-                        vaccineBatchNumber = "",
+                        vaccineBatchNumber = "abcd",
                         certifyState = CertificateState.Certified
                     }
                 };
