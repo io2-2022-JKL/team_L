@@ -861,6 +861,7 @@ namespace VaccinationSystem.Services
 
             if (appointment.whichDose == 1)
             {
+                await dbContext.Database.BeginTransactionAsync();
                 var newCount = new VaccinationCount()
                 {
                     virus = appointment.vaccine.virus,
@@ -868,6 +869,7 @@ namespace VaccinationSystem.Services
                     patient = appointment.patient
                 };
                 dbContext.VaccinationCounts.Add(newCount);
+                await dbContext.Database.CommitTransactionAsync();
             }
             else
             {
@@ -878,7 +880,7 @@ namespace VaccinationSystem.Services
             }
 
             await dbContext.SaveChangesAsync();
-            await dbContext.Database.CommitTransactionAsync();
+           
             return true;
         }
 
