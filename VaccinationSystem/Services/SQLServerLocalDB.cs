@@ -896,7 +896,7 @@ namespace VaccinationSystem.Services
             appointment.vaccineBatchNumber = batchId;
 
             await dbContext.SaveChangesAsync();
-            await dbContext.Database.CommitTransactionAsync();
+            //await dbContext.Database.CommitTransactionAsync();
             return true;
         }
         public async Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId)
@@ -960,7 +960,7 @@ namespace VaccinationSystem.Services
             appointment.vaccineBatchNumber = "";
 
             await dbContext.SaveChangesAsync();
-            await dbContext.Database.CommitTransactionAsync();
+            //await dbContext.Database.CommitTransactionAsync();
             return true;
         }
     }
