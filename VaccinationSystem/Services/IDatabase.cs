@@ -52,6 +52,6 @@ namespace VaccinationSystem.Services
         public Task<List<CityResponse>> GetCities();
         public Task<List<VirusResponse>> GetViruses();
         public Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId);
-        public Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId);
+        public Task<bool> UpdateAppointmentVaccinationDidNotHappen(string doctorId, string appointmentId);
     }
 }

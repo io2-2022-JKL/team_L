@@ -944,15 +944,17 @@ namespace VaccinationSystem.Services
             return virusesNames;
         }
 
-        public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
+        public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(string doctorId, string appointmentId)
         {
-            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentId);
-            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
+            Guid doctorGuid = Guid.Parse(doctorId);
+            Guid appointmentGuid = Guid.Parse(appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).SingleAsync(a => a.id == appointmentGuid);
+            var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorGuid);
             if (appointment == null)
                 return false;
             if (doctor.active == false)
                 return false;
-            if (appointment.timeSlot.doctor.doctorId != doctorId)
+            if (appointment.timeSlot.doctor.doctorId != doctorGuid)
                 throw new ArgumentException();
 
             appointment.certifyState = CertificateState.NotLast;

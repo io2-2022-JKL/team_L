@@ -289,7 +289,7 @@ namespace VaccinationSystem.Contollers
         }
         [HttpPost]
         [Route("vaccinate/vaccinationDidNotHappen/{doctorId}/{appointmentId}")]
-        public async Task<IActionResult> VaccinationDidNotHappen([FromRoute] Guid doctorId, [FromRoute] Guid appoinmentId)
+        public async Task<IActionResult> VaccinationDidNotHappen([FromRoute] string doctorId, [FromRoute] string appoinmentId)
         {
             bool success = false;
             try
