@@ -26,9 +26,7 @@ namespace Backend_Tests
 
             var cities = await controller.GetCities();
 
-
             var okResult = Assert.IsType<OkObjectResult>(cities);
-
 
             var returnValue = Assert.IsType<List<CityResponse>>(okResult.Value);
             Assert.Equal(2, returnValue.Count);

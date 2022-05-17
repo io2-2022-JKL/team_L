@@ -227,12 +227,14 @@ namespace VaccinationSystem.Contollers
         }
         [HttpPost]
         [Route("vaccinate/confirmVaccination/{doctorId}/{appointmentId}/{batchId}")]
-        public async Task<IActionResult> ConfirmVaccination([FromRoute] Guid doctorId, [FromRoute] Guid appoinmentId, [FromRoute] string batchId)
+        public async Task<IActionResult> ConfirmVaccination([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId, [FromRoute] string batchId)
         {
             bool success = false;
+            bool canCertify = false;
             try
             {
-                var successVCount = await dbManager.UpdateVaccinationCount(doctorId, appoinmentId);
+                bool successVCount;
+                (successVCount, canCertify) = await dbManager.UpdateVaccinationCount(doctorId, appointmentId);
                 if (!successVCount)
                     return BadRequest("Updating vaccination count failed");
 
@@ -243,11 +245,11 @@ namespace VaccinationSystem.Contollers
             }
             catch (Exception)
             {
-                return BadRequest("Something went wrong");
+                return BadRequest("Something went wrong update count");
             }
             try
             {
-                var successApp = await dbManager.UpdateBatchInAppointment(doctorId, appoinmentId, batchId);
+                var successApp = await dbManager.UpdateBatchInAppointment(doctorId, appointmentId, batchId);
                 if (!successApp)
                     return BadRequest("Updating batch number failed");
                 success = true;
@@ -258,11 +260,11 @@ namespace VaccinationSystem.Contollers
             }
             catch (Exception)
             {
-                return BadRequest("Something went wrong");
+                return BadRequest("Something went wrong update batch");
             }
             
             if (success)
-                return Ok("Information updated");
+                return Ok(new { canCertify = canCertify });
             return NotFound("Data not found");
         }
         [HttpGet]
@@ -289,12 +291,12 @@ namespace VaccinationSystem.Contollers
         }
         [HttpPost]
         [Route("vaccinate/vaccinationDidNotHappen/{doctorId}/{appointmentId}")]
-        public async Task<IActionResult> VaccinationDidNotHappen([FromRoute] string doctorId, [FromRoute] string appoinmentId)
+        public async Task<IActionResult> VaccinationDidNotHappen([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId)
         {
             bool success = false;
             try
             {
-                var successVCount = await dbManager.UpdateAppointmentVaccinationDidNotHappen(doctorId, appoinmentId);
+                var successVCount = await dbManager.UpdateAppointmentVaccinationDidNotHappen(doctorId, appointmentId);
                 if (!successVCount)
                     return BadRequest("Updating appointment information failed");
                 success = true;

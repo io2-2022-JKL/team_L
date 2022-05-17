@@ -558,7 +558,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => (true,true));
             mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ReturnsAsync(() => true);
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
@@ -585,7 +585,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => (true,true));
             mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ThrowsAsync(new ArgumentException());
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
@@ -605,20 +605,20 @@ namespace Backend_Tests
 
             var confirm = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(confirm);
-            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+            Assert.Equal("Something went wrong update count", notFoundResult.Value.ToString());
         }
         [Fact]
         public async Task ConfirmVaccinationExceptionOnUpdateBatch()
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => true);
+            mockDB.Setup(dB => dB.UpdateVaccinationCount(doctorID, appointmentID)).ReturnsAsync(() => (true,true));
             mockDB.Setup(dB => dB.UpdateBatchInAppointment(doctorID, appointmentID, batch)).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
 
             var confirm = await controller.ConfirmVaccination(doctorID, appointmentID, batch);
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(confirm);
-            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+            Assert.Equal("Something went wrong update batch", notFoundResult.Value.ToString());
         }
 
         [Fact]
