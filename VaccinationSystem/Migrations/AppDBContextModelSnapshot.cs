@@ -63,13 +63,16 @@ namespace VaccinationSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("Doctorid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("Doctorid1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("Patientid1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("certifyState")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("doctorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("doctorId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("patientId")
@@ -92,11 +95,11 @@ namespace VaccinationSystem.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("Doctorid");
-
-                    b.HasIndex("Doctorid1");
-
                     b.HasIndex("Patientid1");
+
+                    b.HasIndex("doctorId");
+
+                    b.HasIndex("doctorId1");
 
                     b.HasIndex("patientId");
 
@@ -132,47 +135,20 @@ namespace VaccinationSystem.Migrations
 
             modelBuilder.Entity("VaccinationSystem.Models.Doctor", b =>
                 {
-                    b.Property<Guid>("id")
+                    b.Property<Guid>("doctorId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("dateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("firstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("lastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid?>("patientAccountId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("pesel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("phoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("vaccinationCenterId")
+                    b.Property<Guid?>("vaccinationCenterId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("id");
+                    b.HasKey("doctorId");
 
                     b.HasIndex("patientAccountId");
 
@@ -391,17 +367,17 @@ namespace VaccinationSystem.Migrations
 
             modelBuilder.Entity("VaccinationSystem.Models.Appointment", b =>
                 {
-                    b.HasOne("VaccinationSystem.Models.Doctor", null)
-                        .WithMany("futureVaccinations")
-                        .HasForeignKey("Doctorid");
-
-                    b.HasOne("VaccinationSystem.Models.Doctor", null)
-                        .WithMany("vaccinationsArchive")
-                        .HasForeignKey("Doctorid1");
-
                     b.HasOne("VaccinationSystem.Models.Patient", null)
                         .WithMany("futureVaccinations")
                         .HasForeignKey("Patientid1");
+
+                    b.HasOne("VaccinationSystem.Models.Doctor", null)
+                        .WithMany("futureVaccinations")
+                        .HasForeignKey("doctorId");
+
+                    b.HasOne("VaccinationSystem.Models.Doctor", null)
+                        .WithMany("vaccinationsArchive")
+                        .HasForeignKey("doctorId1");
 
                     b.HasOne("VaccinationSystem.Models.Patient", "patient")
                         .WithMany("vaccinationHistory")
@@ -445,9 +421,7 @@ namespace VaccinationSystem.Migrations
 
                     b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
                         .WithMany("doctors")
-                        .HasForeignKey("vaccinationCenterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("vaccinationCenterId");
 
                     b.Navigation("patientAccount");
 

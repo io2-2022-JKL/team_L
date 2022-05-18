@@ -76,8 +76,7 @@ namespace VaccinationSystem.Controllers
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");
 
-            var response = new FilterTimeSlotsControllerResponse() { data = timeSlots };
-            return Ok(response);
+            return Ok(timeSlots);
         }
 
         [Route("certificates/{patientId}")]
@@ -160,6 +159,24 @@ namespace VaccinationSystem.Controllers
             if (deleted)
                 return Ok("Appointment deleted");
 
+            return NotFound("Data not found");
+        }
+        [Route("info/{patientId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPatientInfo([FromRoute] Guid patientId)
+        {
+            PatientInfoResponse patientInfo;
+            try
+            {
+                patientInfo = await dbManager.GetPatientInfo(patientId);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (patientInfo != null)
+                return Ok(patientInfo);
             return NotFound("Data not found");
         }
     }

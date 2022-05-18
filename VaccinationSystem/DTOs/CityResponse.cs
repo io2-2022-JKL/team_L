@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace VaccinationSystem.DTOs
 {
-    public class FilterTimeSlotsControllerResponse
+    public class CityResponse
     {
-        public List<FilterTimeSlotResponse> data { get; set; }
+        [Required]
+        public string city { get; set; }
     }
 }

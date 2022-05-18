@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VaccinationSystem.Migrations
 {
-    public partial class createDb : Migration
+    public partial class updateappointment : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -103,21 +103,14 @@ namespace VaccinationSystem.Migrations
                 name: "Doctors",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    vaccinationCenterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    doctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    vaccinationCenterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     patientAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    active = table.Column<bool>(type: "bit", nullable: false),
-                    pesel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    firstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    lastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    dateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    mail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    phoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Doctors", x => x.id);
+                    table.PrimaryKey("PK_Doctors", x => x.doctorId);
                     table.ForeignKey(
                         name: "FK_Doctors_Patients_patientAccountId",
                         column: x => x.patientAccountId,
@@ -129,7 +122,7 @@ namespace VaccinationSystem.Migrations
                         column: x => x.vaccinationCenterId,
                         principalTable: "VaccinationCenters",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,7 +191,7 @@ namespace VaccinationSystem.Migrations
                         name: "FK_TimeSlots_Doctors_doctorId",
                         column: x => x.doctorId,
                         principalTable: "Doctors",
-                        principalColumn: "id",
+                        principalColumn: "doctorId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -238,24 +231,25 @@ namespace VaccinationSystem.Migrations
                     vaccineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     state = table.Column<int>(type: "int", nullable: false),
                     vaccineBatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Doctorid = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Doctorid1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Patientid1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    certifyState = table.Column<int>(type: "int", nullable: false),
+                    Patientid1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    doctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    doctorId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Appointments", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Appointments_Doctors_Doctorid",
-                        column: x => x.Doctorid,
+                        name: "FK_Appointments_Doctors_doctorId",
+                        column: x => x.doctorId,
                         principalTable: "Doctors",
-                        principalColumn: "id",
+                        principalColumn: "doctorId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Appointments_Doctors_Doctorid1",
-                        column: x => x.Doctorid1,
+                        name: "FK_Appointments_Doctors_doctorId1",
+                        column: x => x.doctorId1,
                         principalTable: "Doctors",
-                        principalColumn: "id",
+                        principalColumn: "doctorId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Appointments_Patients_patientId",
@@ -284,14 +278,14 @@ namespace VaccinationSystem.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointments_Doctorid",
+                name: "IX_Appointments_doctorId",
                 table: "Appointments",
-                column: "Doctorid");
+                column: "doctorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointments_Doctorid1",
+                name: "IX_Appointments_doctorId1",
                 table: "Appointments",
-                column: "Doctorid1");
+                column: "doctorId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_patientId",

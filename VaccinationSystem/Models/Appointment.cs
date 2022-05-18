@@ -11,7 +11,14 @@ namespace VaccinationSystem.Models
     {
         Cancelled,
         Planned,
-        Finished
+        Finished,
+        Expired
+    }
+    public enum CertificateState
+    {
+        NotLast,
+        LastNotCertified,
+        Certified
     }
 
     public class Appointment
@@ -32,5 +39,6 @@ namespace VaccinationSystem.Models
         [Required]
         public AppointmentState state { get; set; }
         public string vaccineBatchNumber { get; set; }
+        public CertificateState certifyState { get; set; }
     }
 }

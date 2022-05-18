@@ -17,11 +17,15 @@ namespace VaccinationSystem.Contollers
     public class DoctorController : ControllerBase
     {
         private IDatabase dbManager;
+        private ICertificateGenerator certGenerator;
 
-        public DoctorController(IUserSignInManager signInManager, IDatabase db)
+        public DoctorController(IUserSignInManager signInManager, IDatabase db, ICertificateGenerator certificateGenerator = null)
         {
             dbManager = db;
+            certGenerator = certificateGenerator;
         }
+
+
         [Route("patients/{patientId}")]
         [HttpGet]
         public async Task<IActionResult> GetPatient([FromRoute] Guid patientId)
@@ -119,7 +123,7 @@ namespace VaccinationSystem.Contollers
             }
             catch (ArgumentException)
             {
-                return StatusCode(403,"Usr forbidden from modifying");
+                return StatusCode(403, "Usr forbidden from modifying");
             }
             catch (Exception)
             {
@@ -129,6 +133,186 @@ namespace VaccinationSystem.Contollers
             if (deleted)
                 return Ok("Time slots modified");
 
+            return NotFound("Data not found");
+        }
+        [Route("info/{doctorId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctorInfo([FromRoute] Guid doctorId)
+        {
+            DoctorInfoResponse doctorInfo;
+            try
+            {
+                doctorInfo = await dbManager.GetDoctorInfo(doctorId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (doctorInfo != null)
+                return Ok(doctorInfo);
+            return NotFound("Data not found");
+        }
+        [HttpPost]
+        [Route("vaccinate/certify/{doctorId}/{appointmentId}")]
+        public async Task<IActionResult> Certify([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId)
+        {
+
+            bool created;
+            try
+            {
+                var a = await dbManager.GetAppointment(appointmentId);
+                var d = await dbManager.GetDoctor(doctorId);
+
+                if (a == null || d == null)
+                    return NotFound("Data not found");
+
+                var p = a.patient;
+                var vc = d.vaccinationCenter;
+
+                string url = await certGenerator.Generate(p.firstName + " " + p.lastName, p.dateOfBirth, p.pesel, vc.name, vc.city + " " 
+                    + vc.address, a.vaccine.name, a.whichDose, a.vaccineBatchNumber);
+
+                created = await dbManager.CreateCertificate(doctorId, appointmentId, url);
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from creating vaccine certification");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (created)
+                return Ok("Certificate created");
+            return NotFound("Data not found");
+        }
+        [Route("incomingAppointments/{doctorId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctorIncomingAppointments([FromRoute] Guid doctorId)
+        {
+            List<DoctorIncomingAppResponse> incApps;
+            try
+            {
+                incApps = await dbManager.GetDoctorIncomingAppointments(doctorId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (incApps == null || incApps.Count == 0)
+                return NotFound("Data not found");
+            return Ok(incApps);
+        }
+        [Route("formerAppointments/{doctorId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctorFormerAppointments([FromRoute] Guid doctorId)
+        {
+            List<DoctorFormerAppResponse> formerApps;
+            try
+            {
+                formerApps = await dbManager.GetDoctorFormerAppointments(doctorId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (formerApps == null || formerApps.Count == 0)
+                return NotFound("Data not found");
+            return Ok(formerApps);
+        }
+        [HttpPost]
+        [Route("vaccinate/confirmVaccination/{doctorId}/{appointmentId}/{batchId}")]
+        public async Task<IActionResult> ConfirmVaccination([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId, [FromRoute] string batchId)
+        {
+            bool success = false;
+            bool canCertify = false;
+            try
+            {
+                bool successVCount;
+                (successVCount, canCertify) = await dbManager.UpdateVaccinationCount(doctorId, appointmentId);
+                if (!successVCount)
+                    return BadRequest("Updating vaccination count failed");
+
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from confirming vaccination");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong update count");
+            }
+            try
+            {
+                var successApp = await dbManager.UpdateBatchInAppointment(doctorId, appointmentId, batchId);
+                if (!successApp)
+                    return BadRequest("Updating batch number failed");
+                success = true;
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from confirming vaccination");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong update batch");
+            }
+            
+            if (success)
+                return Ok(new { canCertify = canCertify });
+            return NotFound("Data not found");
+        }
+        [HttpGet]
+        [Route("vaccinate/{doctorId}/{appointmentId}")]
+        public async Task<IActionResult> StartVaccination([FromRoute]Guid doctorId, [FromRoute] Guid appointmentId)
+        {
+            StartVaccinationResponse vaccResponse;
+            try
+            {
+                vaccResponse = await dbManager.GetStartedAppointmentInfo(doctorId, appointmentId);
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from getting detailed info");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+            if (vaccResponse != null)
+                return Ok(vaccResponse);
+            return NotFound("Data not found");
+        }
+        [HttpPost]
+        [Route("vaccinate/vaccinationDidNotHappen/{doctorId}/{appointmentId}")]
+        public async Task<IActionResult> VaccinationDidNotHappen([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId)
+        {
+            bool success = false;
+            try
+            {
+                var successVCount = await dbManager.UpdateAppointmentVaccinationDidNotHappen(doctorId, appointmentId);
+                if (!successVCount)
+                    return BadRequest("Updating appointment information failed");
+                success = true;
+
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from not confirming vaccination");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (success)
+                return Ok("Information updated");
             return NotFound("Data not found");
         }
     }
