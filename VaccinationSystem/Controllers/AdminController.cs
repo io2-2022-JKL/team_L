@@ -266,5 +266,28 @@ namespace VaccinationSystem.Controllers
 
             return Ok(timeSlots);
         }
+
+        [HttpPost]
+        [Route("vaccines/editVaccine")]
+        public async Task<IActionResult> EditVaccine([FromBody] EditVaccine vaccine)
+        {
+
+            bool edited;
+            try
+            {
+                edited = await dbManager.EditVaccine(vaccine);
+
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            if (!edited)
+                return NotFound("Error, no vaccine found to edit");
+
+
+            return Ok("Vaccine edited");
+        }
     }
 }

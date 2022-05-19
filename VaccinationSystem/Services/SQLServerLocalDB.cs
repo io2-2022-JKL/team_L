@@ -974,5 +974,27 @@ namespace VaccinationSystem.Services
             //await dbContext.Database.CommitTransactionAsync();
             return true;
         }
+
+        public async Task<bool> EditVaccine(EditVaccine vaccine)
+        {
+            var dbVaccine = await dbContext.Vaccines.SingleOrDefaultAsync(v => v.id == vaccine.vaccineId);
+
+            if (dbVaccine == null)
+                return false;
+
+            dbVaccine.name = vaccine.name;
+            dbVaccine.company = vaccine.company;
+            dbVaccine.minDaysBetweenDoses = vaccine.minDaysBetweenDoses;
+            dbVaccine.maxDaysBetweenDoses = vaccine.maxDaysBetweenDoses;
+            dbVaccine.minPatientAge = vaccine.minPatientAge;
+            dbVaccine.maxPatientAge = vaccine.maxPatientAge;
+            dbVaccine.virus = (Virus)Enum.Parse(typeof(Virus), vaccine.virus);
+            dbVaccine.active = vaccine.active;
+            dbVaccine.numberOfDoses = vaccine.numberOfDoses;
+
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
