@@ -266,5 +266,23 @@ namespace VaccinationSystem.Controllers
 
             return Ok(timeSlots);
         }
+        [HttpPost]
+        [Route("vaccines/addVaccine")]
+        public async Task<IActionResult> AddVaccine([FromBody] AddVaccine vaccine)
+        {
+
+            try
+            {
+                await dbManager.AddVaccine(vaccine);
+
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+
+            return Ok("Doctor added");
+        }
     }
 }
