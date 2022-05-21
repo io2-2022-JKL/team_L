@@ -963,7 +963,46 @@ namespace Backend_Tests
             };
             return timeSlots;
         }
+        [Fact]
+        public async Task EditVaccineReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ReturnsAsync(()=>true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
 
+            var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+        [Fact]
+        public async Task EditVaccineReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task EditVaccineReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ReturnsAsync(() => false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("Error, no vaccine found to edit", notFoundResult.Value.ToString());
+        }
         [Fact]
         public async Task AddVaccineReturnsOk()
         {
@@ -991,4 +1030,5 @@ namespace Backend_Tests
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
     }
+
 }

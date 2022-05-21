@@ -53,6 +53,7 @@ namespace VaccinationSystem.Services
         public Task<List<VirusResponse>> GetViruses();
         public Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId);
         public Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId);
+        public Task<bool> EditVaccine(EditVaccine vaccine);
         public Task AddVaccine(AddVaccine vaccine);
     }
 }
