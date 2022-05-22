@@ -99,6 +99,10 @@ namespace VaccinationSystem.Controllers
                 deleted = await dbManager.DeleteVaccinationCenter(vaccinationCenterId);
 
             }
+            catch(ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting vaccination center");
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);

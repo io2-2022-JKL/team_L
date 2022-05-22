@@ -184,7 +184,21 @@ namespace Backend_Tests
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
+        [Fact]
+        public async Task DeleteVaccinationCentersReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
 
+            mockDB.Setup(dB => dB.DeleteVaccinationCenter(vCenterId))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeleteVaccinationCenter(vCenterId);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
         [Fact]
         public async Task DeleteVaccinationCentersReturnsOk()
         {
