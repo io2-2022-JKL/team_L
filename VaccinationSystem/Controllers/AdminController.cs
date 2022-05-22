@@ -337,7 +337,6 @@ namespace VaccinationSystem.Controllers
                 return NotFound("Data not found");
             return Ok(vaccines);
         }
-
         [HttpDelete]
         [Route("vaccines/deleteVaccine/{vaccineId}")]
         public async Task<IActionResult> DeleteVaccine([FromRoute] Guid vaccineId)
