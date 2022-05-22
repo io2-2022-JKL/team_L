@@ -55,5 +55,6 @@ namespace VaccinationSystem.Services
         public Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId);
         public Task<bool> EditVaccine(EditVaccine vaccine);
         public Task AddVaccine(AddVaccine vaccine);
+        public Task<List<VaccineResponse>> GetVaccines();
     }
 }
