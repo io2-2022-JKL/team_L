@@ -1138,6 +1138,7 @@ namespace Backend_Tests
             });
             return list;
         }
+        [Fact]
         public async Task DeleteVaccineReturnsOk()
         {
             var mockDB = new Mock<IDatabase>();
