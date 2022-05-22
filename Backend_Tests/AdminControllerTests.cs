@@ -880,7 +880,7 @@ namespace Backend_Tests
                 mail = "j.nowak@mail.com",
                 phoneNumber = "+48555221331",
                 active = true,
-            }) ;
+            });
             patients.Add(new PatientResponse()
             {
                 id = new Guid("35D520DC-16AF-48E6-A309-08DA1B08BABF"),
@@ -999,7 +999,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ReturnsAsync(()=>true);
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ReturnsAsync(() => true);
             var controller = new AdminController(mockSignIn.Object, mockDB.Object);
 
             var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
@@ -1061,6 +1061,83 @@ namespace Backend_Tests
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
         [Fact]
+        public async Task GetVaccinesReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines()).ReturnsAsync(Vaccines());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var okResult = Assert.IsType<OkObjectResult>(vaccines);
+            var returnValue = Assert.IsType<List<VaccineResponse>>(okResult.Value);
+            Assert.Equal(2, returnValue.Count);
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines()).ReturnsAsync(new List<VaccineResponse>());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var notFound = Assert.IsType<NotFoundObjectResult>(vaccines);
+            Assert.Equal("Data not found", notFound.Value.ToString());
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines())
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var badRequst = Assert.IsType<BadRequestObjectResult>(vaccines);
+            Assert.Equal("Something went wrong", badRequst.Value.ToString());
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines())
+                .ThrowsAsync(new ArgumentException());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var forbiddenResult = Assert.IsType<ObjectResult>(vaccines);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        private List<VaccineResponse> Vaccines()
+        {
+            var list = new List<VaccineResponse>();
+            list.Add(new VaccineResponse()
+            {
+                vaccineId = new Guid("452aa3ed-8154-438f-6dfe-08da3663531b"),
+                company = "Pfeizer",
+                name = "Pfeizer vaccine",
+                numberOfDoses = 2,
+                minDaysBetweenDoses = 30,
+                maxDaysBetweenDoses = 0,
+                virus = "Coronavirus",
+                minPatientAge = 12,
+                maxPatientAge = 0,
+                active = true
+            });
+            list.Add(new VaccineResponse()
+            {
+                vaccineId = new Guid("093e8807-f30e-4d60-6e00-08da3663531b"),
+                company = "Johnson and Johnson",
+                name = "J&J vaccine",
+                numberOfDoses = 1,
+                minDaysBetweenDoses = 0,
+                maxDaysBetweenDoses = 0,
+                virus = "Coronavirus",
+                minPatientAge = 18,
+                maxPatientAge = 0,
+                active = true
+            });
+            return list;
+        }
         public async Task DeleteVaccineReturnsOk()
         {
             var mockDB = new Mock<IDatabase>();
@@ -1107,5 +1184,4 @@ namespace Backend_Tests
             Assert.Equal(403, forbiddenResult.StatusCode);
         }
     }
-
 }

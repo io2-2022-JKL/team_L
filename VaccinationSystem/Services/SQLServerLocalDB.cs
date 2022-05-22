@@ -1037,14 +1037,36 @@ namespace VaccinationSystem.Services
 
             await dbContext.SaveChangesAsync();
         }
+        public async Task<List<VaccineResponse>> GetVaccines()
+        {
+            var vaccines = await dbContext.Vaccines.ToListAsync();
+            var response = new List<VaccineResponse>();
+            foreach(var vaccine in vaccines)
+            {
+                response.Add(new VaccineResponse()
+                {
+                    vaccineId = vaccine.id,
+                    company = vaccine.company,
+                    name = vaccine.name,
+                    numberOfDoses = vaccine.numberOfDoses,
+                    minDaysBetweenDoses = vaccine.minDaysBetweenDoses,
+                    maxDaysBetweenDoses = vaccine.maxDaysBetweenDoses,
+                    virus = vaccine.virus.ToString(),
+                    minPatientAge = vaccine.minPatientAge,
+                    maxPatientAge = vaccine.maxPatientAge,
+                    active = vaccine.active
+                });
+            }
+            return response;
+        }
         public async Task<bool> DeleteVaccine(Guid vaccineId)
         {
             var vaccine = await dbContext.Vaccines.SingleAsync(vc => vc.id == vaccineId);
             if (vaccine != null)
             {
-                var appointments = dbContext.Appointments.Include(a=>a.vaccine)
-                    .Where(a => a.vaccine.id == vaccineId).Include(a=>a.patient).ToList();
-                foreach(var app in appointments)
+                var appointments = dbContext.Appointments.Include(a => a.vaccine)
+                    .Where(a => a.vaccine.id == vaccineId).Include(a => a.patient).ToList();
+                foreach (var app in appointments)
                 {
                     if (app.state == AppointmentState.Planned)
                         await CancelIncomingAppointment(app.patient.id, app.id);

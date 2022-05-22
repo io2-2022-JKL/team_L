@@ -314,16 +314,40 @@ namespace VaccinationSystem.Controllers
 
             return Ok("Vaccine edited");
         }
+        [Route("vaccines")]
+        [HttpGet]
+        public async Task<IActionResult> GetVaccines()
+        {
+            List<VaccineResponse> vaccines;
+            try
+            {
+                vaccines = await dbManager.GetVaccines();
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from searching vaccines");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            if (vaccines == null || vaccines.Count == 0)
+                return NotFound("Data not found");
+            return Ok(vaccines);
+        }
+
         [HttpDelete]
         [Route("vaccines/deleteVaccine/{vaccineId}")]
-        public async Task<IActionResult> DeleteVaccine([FromRoute]Guid vaccineId)
+        public async Task<IActionResult> DeleteVaccine([FromRoute] Guid vaccineId)
         {
             bool deleted;
             try
             {
                 deleted = await dbManager.DeleteVaccine(vaccineId);
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 return StatusCode(403, "User forbidden from deleting vaccine");
             }
