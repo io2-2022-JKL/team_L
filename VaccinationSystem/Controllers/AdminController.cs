@@ -376,7 +376,7 @@ namespace VaccinationSystem.Controllers
                 return BadRequest("Something went wrong");
             }
             if (deleted)
-                return Ok("Deleted Vaccine");
+                return Ok("Deleted time slots");
             return NotFound("Data not found");
         }
     }
