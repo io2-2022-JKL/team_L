@@ -166,6 +166,10 @@ namespace VaccinationSystem.Controllers
             {
                 deleted = await dbManager.DeletePatient(patientId);
             }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting patient");
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
@@ -244,6 +248,10 @@ namespace VaccinationSystem.Controllers
             {
                 deleted = await dbManager.DeleteDoctor(doctorId);
             }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting doctor");
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
@@ -305,6 +313,27 @@ namespace VaccinationSystem.Controllers
 
 
             return Ok("Vaccine edited");
+        }
+        [HttpDelete]
+        [Route("vaccines/deleteVaccine/{vaccineId}")]
+        public async Task<IActionResult> DeleteVaccine([FromRoute]Guid vaccineId)
+        {
+            bool deleted;
+            try
+            {
+                deleted = await dbManager.DeleteVaccine(vaccineId);
+            }
+            catch(ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting vaccine");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+            if (deleted)
+                return Ok("Deleted Vaccine");
+            return NotFound("Data not found");
         }
     }
 }

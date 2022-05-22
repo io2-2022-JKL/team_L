@@ -572,6 +572,21 @@ namespace Backend_Tests
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
         [Fact]
+        public async Task DeletePatientReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.DeletePatient(patientID))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeletePatient(patientID);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        [Fact]
         public async Task DeletePatientReturnsNotFound()
         {
             var mockDB = new Mock<IDatabase>();
@@ -732,6 +747,21 @@ namespace Backend_Tests
 
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteDoctorReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.DeleteDoctor(doctorID))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeleteDoctor(doctorID);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
         }
         [Fact]
         public async Task DeleteDoctorReturnsNotFound()
