@@ -374,13 +374,21 @@ namespace VaccinationSystem.Services
             var dbPatient = await dbContext.Patients.SingleAsync(patient => patient.id == patientId);
             if (dbPatient != null)
             {
-                var counts = dbContext.VaccinationCounts.Where(c => c.patient.id == patientId);
-                dbContext.VaccinationCounts.RemoveRange(counts);
-                var appointments = dbContext.Appointments.Where(c => c.patient.id == patientId);
-                dbContext.Appointments.RemoveRange(appointments);
-                var certificates = dbContext.Certificates.Where(c => c.patientId == patientId);
-                dbContext.Certificates.RemoveRange(certificates);
-                dbContext.Patients.Remove(dbPatient);
+                if (!dbPatient.active)
+                    throw new ArgumentException();
+                //var counts = dbContext.VaccinationCounts.Where(c => c.patient.id == patientId);
+                //dbContext.VaccinationCounts.RemoveRange(counts);
+                var appointments = dbContext.Appointments.Where(c => c.patient.id == patientId).ToList();
+                foreach (var app in appointments)
+                {
+                    if (app.state == AppointmentState.Planned)
+                        await CancelIncomingAppointment(app.patient.id, app.id);
+                }
+                //dbContext.Appointments.RemoveRange(appointments);
+                //var certificates = dbContext.Certificates.Where(c => c.patientId == patientId);
+                //dbContext.Certificates.RemoveRange(certificates);
+                //dbContext.Patients.Remove(dbPatient);
+                dbPatient.active = false;
                 await dbContext.SaveChangesAsync();
                 return true;
             }
@@ -439,13 +447,22 @@ namespace VaccinationSystem.Services
             var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.doctorId == doctorId);
             if (dbDoctor != null)
             {
-                var appointments = dbContext.Appointments.Where(d => d.timeSlot.doctor.doctorId == doctorId);
-                dbContext.Appointments.RemoveRange(appointments);
-                var times = dbContext.TimeSlots.Where(t => t.doctor.doctorId == doctorId);
-                dbContext.TimeSlots.RemoveRange(times);
+                if (!dbDoctor.active)
+                    throw new ArgumentException();
+                var appointments = dbContext.Appointments.Include(a=>a.patient).Include(a=>a.timeSlot)
+                    .Include(a=>a.timeSlot.doctor)
+                    .Where(d => d.timeSlot.doctor.doctorId == doctorId).ToList();
+                foreach (var app in appointments)
+                {
+                    if (app.state == AppointmentState.Planned)
+                        await CancelIncomingAppointment(app.patient.id, app.id);
+                }
+                //dbContext.Appointments.RemoveRange(appointments);
+                //var times = dbContext.TimeSlots.Where(t => t.doctor.doctorId == doctorId);
+                //dbContext.TimeSlots.RemoveRange(times);
                 //var center = dbContext.VaccinationCenters.Where(c => c.id == dbDoctor.vaccinationCenter.id);
-
-                dbContext.Doctors.Remove(dbDoctor);
+                //dbContext.Doctors.Remove(dbDoctor);
+                dbDoctor.active = false;
                 await dbContext.SaveChangesAsync();
                 return true;
             }
@@ -705,9 +722,12 @@ namespace VaccinationSystem.Services
         public async Task<bool> CancelIncomingAppointment(Guid patientId, Guid appointmentId)
         {
             var dbAppointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.timeSlot)
-                .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId && a.patient.id == patientId);
+                .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId);
             if (dbAppointment != null)
             {
+                if (dbAppointment.state != AppointmentState.Planned || 
+                                    dbAppointment.patient.id != patientId)
+                    throw new ArgumentException();
                 dbAppointment.state = AppointmentState.Cancelled;
                 if (dbAppointment.timeSlot != null)
                 {
@@ -1038,6 +1058,24 @@ namespace VaccinationSystem.Services
                 });
             }
             return response;
+        }
+        public async Task<bool> DeleteVaccine(Guid vaccineId)
+        {
+            var vaccine = await dbContext.Vaccines.SingleAsync(vc => vc.id == vaccineId);
+            if (vaccine != null)
+            {
+                var appointments = dbContext.Appointments.Include(a => a.vaccine)
+                    .Where(a => a.vaccine.id == vaccineId).Include(a => a.patient).ToList();
+                foreach (var app in appointments)
+                {
+                    if (app.state == AppointmentState.Planned)
+                        await CancelIncomingAppointment(app.patient.id, app.id);
+                }
+                vaccine.active = false;
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -150,6 +150,10 @@ namespace VaccinationSystem.Controllers
             {
                 deleted = await dbManager.CancelIncomingAppointment(patientId,appointmentId);
             }
+            catch(ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from cancelling appointment");
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
