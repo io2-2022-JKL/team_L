@@ -358,5 +358,26 @@ namespace VaccinationSystem.Controllers
                 return Ok("Deleted Vaccine");
             return NotFound("Data not found");
         }
+        [HttpPost]
+        [Route("doctors/timeSlots/deleteTimeSlots")]
+        public async Task<IActionResult> DeleteTimeSlots([FromBody]List<DeleteTimeSlot> timeSlots)
+        {
+            bool deleted;
+            try
+            {
+                deleted = await dbManager.DeleteTimeSlots(timeSlots);
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting time slots");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+            if (deleted)
+                return Ok("Deleted Vaccine");
+            return NotFound("Data not found");
+        }
     }
 }

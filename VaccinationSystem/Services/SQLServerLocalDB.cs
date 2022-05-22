@@ -1064,6 +1064,8 @@ namespace VaccinationSystem.Services
             var vaccine = await dbContext.Vaccines.SingleAsync(vc => vc.id == vaccineId);
             if (vaccine != null)
             {
+                if (!vaccine.active)
+                    throw new ArgumentException();
                 var appointments = dbContext.Appointments.Include(a => a.vaccine)
                     .Where(a => a.vaccine.id == vaccineId).Include(a => a.patient).ToList();
                 foreach (var app in appointments)
@@ -1076,6 +1078,29 @@ namespace VaccinationSystem.Services
                 return true;
             }
             return false;
+        }
+        public async Task<bool> DeleteTimeSlots(List<DeleteTimeSlot> timeSlots)
+        {
+            foreach (var slotId in timeSlots)
+            { 
+                var slot = await dbContext.TimeSlots.SingleOrDefaultAsync(s => s.id == slotId.id);
+                if (slot == null)
+                    return false;
+
+                if (!slot.active)
+                {
+                    throw new ArgumentException();
+                }
+                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a=>a.patient)
+                    .SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
+                if (app != null && app.state == AppointmentState.Planned)
+                    await CancelIncomingAppointment(app.patient.id, app.id);
+                slot.active = false;
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return true;
         }
     }
 }

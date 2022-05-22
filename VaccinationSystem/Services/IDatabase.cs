@@ -57,5 +57,6 @@ namespace VaccinationSystem.Services
         public Task AddVaccine(AddVaccine vaccine);
         public Task<List<VaccineResponse>> GetVaccines();
         public Task<bool> DeleteVaccine(Guid vaccineId);
+        public Task<bool> DeleteTimeSlots(List<DeleteTimeSlot> timeSlotes);
     }
 }
