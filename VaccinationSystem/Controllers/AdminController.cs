@@ -99,6 +99,10 @@ namespace VaccinationSystem.Controllers
                 deleted = await dbManager.DeleteVaccinationCenter(vaccinationCenterId);
 
             }
+            catch(ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting vaccination center");
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
@@ -356,6 +360,27 @@ namespace VaccinationSystem.Controllers
             }
             if (deleted)
                 return Ok("Deleted Vaccine");
+            return NotFound("Data not found");
+        }
+        [HttpPost]
+        [Route("doctors/timeSlots/deleteTimeSlots")]
+        public async Task<IActionResult> DeleteTimeSlots([FromBody]List<DeleteTimeSlot> timeSlots)
+        {
+            bool deleted;
+            try
+            {
+                deleted = await dbManager.DeleteTimeSlots(timeSlots);
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(403, "User forbidden from deleting time slots");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+            if (deleted)
+                return Ok("Deleted time slots");
             return NotFound("Data not found");
         }
     }

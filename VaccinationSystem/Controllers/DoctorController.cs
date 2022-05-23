@@ -95,7 +95,7 @@ namespace VaccinationSystem.Contollers
             }
             catch (ArgumentException )
             {
-                return StatusCode(403,"Usr forbidden from deleting");
+                return StatusCode(403,"User forbidden from deleting");
             }
             catch (Exception)
             {

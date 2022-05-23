@@ -20,6 +20,10 @@ namespace Backend_Tests
         private Guid patientID = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5");
         private Guid doctorID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
         private Guid vaccineID = new Guid("6DD0DA08-4C9E-4606-A797-08DA3C1159E9");
+        private List<DeleteTimeSlot> listDeleteTimeSlots = new List<DeleteTimeSlot>() {
+                    new DeleteTimeSlot(){ id=new Guid("56FD372F-237C-4D87-87C5-08DA3C232B6F") },
+                    new DeleteTimeSlot(){ id = new Guid("4F442870-B313-4DB8-87C7-08DA3C232B6F")}
+            };
         [Fact]
         public async Task ShowVaccinationCentersReturnsCenters()
         {
@@ -180,7 +184,21 @@ namespace Backend_Tests
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
+        [Fact]
+        public async Task DeleteVaccinationCentersReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
 
+            mockDB.Setup(dB => dB.DeleteVaccinationCenter(vCenterId))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeleteVaccinationCenter(vCenterId);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
         [Fact]
         public async Task DeleteVaccinationCentersReturnsOk()
         {
@@ -1181,6 +1199,52 @@ namespace Backend_Tests
                 .ThrowsAsync(new ArgumentException());
             var controller = new AdminController(mockSignIn.Object, mockDB.Object);
             var deleted = await controller.DeleteVaccine(vaccineID);
+            var forbiddenResult = Assert.IsType<ObjectResult>(deleted);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots)).ReturnsAsync(true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var okResult = Assert.IsType<OkObjectResult>(deleted);
+            Assert.Equal("Deleted time slots", okResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots)).ReturnsAsync(false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(deleted);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots))
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var badRequest = Assert.IsType<BadRequestObjectResult>(deleted);
+            Assert.Equal("Something went wrong", badRequest.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
             var forbiddenResult = Assert.IsType<ObjectResult>(deleted);
             Assert.Equal(403, forbiddenResult.StatusCode);
         }
