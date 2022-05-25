@@ -15,7 +15,7 @@ namespace VaccinationSystem.Services
         private BlobContainerClient container;
         public VaccinationCertificateGenerator()
         {
-            var storage = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=vaccinationcertificates;AccountKey=ONQNGjjnQjp7qR5r52uSs9UfNXRhH+GKBHyYnaMbqTYFiIqsh+7A18U7MTUToBMQpCCz7CyiIE4A+ASt01SE6A==;EndpointSuffix=core.windows.net");
+            var storage = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=vaccinationsystemstorage;AccountKey=66vN88zKSolLXKw5Om5liSBM5iROdOO/BXoxa2wsQT8TVZnXgV9wmd+BuGjxsPg47QRBqNEJ3C7i+AStyuY9rg==;EndpointSuffix=core.windows.net");
             container = storage.GetBlobContainerClient("certificates");
 
         }
