@@ -635,13 +635,7 @@ namespace Backend_Tests
         {
             return new RegisteringDoctor
             {
-                PESEL = "88101023232",
-                firstName = "Alojzy",
-                lastName = "Prus",
-                dateOfBirth = new DateTime(1988, 10, 10),
-                mail = "fajnymail@mail.com",
-                phoneNumber = "+48391094167",
-                password = "chwilowehaslo123",
+                patientId = patientID,
                 vaccinationCenterId = vCenterId
             };
         }

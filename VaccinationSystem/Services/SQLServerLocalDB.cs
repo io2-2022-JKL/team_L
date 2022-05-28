@@ -391,7 +391,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> AddDoctor(RegisteringDoctor doctor)
         {
-            var patient = await dbContext.Patients.SingleAsync(patient => patient.pesel == doctor.PESEL);
+            var patient = await dbContext.Patients.SingleAsync(patient => patient.id==doctor.patientId);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             Doctor doc = new Doctor
             {
