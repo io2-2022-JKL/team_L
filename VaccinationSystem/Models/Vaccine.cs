@@ -8,7 +8,7 @@ namespace VaccinationSystem.Models
 {
     public enum Virus
     {
-        Coronavirus
+        Coronavirus,
     }
     public class Vaccine
     {

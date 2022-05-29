@@ -9,9 +9,11 @@ using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Contollers
 {
+    //[Authorize]
     [Route("doctor")]
     [ApiController]
     public class DoctorController : ControllerBase

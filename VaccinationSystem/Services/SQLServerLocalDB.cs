@@ -286,8 +286,8 @@ namespace VaccinationSystem.Services
             var hours = await dbContext.OpeningHours.Where(h => h.vaccinationCenter.id == vaccinationCenterId)
                 .Select(h => new OpeningHoursDays()
                 {
-                    from = $"{h.from.Hours}:{h.from.Minutes}",
-                    to = $"{h.to.Hours}:{h.to.Minutes}"
+                    from = h.from.ToString(@"hh\:mm"),
+                    to = h.to.ToString(@"hh\:mm"),
                 }).ToListAsync();
 
             return hours;
@@ -460,7 +460,7 @@ namespace VaccinationSystem.Services
 
         public Task<List<TimeSlotsResponse>> GetTimeSlots(Guid doctorId)
         {
-            var slots = dbContext.TimeSlots.Where(s => s.doctor.doctorId == doctorId)
+            var slots = dbContext.TimeSlots.Where(s => s.doctor.doctorId == doctorId && s.active)
                 .Select(s => new TimeSlotsResponse
                 {
                     id = s.id,
@@ -959,11 +959,11 @@ namespace VaccinationSystem.Services
             return cityNames;
         }
 
-        public async Task<List<VirusResponse>> GetViruses()
+        public List<VirusResponse> GetViruses()
         {
-            var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
+            //var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
 
-            return virusesNames;
+            return Enum.GetNames(typeof(Virus)).Select(v => new VirusResponse() { virus = v }).ToList();
         }
 
         public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
