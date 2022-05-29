@@ -10,7 +10,7 @@ namespace VaccinationSystem.Models
     public class EditedDoctor 
     {
         [Key]
-        public Guid id { get; set; }
+        public Guid doctorId { get; set; }
         [Required]
         [StringLength(11)]
         public string PESEL { get; set; }
