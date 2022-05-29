@@ -412,7 +412,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> EditDoctor(EditedDoctor doctor)
         {
-            var dbDoctor = await dbContext.Doctors.Include(d => d.patientAccount).SingleAsync(doc => doc.doctorId == doctor.id);
+            var dbDoctor = await dbContext.Doctors.Include(d => d.patientAccount).SingleAsync(doc => doc.doctorId == doctor.doctorId);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             if (dbDoctor != null)
             {

@@ -26,6 +26,8 @@ namespace VaccinationSystem.Models
         [Required]
         public string phoneNumber { get; set; }
         [Required]
+        public bool active { get; set; }
+        [Required]
         public Guid vaccinationCenterId { get; set; }
     }
 }
