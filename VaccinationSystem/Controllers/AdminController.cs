@@ -273,7 +273,7 @@ namespace VaccinationSystem.Controllers
         [Route("doctors/timeSlots/{doctorId}")]
         public async Task<IActionResult> GetTimeSlots([FromRoute] Guid doctorId)
         {
-            List<TimeSlotsResponse> timeSlots = await dbManager.GetTimeSlots(doctorId);
+            var timeSlots = await dbManager.GetAllTimeSlots(doctorId);
 
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");

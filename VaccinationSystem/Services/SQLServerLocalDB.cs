@@ -112,8 +112,8 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-            if (doctor != null && doctor.patientAccount.active && doctor.patientAccount.password.CompareTo(login.password) == 0)
+            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.active && d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            if (doctor != null && doctor.patientAccount.password.CompareTo(login.password) == 0)
             {
                 return new LoginResponse()
                 {
@@ -123,8 +123,8 @@ namespace VaccinationSystem.Services
             }
             else
             {
-                var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-                if (patient != null && patient.active && patient.password.CompareTo(login.password) == 0)
+                var patient = dbContext.Patients.Where(p => p.active && p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                if (patient != null && patient.password.CompareTo(login.password) == 0)
                 {
                     return new LoginResponse()
                     {
@@ -467,6 +467,21 @@ namespace VaccinationSystem.Services
                     from = s.from.ToString("dd-MM-yyyy HH:mm"),
                     to = s.to.ToString("dd-MM-yyyy HH:mm"),
                     isFree = s.isFree
+                }).ToListAsync();
+
+            return slots;
+        }
+
+        public Task<List<WholeTimeSlotsResponse>> GetAllTimeSlots(Guid doctorId)
+        {
+            var slots = dbContext.TimeSlots.Where(s => s.doctor.doctorId == doctorId)
+                .Select(s => new WholeTimeSlotsResponse
+                {
+                    id = s.id,
+                    from = s.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = s.to.ToString("dd-MM-yyyy HH:mm"),
+                    isFree = s.isFree,
+                    active = s.active
                 }).ToListAsync();
 
             return slots;

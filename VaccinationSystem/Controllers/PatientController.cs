@@ -39,7 +39,7 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Something went wrong"+e.Message+e.StackTrace);
+                return BadRequest("Something went wrong");
             }
 
             if (made)
