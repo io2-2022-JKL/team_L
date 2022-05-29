@@ -112,7 +112,7 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.active &&  d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
             if (doctor != null && doctor.patientAccount.password.CompareTo(login.password) == 0)
             {
                 return new LoginResponse()
@@ -123,7 +123,7 @@ namespace VaccinationSystem.Services
             }
             else
             {
-                var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                var patient = dbContext.Patients.Where(p => p.active &&  p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
                 if (patient != null && patient.password.CompareTo(login.password) == 0)
                 {
                     return new LoginResponse()
@@ -153,7 +153,7 @@ namespace VaccinationSystem.Services
 
         public bool IsUserInDatabase(string email)
         {
-            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email) == 0).Count();
+            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email) == 0 && p.active).Count();
 
             if (emailOccurance > 0)
                 return true;
