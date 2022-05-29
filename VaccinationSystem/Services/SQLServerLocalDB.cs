@@ -113,7 +113,7 @@ namespace VaccinationSystem.Services
         public LoginResponse AreCredentialsValid(Login login)
         {
             var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-            if (doctor != null && doctor.patientAccount.password.CompareTo(login.password) == 0)
+            if (doctor != null && doctor.patientAccount.active && doctor.patientAccount.password.CompareTo(login.password) == 0)
             {
                 return new LoginResponse()
                 {
@@ -124,7 +124,7 @@ namespace VaccinationSystem.Services
             else
             {
                 var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-                if (patient != null && patient.password.CompareTo(login.password) == 0)
+                if (patient != null && patient.active && patient.password.CompareTo(login.password) == 0)
                 {
                     return new LoginResponse()
                     {
@@ -135,7 +135,7 @@ namespace VaccinationSystem.Services
                 else
                 {
                     var admin = dbContext.Admins.Where(a => a.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-                    if (admin != null && admin.password.CompareTo(login.password) == 0)
+                    if (admin != null &&  admin.password.CompareTo(login.password) == 0)
                         return new LoginResponse()
                         {
                             userId = admin.id,
@@ -153,7 +153,7 @@ namespace VaccinationSystem.Services
 
         public bool IsUserInDatabase(string email)
         {
-            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email) == 0).Count();
+            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email) == 0 && p.active).Count();
 
             if (emailOccurance > 0)
                 return true;
@@ -565,6 +565,11 @@ namespace VaccinationSystem.Services
 
             timeSlot.isFree = false;
             var vaccineCount = await dbContext.VaccinationCounts.SingleOrDefaultAsync(c => c.patient.id == patientId && c.virus == vaccine.virus);
+
+            CertificateState certState = CertificateState.NotLast;
+            if ((vaccineCount == null && vaccine.numberOfDoses == 1) || (vaccineCount != null && vaccine.numberOfDoses == (vaccineCount.count + 1)))
+                certState = CertificateState.LastNotCertified;
+
             var appointment = new Appointment()
             {
                 patient = patient,
@@ -572,7 +577,7 @@ namespace VaccinationSystem.Services
                 vaccine = vaccine,
                 state = AppointmentState.Planned,
                 whichDose = vaccineCount == null ? 1 : (vaccineCount.count+1),
-                certifyState = vaccine.numberOfDoses == (vaccineCount.count+1) ? CertificateState.LastNotCertified : CertificateState.NotLast
+                certifyState = certState
             };
 
             dbContext.Appointments.Add(appointment);
