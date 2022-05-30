@@ -9,6 +9,6 @@ namespace VaccinationSystem.Services
 {
     public interface ICertificateGenerator
     {
-        public Task<string> Generate(string patientName, DateTime dateOfBirth, string pesel, string vcName, string vcAddress, string vaccine, int dose, string batch);
+        public Task<string> Generate(string patientName, DateTime dateOfBirth, string pesel, string vcName, string vcAddress, string vaccine, int dose, string batch, DateTime vaccDate);
     }
 }

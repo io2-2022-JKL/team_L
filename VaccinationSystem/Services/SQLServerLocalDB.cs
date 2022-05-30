@@ -773,7 +773,7 @@ namespace VaccinationSystem.Services
 
         public async Task<Appointment> GetAppointment(Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).Include(a=> a.timeSlot).SingleOrDefaultAsync(a => a.id == appointmentId);
 
             return appointment;
         }
