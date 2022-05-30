@@ -9,9 +9,11 @@ using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Contollers
 {
+    //[Authorize]
     [Route("doctor")]
     [ApiController]
     public class DoctorController : ControllerBase
@@ -171,7 +173,7 @@ namespace VaccinationSystem.Contollers
                 var vc = d.vaccinationCenter;
 
                 string url = await certGenerator.Generate(p.firstName + " " + p.lastName, p.dateOfBirth, p.pesel, vc.name, vc.city + " " 
-                    + vc.address, a.vaccine.name, a.whichDose, a.vaccineBatchNumber);
+                    + vc.address, a.vaccine.name, a.whichDose, a.vaccineBatchNumber, a.timeSlot.from);
 
                 created = await dbManager.CreateCertificate(doctorId, appointmentId, url);
             }

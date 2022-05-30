@@ -9,9 +9,11 @@ using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
+    //[Authorize]
     [Route("admin")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -271,7 +273,7 @@ namespace VaccinationSystem.Controllers
         [Route("doctors/timeSlots/{doctorId}")]
         public async Task<IActionResult> GetTimeSlots([FromRoute] Guid doctorId)
         {
-            List<TimeSlotsResponse> timeSlots = await dbManager.GetTimeSlots(doctorId);
+            var timeSlots = await dbManager.GetAllTimeSlots(doctorId);
 
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");

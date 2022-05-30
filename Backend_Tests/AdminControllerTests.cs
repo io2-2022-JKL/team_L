@@ -960,7 +960,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ReturnsAsync(GetTimeSlots);
+            mockDB.Setup(dB => dB.GetAllTimeSlots(doctorID)).ReturnsAsync(GetAllTimeSlots);
             var controller = new AdminController(mockSignIn.Object, mockDB.Object);
 
             var slots = await controller.GetTimeSlots(doctorID);
@@ -969,7 +969,7 @@ namespace Backend_Tests
             var okResult = Assert.IsType<OkObjectResult>(slots);
 
 
-            var returnValue = Assert.IsType<List<TimeSlotsResponse>>(okResult.Value);
+            var returnValue = Assert.IsType<List<WholeTimeSlotsResponse>>(okResult.Value);
             Assert.Equal(2, returnValue.Count);
 
         }
@@ -995,13 +995,38 @@ namespace Backend_Tests
                 {
                     id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
                     from = "2022-01-29T08:00",
-                    to = "2022-01-29T09:00"
+                    to = "2022-01-29T09:00",
+                    isFree = true
                 },
                 new TimeSlotsResponse()
                 {
                     id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
                     from = "2022-01-29T09:00",
-                    to = "2022-01-29T10:00"
+                    to = "2022-01-29T10:00",
+                    isFree = true
+                }
+            };
+            return timeSlots;
+        }
+        private List<WholeTimeSlotsResponse> GetAllTimeSlots()
+        {
+            var timeSlots = new List<WholeTimeSlotsResponse>()
+            {
+                new WholeTimeSlotsResponse()
+                {
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    from = "2022-01-29T08:00",
+                    to = "2022-01-29T09:00",
+                    isFree = true,
+                    active = true
+                },
+                new WholeTimeSlotsResponse()
+                {
+                    id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
+                    from = "2022-01-29T09:00",
+                    to = "2022-01-29T10:00",
+                    isFree = true,
+                    active = true
                 }
             };
             return timeSlots;

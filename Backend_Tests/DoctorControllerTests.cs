@@ -325,7 +325,7 @@ namespace Backend_Tests
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
             mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
 
@@ -346,7 +346,7 @@ namespace Backend_Tests
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
             mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
 
@@ -368,7 +368,7 @@ namespace Backend_Tests
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
             mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
 
@@ -397,7 +397,15 @@ namespace Backend_Tests
             {
                 id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
                 whichDose = 1,
-                timeSlot = It.IsAny<TimeSlot>(),
+                timeSlot = new TimeSlot()
+                {
+                    from = DateTime.Now,
+                    to = DateTime.Now.AddMinutes(10),
+                    active = true,
+                    doctor = It.IsAny<Doctor>(),
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    isFree = true
+                },
                 patient = new Patient
                 {
                     id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
