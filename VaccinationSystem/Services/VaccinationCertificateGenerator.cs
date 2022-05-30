@@ -19,7 +19,7 @@ namespace VaccinationSystem.Services
             container = storage.GetBlobContainerClient("certificates");
 
         }
-        public async Task<string> Generate(string patientName, DateTime dateOfBirth, string pesel, string vcName, string vcAddress, string vaccine, int dose, string batch, DateTime vaccDate)
+        public async Task<string> Generate(string patientName, DateTime dateOfBirth, string pesel, string vcName, string vcAddress, string vaccine, int dose, string batch, DateTime vaccDose)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -29,7 +29,7 @@ namespace VaccinationSystem.Services
 
             DrawTitle(g);
             DrawPatientInformations(g, patientName, dateOfBirth, pesel);
-            DrawVaccinationInformations(g, vcName, vcAddress, vaccine, dose, batch, vaccDate);
+            DrawVaccinationInformations(g, vcName, vcAddress, vaccine, dose, batch, vaccDose);
 
             string fileName = patientName + "_" + pesel + "_" + dose.ToString() + ".pdf";
             var client = container.GetBlobClient(fileName);
@@ -66,7 +66,7 @@ namespace VaccinationSystem.Services
             g.DrawLine(XPens.DarkRed, new XPoint(70, 370), new XPoint(530, 370));
         }
 
-        private void DrawVaccinationInformations(XGraphics g, string vcName, string vcAddress, string vaccine, int dose, string batch, DateTime vaccDate)
+        private void DrawVaccinationInformations(XGraphics g, string vcName, string vcAddress, string vaccine, int dose, string batch, DateTime vaccDose)
         {
             g.DrawString("Vaccination Informations", new XFont("Arial", 20, XFontStyle.Bold), XBrushes.Black, new XPoint(180, 420));
 
@@ -74,7 +74,7 @@ namespace VaccinationSystem.Services
             g.DrawString(vcName, new XFont("Arial", 14), XBrushes.Black, new XPoint(70, 490));
 
             g.DrawString("Vaccination date", new XFont("Arial", 14, XFontStyle.Bold), XBrushes.Black, new XPoint(70, 530));
-            g.DrawString(vaccDate.ToString("hh-MM-yyyy"), new XFont("Arial", 14), XBrushes.Black, new XPoint(70, 550));
+            g.DrawString(vaccDose.ToString("dd-MM-yyyy"), new XFont("Arial", 14), XBrushes.Black, new XPoint(70, 550));
 
             g.DrawString("Vaccine name", new XFont("Arial", 14, XFontStyle.Bold), XBrushes.Black, new XPoint(70, 590));
             g.DrawString(vaccine, new XFont("Arial", 14), XBrushes.Black, new XPoint(70, 610));

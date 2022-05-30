@@ -621,7 +621,7 @@ namespace Backend_Tests
         {
             return new EditedDoctor
             {
-                id = doctorID,
+                doctorId = doctorID,
                 firstName = "Robert",
                 lastName = "Weide",
                 dateOfBirth = "1959-06-20",

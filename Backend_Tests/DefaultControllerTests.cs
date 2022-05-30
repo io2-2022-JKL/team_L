@@ -39,6 +39,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             mockDB.Setup(dB => dB.GetCities()).ReturnsAsync(new List<CityResponse>());
+
             var controller = new DefaultController(mockSignIn.Object, mockDB.Object);
 
             var cities = await controller.GetCities();
@@ -68,6 +69,8 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             mockDB.Setup(dB => dB.GetViruses()).Returns(GetViruses);
+
+            mockDB.Setup(dB => dB.GetCities()).ReturnsAsync(GetCities);
             var controller = new DefaultController(mockSignIn.Object, mockDB.Object);
 
             var viruses = await controller.GetViruses();

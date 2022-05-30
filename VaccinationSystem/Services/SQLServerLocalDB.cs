@@ -58,7 +58,7 @@ namespace VaccinationSystem.Services
         }
         public async Task<List<DoctorResponse>> GetDoctors()
         {
-            var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter).Include(d=>d.patientAccount).ToList();
+            var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter).Include(d => d.patientAccount).ToList();
             var doctorsResponse = new List<DoctorResponse>();
             VaccinationCenter center;
             Patient patientAcc;
@@ -112,7 +112,7 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.active && d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            var doctor = dbContext.Doctors.Include(d => d.patientAccount).Where(d => d.active && d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
             if (doctor != null && doctor.patientAccount.password.CompareTo(login.password) == 0)
             {
                 return new LoginResponse()
@@ -135,7 +135,7 @@ namespace VaccinationSystem.Services
                 else
                 {
                     var admin = dbContext.Admins.Where(a => a.mail.CompareTo(login.mail) == 0).FirstOrDefault();
-                    if (admin != null &&  admin.password.CompareTo(login.password) == 0)
+                    if (admin != null && admin.password.CompareTo(login.password) == 0)
                         return new LoginResponse()
                         {
                             userId = admin.id,
@@ -391,7 +391,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> AddDoctor(RegisteringDoctor doctor)
         {
-            var patient = await dbContext.Patients.SingleAsync(patient => patient.id==doctor.patientId);
+            var patient = await dbContext.Patients.SingleAsync(patient => patient.id == doctor.patientId);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             Doctor doc = new Doctor
             {
@@ -442,8 +442,8 @@ namespace VaccinationSystem.Services
             {
                 if (!dbDoctor.active)
                     throw new ArgumentException();
-                var appointments = dbContext.Appointments.Include(a=>a.patient).Include(a=>a.timeSlot)
-                    .Include(a=>a.timeSlot.doctor)
+                var appointments = dbContext.Appointments.Include(a => a.patient).Include(a => a.timeSlot)
+                    .Include(a => a.timeSlot.doctor)
                     .Where(d => d.timeSlot.doctor.doctorId == doctorId).ToList();
                 foreach (var app in appointments)
                 {
@@ -591,7 +591,7 @@ namespace VaccinationSystem.Services
                 timeSlot = timeSlot,
                 vaccine = vaccine,
                 state = AppointmentState.Planned,
-                whichDose = vaccineCount == null ? 1 : (vaccineCount.count+1),
+                whichDose = vaccineCount == null ? 1 : (vaccineCount.count + 1),
                 certifyState = certState
             };
 
@@ -607,7 +607,7 @@ namespace VaccinationSystem.Services
         public async Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter)
         {
             var timeSlots = new List<FilterTimeSlotResponse>();
-            foreach (var tS in dbContext.TimeSlots.Include(tS => tS.doctor).Include(ts => ts.doctor.vaccinationCenter).Include(ts=>ts.doctor.patientAccount).ToList())
+            foreach (var tS in dbContext.TimeSlots.Include(tS => tS.doctor).Include(ts => ts.doctor.vaccinationCenter).Include(ts => ts.doctor.patientAccount).ToList())
             {
                 if (tS.from < DateTime.ParseExact(filter.dateFrom, "dd-MM-yyyy", null) || tS.to > DateTime.ParseExact(filter.dateTo, "dd-MM-yyyy", null) || !tS.isFree || !tS.active)
                     continue;
@@ -676,7 +676,7 @@ namespace VaccinationSystem.Services
         {
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
                 .Where(a => a.state == AppointmentState.Planned).Include(a => a.vaccine).Include(a => a.timeSlot)
-                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter). Include(a=>a.timeSlot.doctor.patientAccount).ToList();
+                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a => a.timeSlot.doctor.patientAccount).ToList();
             var incApps = new List<IncomingAppointmentResponse>();
             IncomingAppointmentResponse incAppointment;
             foreach (var app in apps.ToList())
@@ -705,7 +705,7 @@ namespace VaccinationSystem.Services
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
                .Where(a => a.state == AppointmentState.Finished || a.state == AppointmentState.Cancelled)
                .Include(a => a.vaccine).Include(a => a.timeSlot)
-               .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a=>a.timeSlot.doctor.patientAccount).ToList();
+               .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a => a.timeSlot.doctor.patientAccount).ToList();
             var formerApps = new List<FormerAppointmentResponse>();
             FormerAppointmentResponse formAppointment;
             foreach (var app in apps.ToList())
@@ -736,7 +736,7 @@ namespace VaccinationSystem.Services
                 .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId);
             if (dbAppointment != null)
             {
-                if (dbAppointment.state != AppointmentState.Planned || 
+                if (dbAppointment.state != AppointmentState.Planned ||
                                     dbAppointment.patient.id != patientId)
                     throw new ArgumentException();
                 dbAppointment.state = AppointmentState.Cancelled;
@@ -750,9 +750,9 @@ namespace VaccinationSystem.Services
             }
             return false;
         }
-       public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
+        public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
         {
-            var doctor = await dbContext.Doctors.Include(d=>d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
+            var doctor = await dbContext.Doctors.Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
             var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
             if (appointment.state != AppointmentState.Finished && appointment.certifyState != CertificateState.LastNotCertified)
                 return false;
@@ -773,14 +773,14 @@ namespace VaccinationSystem.Services
 
         public async Task<Appointment> GetAppointment(Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).Include(a=> a.timeSlot).SingleOrDefaultAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).Include(a => a.timeSlot).SingleOrDefaultAsync(a => a.id == appointmentId);
 
             return appointment;
         }
 
         public Task<Doctor> GetDoctor(Guid doctorId)
         {
-            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
+            var doctor = dbContext.Doctors.Include(d => d.patientAccount).Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
 
             return doctor;
         }
@@ -879,15 +879,15 @@ namespace VaccinationSystem.Services
             return formerApps;
         }
 
-        public async Task<(bool,bool)> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
+        public async Task<(bool, bool)> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.Include(a=>a.vaccine).Include(a => a.timeSlot)
-                .Include(a => a.timeSlot.doctor).Include(a=>a.patient).SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.vaccine).Include(a => a.timeSlot)
+                .Include(a => a.timeSlot.doctor).Include(a => a.patient).SingleAsync(a => a.id == appointmentId);
             var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
-                return (false,false);
+                return (false, false);
             if (doctor.active == false)
-                return (false,false);
+                return (false, false);
             if (appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
@@ -907,10 +907,10 @@ namespace VaccinationSystem.Services
             }
             else
             {
-                var count = await dbContext.VaccinationCounts.Include(c=>c.patient)
+                var count = await dbContext.VaccinationCounts.Include(c => c.patient)
                     .SingleAsync(c => c.patient == appointment.patient && c.virus == appointment.vaccine.virus);
                 if (count == null)
-                    return (false,false);
+                    return (false, false);
                 count.count++;
             }
             if (appointment.whichDose == appointment.vaccine.numberOfDoses)
@@ -919,8 +919,8 @@ namespace VaccinationSystem.Services
 
             await dbContext.SaveChangesAsync();
             bool canCertify = (appointment.certifyState == CertificateState.LastNotCertified) ? true : false;
-           
-            return (true,canCertify);
+
+            return (true, canCertify);
         }
 
         public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
@@ -945,11 +945,11 @@ namespace VaccinationSystem.Services
         {
             var appointment = dbContext.Appointments
                 .Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).Include(a => a.patient)
-                .Include(a => a.vaccine).SingleOrDefault(a=>a.id == appointmentId);
-            if(appointment.state!= AppointmentState.Planned || appointment.timeSlot.doctor.doctorId!=doctorId)
+                .Include(a => a.vaccine).SingleOrDefault(a => a.id == appointmentId);
+            if (appointment.state != AppointmentState.Planned || appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
             StartVaccinationResponse response = null;
-            if(appointment!=null)
+            if (appointment != null)
             {
                 response = new StartVaccinationResponse()
                 {
@@ -1027,7 +1027,7 @@ namespace VaccinationSystem.Services
 
             return true;
         }
-        
+
         public async Task AddVaccine(AddVaccine vaccine)
         {
             var dbVaccine = new Vaccine()
@@ -1052,7 +1052,7 @@ namespace VaccinationSystem.Services
         {
             var vaccines = await dbContext.Vaccines.ToListAsync();
             var response = new List<VaccineResponse>();
-            foreach(var vaccine in vaccines)
+            foreach (var vaccine in vaccines)
             {
                 response.Add(new VaccineResponse()
                 {
@@ -1093,7 +1093,7 @@ namespace VaccinationSystem.Services
         public async Task<bool> DeleteTimeSlots(List<DeleteTimeSlot> timeSlots)
         {
             foreach (var slotId in timeSlots)
-            { 
+            {
                 var slot = await dbContext.TimeSlots.SingleOrDefaultAsync(s => s.id == slotId.id);
                 if (slot == null)
                     return false;
@@ -1102,7 +1102,7 @@ namespace VaccinationSystem.Services
                 {
                     throw new ArgumentException();
                 }
-                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a=>a.patient)
+                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient)
                     .SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
                 if (app != null && app.state == AppointmentState.Planned)
                     await CancelIncomingAppointment(app.patient.id, app.id);

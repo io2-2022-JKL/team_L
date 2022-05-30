@@ -95,9 +95,9 @@ namespace VaccinationSystem.Contollers
             {
                 deleted = await dbManager.DeleteTimeSlots(doctorId, ids);
             }
-            catch (ArgumentException )
+            catch (ArgumentException)
             {
-                return StatusCode(403,"User forbidden from deleting");
+                return StatusCode(403, "User forbidden from deleting");
             }
             catch (Exception)
             {
@@ -172,7 +172,7 @@ namespace VaccinationSystem.Contollers
                 var p = a.patient;
                 var vc = d.vaccinationCenter;
 
-                string url = await certGenerator.Generate(p.firstName + " " + p.lastName, p.dateOfBirth, p.pesel, vc.name, vc.city + " " 
+                string url = await certGenerator.Generate(p.firstName + " " + p.lastName, p.dateOfBirth, p.pesel, vc.name, vc.city + " "
                     + vc.address, a.vaccine.name, a.whichDose, a.vaccineBatchNumber, a.timeSlot.from);
 
                 created = await dbManager.CreateCertificate(doctorId, appointmentId, url);
@@ -264,14 +264,14 @@ namespace VaccinationSystem.Contollers
             {
                 return BadRequest("Something went wrong update batch");
             }
-            
+
             if (success)
                 return Ok(new { canCertify = canCertify });
             return NotFound("Data not found");
         }
         [HttpGet]
         [Route("vaccinate/{doctorId}/{appointmentId}")]
-        public async Task<IActionResult> StartVaccination([FromRoute]Guid doctorId, [FromRoute] Guid appointmentId)
+        public async Task<IActionResult> StartVaccination([FromRoute] Guid doctorId, [FromRoute] Guid appointmentId)
         {
             StartVaccinationResponse vaccResponse;
             try
