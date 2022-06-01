@@ -201,14 +201,14 @@ namespace VaccinationSystem.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     vaccineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    vaccineCenterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    vaccinationCenterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VaccinesInCenters", x => x.id);
                     table.ForeignKey(
-                        name: "FK_VaccinesInCenters_VaccinationCenters_vaccineCenterId",
-                        column: x => x.vaccineCenterId,
+                        name: "FK_VaccinesInCenters_VaccinationCenters_vaccinationCenterId",
+                        column: x => x.vaccinationCenterId,
                         principalTable: "VaccinationCenters",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -343,9 +343,9 @@ namespace VaccinationSystem.Migrations
                 column: "VaccinationCenterid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VaccinesInCenters_vaccineCenterId",
+                name: "IX_VaccinesInCenters_vaccinationCenterId",
                 table: "VaccinesInCenters",
-                column: "vaccineCenterId");
+                column: "vaccinationCenterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VaccinesInCenters_vaccineId",
