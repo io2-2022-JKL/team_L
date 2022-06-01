@@ -20,7 +20,7 @@ namespace VaccinationSystem.Data
                     lastName = "Kowalski",
                     mail = "superadmin@mail.com",
                     phoneNumber = "+48111222333",
-                    password = "superadmin!23"
+                    password = "test123"
                 };
                 context.Add(admin);
                 context.SaveChanges();
@@ -224,7 +224,7 @@ namespace VaccinationSystem.Data
                         lastName = "Nowak",
                         mail = "j.nowak@mail.com",
                         phoneNumber = "+48555221331",
-                        password = "password123()",
+                        password = "test123",
                         active = true
                     },
                     new Patient
@@ -235,7 +235,7 @@ namespace VaccinationSystem.Data
                         lastName = "Nowakowa",
                         mail = "j.nowakowa@mail.com",
                         phoneNumber = "+48576221390",
-                        password = "trudne1haslo2#",
+                        password = "test123",
                         active = true
                     },
                     new Patient
@@ -246,7 +246,7 @@ namespace VaccinationSystem.Data
                         lastName = "Weide",
                         mail = "robert.b.weide@mail.com",
                         phoneNumber = "+48125200331",
-                        password = "123abc!@#",
+                        password = "test123",
                         active = true
                     },
                     new Patient
@@ -257,7 +257,7 @@ namespace VaccinationSystem.Data
                         lastName = "Kowalska",
                         mail = "m.kowalska@mail.com",
                         phoneNumber = "+48349824991",
-                        password = "wasd1234lkj098",
+                        password = "test123",
                         active = true
                     },
                     new Patient
@@ -268,7 +268,7 @@ namespace VaccinationSystem.Data
                         lastName = "Izabelski",
                         mail = "leonizabel@mail.com",
                         phoneNumber = "+48903251026",
-                        password = "4bdyw1#8i",
+                        password = "test123",
                         active = true
                     }
                 };

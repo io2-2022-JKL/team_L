@@ -63,17 +63,17 @@ namespace VaccinationSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("Patientid1")
-                        .HasColumnType("uniqueidentifier");
+                    //b.Property<Guid?>("Patientid1")
+                       // .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("certifyState")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("doctorId")
-                        .HasColumnType("uniqueidentifier");
+                    //b.Property<Guid?>("doctorId")
+                      //  .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("doctorId1")
-                        .HasColumnType("uniqueidentifier");
+                   // b.Property<Guid?>("doctorId1")
+                       // .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("patientId")
                         .HasColumnType("uniqueidentifier");
@@ -95,11 +95,11 @@ namespace VaccinationSystem.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("Patientid1");
+                    //b.HasIndex("Patientid1");
 
-                    b.HasIndex("doctorId");
+                   // b.HasIndex("doctorId");
 
-                    b.HasIndex("doctorId1");
+                   // b.HasIndex("doctorId1");
 
                     b.HasIndex("patientId");
 
@@ -350,7 +350,7 @@ namespace VaccinationSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("vaccineCenterId")
+                    b.Property<Guid>("vaccinationCenterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("vaccineId")
@@ -358,7 +358,7 @@ namespace VaccinationSystem.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("vaccineCenterId");
+                    b.HasIndex("vaccinationCenterId");
 
                     b.HasIndex("vaccineId");
 
@@ -369,7 +369,7 @@ namespace VaccinationSystem.Migrations
                 {
                     b.HasOne("VaccinationSystem.Models.Patient", null)
                         .WithMany("futureVaccinations")
-                        .HasForeignKey("Patientid1");
+                        .HasForeignKey("patientId");
 
                     b.HasOne("VaccinationSystem.Models.Doctor", null)
                         .WithMany("futureVaccinations")
@@ -381,7 +381,7 @@ namespace VaccinationSystem.Migrations
 
                     b.HasOne("VaccinationSystem.Models.Patient", "patient")
                         .WithMany("vaccinationHistory")
-                        .HasForeignKey("patientId")
+                        .HasForeignKey("Patientid1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -472,7 +472,7 @@ namespace VaccinationSystem.Migrations
                 {
                     b.HasOne("VaccinationSystem.Models.VaccinationCenter", "vaccinationCenter")
                         .WithMany()
-                        .HasForeignKey("vaccineCenterId")
+                        .HasForeignKey("vaccinationCenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

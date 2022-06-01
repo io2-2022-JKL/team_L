@@ -341,6 +341,18 @@ namespace Backend_Tests
             Assert.Equal("Something went wrong", badResult.Value.ToString());
         }
         [Fact]
+        public async Task CancelIncomingAppointmentReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.CancelIncomingAppointment(patientID, appointmentID))
+                            .ThrowsAsync(new ArgumentException());
+            var controller = new PatientController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.CancelIncomingAppointment(patientID, appointmentID);
+            var forbiddentResult = Assert.IsType<ObjectResult>(deleted);
+            Assert.Equal(403, forbiddentResult.StatusCode);
+        }
+        [Fact]
         public async Task GetPatientInfoReturnsOk()
         {
             var mockDB = new Mock<IDatabase>();

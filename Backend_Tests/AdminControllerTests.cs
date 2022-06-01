@@ -19,6 +19,11 @@ namespace Backend_Tests
         private Guid vCenterId = new Guid("1c8ddbb7-06c8-44ec-893e-f936607aa36f");
         private Guid patientID = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5");
         private Guid doctorID = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE");
+        private Guid vaccineID = new Guid("6DD0DA08-4C9E-4606-A797-08DA3C1159E9");
+        private List<DeleteTimeSlot> listDeleteTimeSlots = new List<DeleteTimeSlot>() {
+                    new DeleteTimeSlot(){ id=new Guid("56FD372F-237C-4D87-87C5-08DA3C232B6F") },
+                    new DeleteTimeSlot(){ id = new Guid("4F442870-B313-4DB8-87C7-08DA3C232B6F")}
+            };
         [Fact]
         public async Task ShowVaccinationCentersReturnsCenters()
         {
@@ -179,7 +184,21 @@ namespace Backend_Tests
             var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
+        [Fact]
+        public async Task DeleteVaccinationCentersReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
 
+            mockDB.Setup(dB => dB.DeleteVaccinationCenter(vCenterId))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeleteVaccinationCenter(vCenterId);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
         [Fact]
         public async Task DeleteVaccinationCentersReturnsOk()
         {
@@ -572,6 +591,21 @@ namespace Backend_Tests
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
         [Fact]
+        public async Task DeletePatientReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.DeletePatient(patientID))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeletePatient(patientID);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        [Fact]
         public async Task DeletePatientReturnsNotFound()
         {
             var mockDB = new Mock<IDatabase>();
@@ -587,7 +621,7 @@ namespace Backend_Tests
         {
             return new EditedDoctor
             {
-                id = doctorID,
+                doctorId = doctorID,
                 firstName = "Robert",
                 lastName = "Weide",
                 dateOfBirth = "1959-06-20",
@@ -601,13 +635,7 @@ namespace Backend_Tests
         {
             return new RegisteringDoctor
             {
-                PESEL = "88101023232",
-                firstName = "Alojzy",
-                lastName = "Prus",
-                dateOfBirth = new DateTime(1988, 10, 10),
-                mail = "fajnymail@mail.com",
-                phoneNumber = "+48391094167",
-                password = "chwilowehaslo123",
+                patientId = patientID,
                 vaccinationCenterId = vCenterId
             };
         }
@@ -734,6 +762,21 @@ namespace Backend_Tests
             Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
         }
         [Fact]
+        public async Task DeleteDoctorReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.DeleteDoctor(doctorID))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.DeleteDoctor(doctorID);
+
+            var forbiddenResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        [Fact]
         public async Task DeleteDoctorReturnsNotFound()
         {
             var mockDB = new Mock<IDatabase>();
@@ -849,7 +892,7 @@ namespace Backend_Tests
                 mail = "j.nowak@mail.com",
                 phoneNumber = "+48555221331",
                 active = true,
-            }) ;
+            });
             patients.Add(new PatientResponse()
             {
                 id = new Guid("35D520DC-16AF-48E6-A309-08DA1B08BABF"),
@@ -917,7 +960,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.GetTimeSlots(doctorID)).ReturnsAsync(GetTimeSlots);
+            mockDB.Setup(dB => dB.GetAllTimeSlots(doctorID)).ReturnsAsync(GetAllTimeSlots);
             var controller = new AdminController(mockSignIn.Object, mockDB.Object);
 
             var slots = await controller.GetTimeSlots(doctorID);
@@ -926,7 +969,7 @@ namespace Backend_Tests
             var okResult = Assert.IsType<OkObjectResult>(slots);
 
 
-            var returnValue = Assert.IsType<List<TimeSlotsResponse>>(okResult.Value);
+            var returnValue = Assert.IsType<List<WholeTimeSlotsResponse>>(okResult.Value);
             Assert.Equal(2, returnValue.Count);
 
         }
@@ -952,16 +995,277 @@ namespace Backend_Tests
                 {
                     id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
                     from = "2022-01-29T08:00",
-                    to = "2022-01-29T09:00"
+                    to = "2022-01-29T09:00",
+                    isFree = true
                 },
                 new TimeSlotsResponse()
                 {
                     id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
                     from = "2022-01-29T09:00",
-                    to = "2022-01-29T10:00"
+                    to = "2022-01-29T10:00",
+                    isFree = true
                 }
             };
             return timeSlots;
+        }
+        private List<WholeTimeSlotsResponse> GetAllTimeSlots()
+        {
+            var timeSlots = new List<WholeTimeSlotsResponse>()
+            {
+                new WholeTimeSlotsResponse()
+                {
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    from = "2022-01-29T08:00",
+                    to = "2022-01-29T09:00",
+                    isFree = true,
+                    active = true
+                },
+                new WholeTimeSlotsResponse()
+                {
+                    id = new Guid("55A2BBCE-E031-4931-E751-08DA13EF87A5"),
+                    from = "2022-01-29T09:00",
+                    to = "2022-01-29T10:00",
+                    isFree = true,
+                    active = true
+                }
+            };
+            return timeSlots;
+        }
+        [Fact]
+        public async Task EditVaccineReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ReturnsAsync(() => true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+        [Fact]
+        public async Task EditVaccineReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task EditVaccineReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.EditVaccine(It.IsAny<EditVaccine>())).ReturnsAsync(() => false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.EditVaccine(It.IsAny<EditVaccine>());
+
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("Error, no vaccine found to edit", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task AddVaccineReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.AddVaccine(It.IsAny<AddVaccine>()));
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.AddVaccine(It.IsAny<AddVaccine>());
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+        [Fact]
+        public async Task AddVaccineReturnsBadRequestDatabaseException()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+
+            mockDB.Setup(dB => dB.AddVaccine(It.IsAny<AddVaccine>())).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+
+            var result = await controller.AddVaccine(It.IsAny<AddVaccine>());
+
+            var notFoundResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Something went wrong", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines()).ReturnsAsync(Vaccines());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var okResult = Assert.IsType<OkObjectResult>(vaccines);
+            var returnValue = Assert.IsType<List<VaccineResponse>>(okResult.Value);
+            Assert.Equal(2, returnValue.Count);
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines()).ReturnsAsync(new List<VaccineResponse>());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var notFound = Assert.IsType<NotFoundObjectResult>(vaccines);
+            Assert.Equal("Data not found", notFound.Value.ToString());
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines())
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var badRequst = Assert.IsType<BadRequestObjectResult>(vaccines);
+            Assert.Equal("Something went wrong", badRequst.Value.ToString());
+        }
+        [Fact]
+        public async Task GetVaccinesReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.GetVaccines())
+                .ThrowsAsync(new ArgumentException());
+            var contoller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var vaccines = await contoller.GetVaccines();
+            var forbiddenResult = Assert.IsType<ObjectResult>(vaccines);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        private List<VaccineResponse> Vaccines()
+        {
+            var list = new List<VaccineResponse>();
+            list.Add(new VaccineResponse()
+            {
+                vaccineId = new Guid("452aa3ed-8154-438f-6dfe-08da3663531b"),
+                company = "Pfeizer",
+                name = "Pfeizer vaccine",
+                numberOfDoses = 2,
+                minDaysBetweenDoses = 30,
+                maxDaysBetweenDoses = 0,
+                virus = "Coronavirus",
+                minPatientAge = 12,
+                maxPatientAge = 0,
+                active = true
+            });
+            list.Add(new VaccineResponse()
+            {
+                vaccineId = new Guid("093e8807-f30e-4d60-6e00-08da3663531b"),
+                company = "Johnson and Johnson",
+                name = "J&J vaccine",
+                numberOfDoses = 1,
+                minDaysBetweenDoses = 0,
+                maxDaysBetweenDoses = 0,
+                virus = "Coronavirus",
+                minPatientAge = 18,
+                maxPatientAge = 0,
+                active = true
+            });
+            return list;
+        }
+        [Fact]
+        public async Task DeleteVaccineReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteVaccine(vaccineID)).ReturnsAsync(true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteVaccine(vaccineID);
+            var okResult = Assert.IsType<OkObjectResult>(deleted);
+            Assert.Equal("Deleted Vaccine", okResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteVaccineReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteVaccine(vaccineID)).ReturnsAsync(false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteVaccine(vaccineID);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(deleted);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteVaccineReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteVaccine(vaccineID))
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteVaccine(vaccineID);
+            var badRequest = Assert.IsType<BadRequestObjectResult>(deleted);
+            Assert.Equal("Something went wrong", badRequest.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteVaccineReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteVaccine(vaccineID))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteVaccine(vaccineID);
+            var forbiddenResult = Assert.IsType<ObjectResult>(deleted);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots)).ReturnsAsync(true);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var okResult = Assert.IsType<OkObjectResult>(deleted);
+            Assert.Equal("Deleted time slots", okResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots)).ReturnsAsync(false);
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(deleted);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots))
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var badRequest = Assert.IsType<BadRequestObjectResult>(deleted);
+            Assert.Equal("Something went wrong", badRequest.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(listDeleteTimeSlots))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new AdminController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlots(listDeleteTimeSlots);
+            var forbiddenResult = Assert.IsType<ObjectResult>(deleted);
+            Assert.Equal(403, forbiddenResult.StatusCode);
         }
     }
 }

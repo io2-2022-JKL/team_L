@@ -58,7 +58,7 @@ namespace VaccinationSystem.Services
         }
         public async Task<List<DoctorResponse>> GetDoctors()
         {
-            var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter).Include(d=>d.patientAccount).ToList();
+            var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter).Include(d => d.patientAccount).ToList();
             var doctorsResponse = new List<DoctorResponse>();
             VaccinationCenter center;
             Patient patientAcc;
@@ -112,7 +112,7 @@ namespace VaccinationSystem.Services
 
         public LoginResponse AreCredentialsValid(Login login)
         {
-            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Where(d => d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+            var doctor = dbContext.Doctors.Include(d => d.patientAccount).Where(d => d.active && d.patientAccount.mail.CompareTo(login.mail) == 0).FirstOrDefault();
             if (doctor != null && doctor.patientAccount.password.CompareTo(login.password) == 0)
             {
                 return new LoginResponse()
@@ -123,7 +123,7 @@ namespace VaccinationSystem.Services
             }
             else
             {
-                var patient = dbContext.Patients.Where(p => p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
+                var patient = dbContext.Patients.Where(p => p.active && p.mail.CompareTo(login.mail) == 0).FirstOrDefault();
                 if (patient != null && patient.password.CompareTo(login.password) == 0)
                 {
                     return new LoginResponse()
@@ -153,7 +153,7 @@ namespace VaccinationSystem.Services
 
         public bool IsUserInDatabase(string email)
         {
-            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email) == 0).Count();
+            int emailOccurance = dbContext.Patients.Where(p => p.mail.CompareTo(email) == 0 && p.active).Count();
 
             if (emailOccurance > 0)
                 return true;
@@ -249,17 +249,16 @@ namespace VaccinationSystem.Services
 
             if (dbCenter != null)
             {
-                var vaccines = dbContext.VaccinesInCenters.Where(w => w.vaccinationCenter.id == dbCenter.id);
-                dbContext.VaccinesInCenters.RemoveRange(vaccines);
-
-                var hours = dbContext.OpeningHours.Where(h => h.vaccinationCenter.id == dbCenter.id);
-                dbContext.OpeningHours.RemoveRange(hours);
-
-                await dbContext.Doctors.Where(d => d.vaccinationCenter.id == dbCenter.id)
-                    .ForEachAsync(d => d.vaccinationCenter = null);
-
-                dbContext.VaccinationCenters.Remove(dbCenter);
-
+                if (!dbCenter.active)
+                    throw new ArgumentException();
+                var doctors = dbContext.Doctors.Include(d => d.vaccinationCenter)
+                    .Where(d => d.vaccinationCenter.id == dbCenter.id).ToList();
+                foreach (var doctor in doctors)
+                {
+                    if (doctor.active)
+                        await DeleteDoctor(doctor.doctorId);
+                }
+                dbCenter.active = false;
                 await dbContext.SaveChangesAsync();
 
                 return true;
@@ -287,8 +286,8 @@ namespace VaccinationSystem.Services
             var hours = await dbContext.OpeningHours.Where(h => h.vaccinationCenter.id == vaccinationCenterId)
                 .Select(h => new OpeningHoursDays()
                 {
-                    from = $"{h.from.Hours}:{h.from.Minutes}",
-                    to = $"{h.to.Hours}:{h.to.Minutes}"
+                    from = h.from.ToString(@"hh\:mm"),
+                    to = h.to.ToString(@"hh\:mm"),
                 }).ToListAsync();
 
             return hours;
@@ -374,13 +373,15 @@ namespace VaccinationSystem.Services
             var dbPatient = await dbContext.Patients.SingleAsync(patient => patient.id == patientId);
             if (dbPatient != null)
             {
-                var counts = dbContext.VaccinationCounts.Where(c => c.patient.id == patientId);
-                dbContext.VaccinationCounts.RemoveRange(counts);
-                var appointments = dbContext.Appointments.Where(c => c.patient.id == patientId);
-                dbContext.Appointments.RemoveRange(appointments);
-                var certificates = dbContext.Certificates.Where(c => c.patientId == patientId);
-                dbContext.Certificates.RemoveRange(certificates);
-                dbContext.Patients.Remove(dbPatient);
+                if (!dbPatient.active)
+                    throw new ArgumentException();
+                var appointments = dbContext.Appointments.Where(c => c.patient.id == patientId).ToList();
+                foreach (var app in appointments)
+                {
+                    if (app.state == AppointmentState.Planned)
+                        await CancelIncomingAppointment(app.patient.id, app.id);
+                }
+                dbPatient.active = false;
                 await dbContext.SaveChangesAsync();
                 return true;
             }
@@ -390,7 +391,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> AddDoctor(RegisteringDoctor doctor)
         {
-            var patient = await dbContext.Patients.SingleAsync(patient => patient.pesel == doctor.PESEL);
+            var patient = await dbContext.Patients.SingleAsync(patient => patient.id == doctor.patientId);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             Doctor doc = new Doctor
             {
@@ -411,7 +412,7 @@ namespace VaccinationSystem.Services
 
         public async Task<bool> EditDoctor(EditedDoctor doctor)
         {
-            var dbDoctor = await dbContext.Doctors.Include(d => d.patientAccount).SingleAsync(doc => doc.doctorId == doctor.id);
+            var dbDoctor = await dbContext.Doctors.Include(d => d.patientAccount).SingleAsync(doc => doc.doctorId == doctor.doctorId);
             var center = await dbContext.VaccinationCenters.SingleAsync(center => center.id == doctor.vaccinationCenterId);
             if (dbDoctor != null)
             {
@@ -439,13 +440,17 @@ namespace VaccinationSystem.Services
             var dbDoctor = await dbContext.Doctors.SingleAsync(doc => doc.doctorId == doctorId);
             if (dbDoctor != null)
             {
-                var appointments = dbContext.Appointments.Where(d => d.timeSlot.doctor.doctorId == doctorId);
-                dbContext.Appointments.RemoveRange(appointments);
-                var times = dbContext.TimeSlots.Where(t => t.doctor.doctorId == doctorId);
-                dbContext.TimeSlots.RemoveRange(times);
-                //var center = dbContext.VaccinationCenters.Where(c => c.id == dbDoctor.vaccinationCenter.id);
-
-                dbContext.Doctors.Remove(dbDoctor);
+                if (!dbDoctor.active)
+                    throw new ArgumentException();
+                var appointments = dbContext.Appointments.Include(a => a.patient).Include(a => a.timeSlot)
+                    .Include(a => a.timeSlot.doctor)
+                    .Where(d => d.timeSlot.doctor.doctorId == doctorId).ToList();
+                foreach (var app in appointments)
+                {
+                    if (app.state == AppointmentState.Planned)
+                        await CancelIncomingAppointment(app.patient.id, app.id);
+                }
+                dbDoctor.active = false;
                 await dbContext.SaveChangesAsync();
                 return true;
             }
@@ -455,13 +460,28 @@ namespace VaccinationSystem.Services
 
         public Task<List<TimeSlotsResponse>> GetTimeSlots(Guid doctorId)
         {
-            var slots = dbContext.TimeSlots.Where(s => s.doctor.doctorId == doctorId)
+            var slots = dbContext.TimeSlots.Where(s => s.doctor.doctorId == doctorId && s.active)
                 .Select(s => new TimeSlotsResponse
                 {
                     id = s.id,
                     from = s.from.ToString("dd-MM-yyyy HH:mm"),
                     to = s.to.ToString("dd-MM-yyyy HH:mm"),
                     isFree = s.isFree
+                }).ToListAsync();
+
+            return slots;
+        }
+
+        public Task<List<WholeTimeSlotsResponse>> GetAllTimeSlots(Guid doctorId)
+        {
+            var slots = dbContext.TimeSlots.Where(s => s.doctor.doctorId == doctorId)
+                .Select(s => new WholeTimeSlotsResponse
+                {
+                    id = s.id,
+                    from = s.from.ToString("dd-MM-yyyy HH:mm"),
+                    to = s.to.ToString("dd-MM-yyyy HH:mm"),
+                    isFree = s.isFree,
+                    active = s.active
                 }).ToListAsync();
 
             return slots;
@@ -519,12 +539,15 @@ namespace VaccinationSystem.Services
                 if (slot == null)
                     return false;
 
-                if (slot.doctor.doctorId != doctorId)
+                if (slot.doctor.doctorId != doctorId || !slot.active)
                 {
                     throw new ArgumentException();
                 }
-
-                dbContext.TimeSlots.Remove(slot);
+                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient)
+                        .SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
+                if (app != null && app.state == AppointmentState.Planned)
+                    await CancelIncomingAppointment(app.patient.id, app.id);
+                slot.active = false;
             }
 
             await dbContext.SaveChangesAsync();
@@ -557,14 +580,19 @@ namespace VaccinationSystem.Services
 
             timeSlot.isFree = false;
             var vaccineCount = await dbContext.VaccinationCounts.SingleOrDefaultAsync(c => c.patient.id == patientId && c.virus == vaccine.virus);
+
+            CertificateState certState = CertificateState.NotLast;
+            if ((vaccineCount == null && vaccine.numberOfDoses == 1) || (vaccineCount != null && vaccine.numberOfDoses == (vaccineCount.count + 1)))
+                certState = CertificateState.LastNotCertified;
+
             var appointment = new Appointment()
             {
                 patient = patient,
                 timeSlot = timeSlot,
                 vaccine = vaccine,
                 state = AppointmentState.Planned,
-                whichDose = vaccineCount == null ? 1 : (vaccineCount.count+1),
-                certifyState = vaccine.numberOfDoses == (vaccineCount.count+1) ? CertificateState.LastNotCertified : CertificateState.NotLast
+                whichDose = vaccineCount == null ? 1 : (vaccineCount.count + 1),
+                certifyState = certState
             };
 
             dbContext.Appointments.Add(appointment);
@@ -579,7 +607,7 @@ namespace VaccinationSystem.Services
         public async Task<List<FilterTimeSlotResponse>> GetTimeSlotsWithFiltration(TimeSlotsFilter filter)
         {
             var timeSlots = new List<FilterTimeSlotResponse>();
-            foreach (var tS in dbContext.TimeSlots.Include(tS => tS.doctor).Include(ts => ts.doctor.vaccinationCenter).Include(ts=>ts.doctor.patientAccount).ToList())
+            foreach (var tS in dbContext.TimeSlots.Include(tS => tS.doctor).Include(ts => ts.doctor.vaccinationCenter).Include(ts => ts.doctor.patientAccount).ToList())
             {
                 if (tS.from < DateTime.ParseExact(filter.dateFrom, "dd-MM-yyyy", null) || tS.to > DateTime.ParseExact(filter.dateTo, "dd-MM-yyyy", null) || !tS.isFree || !tS.active)
                     continue;
@@ -648,7 +676,7 @@ namespace VaccinationSystem.Services
         {
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
                 .Where(a => a.state == AppointmentState.Planned).Include(a => a.vaccine).Include(a => a.timeSlot)
-                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter). Include(a=>a.timeSlot.doctor.patientAccount).ToList();
+                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a => a.timeSlot.doctor.patientAccount).ToList();
             var incApps = new List<IncomingAppointmentResponse>();
             IncomingAppointmentResponse incAppointment;
             foreach (var app in apps.ToList())
@@ -677,7 +705,7 @@ namespace VaccinationSystem.Services
             var apps = dbContext.Appointments.Include(a => a.patient).Where(a => a.patient.id == patientId)
                .Where(a => a.state == AppointmentState.Finished || a.state == AppointmentState.Cancelled)
                .Include(a => a.vaccine).Include(a => a.timeSlot)
-               .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a=>a.timeSlot.doctor.patientAccount).ToList();
+               .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a => a.timeSlot.doctor.patientAccount).ToList();
             var formerApps = new List<FormerAppointmentResponse>();
             FormerAppointmentResponse formAppointment;
             foreach (var app in apps.ToList())
@@ -705,9 +733,12 @@ namespace VaccinationSystem.Services
         public async Task<bool> CancelIncomingAppointment(Guid patientId, Guid appointmentId)
         {
             var dbAppointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.timeSlot)
-                .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId && a.patient.id == patientId);
+                .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId);
             if (dbAppointment != null)
             {
+                if (dbAppointment.state != AppointmentState.Planned ||
+                                    dbAppointment.patient.id != patientId)
+                    throw new ArgumentException();
                 dbAppointment.state = AppointmentState.Cancelled;
                 if (dbAppointment.timeSlot != null)
                 {
@@ -719,9 +750,9 @@ namespace VaccinationSystem.Services
             }
             return false;
         }
-       public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
+        public async Task<bool> CreateCertificate(Guid doctorId, Guid appointmentId, string url)
         {
-            var doctor = await dbContext.Doctors.Include(d=>d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
+            var doctor = await dbContext.Doctors.Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
             var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
             if (appointment.state != AppointmentState.Finished && appointment.certifyState != CertificateState.LastNotCertified)
                 return false;
@@ -742,14 +773,14 @@ namespace VaccinationSystem.Services
 
         public async Task<Appointment> GetAppointment(Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).SingleOrDefaultAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.vaccine).Include(a => a.timeSlot).SingleOrDefaultAsync(a => a.id == appointmentId);
 
             return appointment;
         }
 
         public Task<Doctor> GetDoctor(Guid doctorId)
         {
-            var doctor = dbContext.Doctors.Include(d=>d.patientAccount).Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
+            var doctor = dbContext.Doctors.Include(d => d.patientAccount).Include(d => d.vaccinationCenter).SingleOrDefaultAsync(d => d.doctorId == doctorId);
 
             return doctor;
         }
@@ -848,15 +879,15 @@ namespace VaccinationSystem.Services
             return formerApps;
         }
 
-        public async Task<(bool,bool)> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
+        public async Task<(bool, bool)> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
-            var appointment = await dbContext.Appointments.Include(a=>a.vaccine).Include(a => a.timeSlot)
-                .Include(a => a.timeSlot.doctor).Include(a=>a.patient).SingleAsync(a => a.id == appointmentId);
+            var appointment = await dbContext.Appointments.Include(a => a.vaccine).Include(a => a.timeSlot)
+                .Include(a => a.timeSlot.doctor).Include(a => a.patient).SingleAsync(a => a.id == appointmentId);
             var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
-                return (false,false);
+                return (false, false);
             if (doctor.active == false)
-                return (false,false);
+                return (false, false);
             if (appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
@@ -876,10 +907,10 @@ namespace VaccinationSystem.Services
             }
             else
             {
-                var count = await dbContext.VaccinationCounts.Include(c=>c.patient)
+                var count = await dbContext.VaccinationCounts.Include(c => c.patient)
                     .SingleAsync(c => c.patient == appointment.patient && c.virus == appointment.vaccine.virus);
                 if (count == null)
-                    return (false,false);
+                    return (false, false);
                 count.count++;
             }
             if (appointment.whichDose == appointment.vaccine.numberOfDoses)
@@ -888,8 +919,8 @@ namespace VaccinationSystem.Services
 
             await dbContext.SaveChangesAsync();
             bool canCertify = (appointment.certifyState == CertificateState.LastNotCertified) ? true : false;
-           
-            return (true,canCertify);
+
+            return (true, canCertify);
         }
 
         public async Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId)
@@ -914,11 +945,11 @@ namespace VaccinationSystem.Services
         {
             var appointment = dbContext.Appointments
                 .Include(a => a.timeSlot).Include(a => a.timeSlot.doctor).Include(a => a.patient)
-                .Include(a => a.vaccine).SingleOrDefault(a=>a.id == appointmentId);
-            if(appointment.state!= AppointmentState.Planned || appointment.timeSlot.doctor.doctorId!=doctorId)
+                .Include(a => a.vaccine).SingleOrDefault(a => a.id == appointmentId);
+            if (appointment.state != AppointmentState.Planned || appointment.timeSlot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
             StartVaccinationResponse response = null;
-            if(appointment!=null)
+            if (appointment != null)
             {
                 response = new StartVaccinationResponse()
                 {
@@ -948,11 +979,11 @@ namespace VaccinationSystem.Services
             return cityNames;
         }
 
-        public async Task<List<VirusResponse>> GetViruses()
+        public List<VirusResponse> GetViruses()
         {
-            var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
+            //var virusesNames = await dbContext.Vaccines.Select(v => v.virus.ToString()).Distinct().Select(v => new VirusResponse() { virus = v }).ToListAsync();
 
-            return virusesNames;
+            return Enum.GetNames(typeof(Virus)).Select(v => new VirusResponse() { virus = v }).ToList();
         }
 
         public async Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId)
@@ -972,6 +1003,114 @@ namespace VaccinationSystem.Services
 
             await dbContext.SaveChangesAsync();
             //await dbContext.Database.CommitTransactionAsync();
+            return true;
+        }
+
+        public async Task<bool> EditVaccine(EditVaccine vaccine)
+        {
+            var dbVaccine = await dbContext.Vaccines.SingleOrDefaultAsync(v => v.id == vaccine.vaccineId);
+
+            if (dbVaccine == null)
+                return false;
+
+            dbVaccine.name = vaccine.name;
+            dbVaccine.company = vaccine.company;
+            dbVaccine.minDaysBetweenDoses = vaccine.minDaysBetweenDoses;
+            dbVaccine.maxDaysBetweenDoses = vaccine.maxDaysBetweenDoses;
+            dbVaccine.minPatientAge = vaccine.minPatientAge;
+            dbVaccine.maxPatientAge = vaccine.maxPatientAge;
+            dbVaccine.virus = (Virus)Enum.Parse(typeof(Virus), vaccine.virus);
+            dbVaccine.active = vaccine.active;
+            dbVaccine.numberOfDoses = vaccine.numberOfDoses;
+
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task AddVaccine(AddVaccine vaccine)
+        {
+            var dbVaccine = new Vaccine()
+            {
+                name = vaccine.name,
+                company = vaccine.company,
+                minPatientAge = vaccine.minPatientAge,
+                maxPatientAge = vaccine.maxPatientAge,
+                minDaysBetweenDoses = vaccine.minDaysBetweenDoses,
+                maxDaysBetweenDoses = vaccine.maxDaysBetweenDoses,
+                numberOfDoses = vaccine.numberOfDoses,
+                virus = (Virus)Enum.Parse(typeof(Virus), vaccine.virus),
+                active = vaccine.active
+
+            };
+
+            dbContext.Vaccines.Add(dbVaccine);
+
+            await dbContext.SaveChangesAsync();
+        }
+        public async Task<List<VaccineResponse>> GetVaccines()
+        {
+            var vaccines = await dbContext.Vaccines.ToListAsync();
+            var response = new List<VaccineResponse>();
+            foreach (var vaccine in vaccines)
+            {
+                response.Add(new VaccineResponse()
+                {
+                    vaccineId = vaccine.id,
+                    company = vaccine.company,
+                    name = vaccine.name,
+                    numberOfDoses = vaccine.numberOfDoses,
+                    minDaysBetweenDoses = vaccine.minDaysBetweenDoses,
+                    maxDaysBetweenDoses = vaccine.maxDaysBetweenDoses,
+                    virus = vaccine.virus.ToString(),
+                    minPatientAge = vaccine.minPatientAge,
+                    maxPatientAge = vaccine.maxPatientAge,
+                    active = vaccine.active
+                });
+            }
+            return response;
+        }
+        public async Task<bool> DeleteVaccine(Guid vaccineId)
+        {
+            var vaccine = await dbContext.Vaccines.SingleAsync(vc => vc.id == vaccineId);
+            if (vaccine != null)
+            {
+                if (!vaccine.active)
+                    throw new ArgumentException();
+                var appointments = dbContext.Appointments.Include(a => a.vaccine)
+                    .Where(a => a.vaccine.id == vaccineId).Include(a => a.patient).ToList();
+                foreach (var app in appointments)
+                {
+                    if (app.state == AppointmentState.Planned)
+                        await CancelIncomingAppointment(app.patient.id, app.id);
+                }
+                vaccine.active = false;
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        public async Task<bool> DeleteTimeSlots(List<DeleteTimeSlot> timeSlots)
+        {
+            foreach (var slotId in timeSlots)
+            {
+                var slot = await dbContext.TimeSlots.SingleOrDefaultAsync(s => s.id == slotId.id);
+                if (slot == null)
+                    return false;
+
+                if (!slot.active)
+                {
+                    throw new ArgumentException();
+                }
+                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient)
+                    .SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
+                if (app != null && app.state == AppointmentState.Planned)
+                    await CancelIncomingAppointment(app.patient.id, app.id);
+                slot.active = false;
+            }
+
+            await dbContext.SaveChangesAsync();
+
             return true;
         }
     }

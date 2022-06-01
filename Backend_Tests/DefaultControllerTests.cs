@@ -39,6 +39,7 @@ namespace Backend_Tests
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
             mockDB.Setup(dB => dB.GetCities()).ReturnsAsync(new List<CityResponse>());
+
             var controller = new DefaultController(mockSignIn.Object, mockDB.Object);
 
             var cities = await controller.GetCities();
@@ -67,7 +68,9 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.GetViruses()).ReturnsAsync(GetViruses);
+            mockDB.Setup(dB => dB.GetViruses()).Returns(GetViruses);
+
+            mockDB.Setup(dB => dB.GetCities()).ReturnsAsync(GetCities);
             var controller = new DefaultController(mockSignIn.Object, mockDB.Object);
 
             var viruses = await controller.GetViruses();
@@ -86,7 +89,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.GetViruses()).ReturnsAsync(new List<VirusResponse>());
+            mockDB.Setup(dB => dB.GetViruses()).Returns(new List<VirusResponse>());
             var controller = new DefaultController(mockSignIn.Object, mockDB.Object);
 
             var viruses = await controller.GetViruses();
@@ -101,7 +104,7 @@ namespace Backend_Tests
         {
             var mockDB = new Mock<IDatabase>();
             var mockSignIn = new Mock<IUserSignInManager>();
-            mockDB.Setup(dB => dB.GetViruses()).ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            mockDB.Setup(dB => dB.GetViruses()).Throws(new System.Data.DeletedRowInaccessibleException());
             var controller = new DefaultController(mockSignIn.Object, mockDB.Object);
 
             var viruses = await controller.GetViruses();

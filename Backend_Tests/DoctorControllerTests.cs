@@ -22,6 +22,10 @@ namespace Backend_Tests
         private Guid appointmentID = new Guid("33E18E13-8F45-4766-A0C0-08DA13EF5847");
         private string url = "jakistamurl";
         private string batch = "batch01234";
+        private List<DeleteTimeSlot> listDeleteTimeSlots = new List<DeleteTimeSlot>() {
+                    new DeleteTimeSlot(){ id=new Guid("56FD372F-237C-4D87-87C5-08DA3C232B6F") },
+                    new DeleteTimeSlot(){ id = new Guid("4F442870-B313-4DB8-87C7-08DA3C232B6F")}
+            };
         [Fact]
         public async Task GetTimeSlotsReturnsTImeSlots()
         {
@@ -189,7 +193,52 @@ namespace Backend_Tests
 
             Assert.IsType<BadRequestObjectResult>(result);
         }
-
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsOk()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(doctorID, listDeleteTimeSlots)).ReturnsAsync(true);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlot(doctorID,listDeleteTimeSlots);
+            var okResult = Assert.IsType<OkObjectResult>(deleted);
+            Assert.Equal("Time slots deleted", okResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsNotFound()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(doctorID, listDeleteTimeSlots)).ReturnsAsync(false);
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlot(doctorID, listDeleteTimeSlots);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(deleted);
+            Assert.Equal("Data not found", notFoundResult.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsBadRequest()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(doctorID, listDeleteTimeSlots))
+                .ThrowsAsync(new System.Data.DeletedRowInaccessibleException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlot(doctorID, listDeleteTimeSlots);
+            var badRequest = Assert.IsType<BadRequestObjectResult>(deleted);
+            Assert.Equal("Something went wrong", badRequest.Value.ToString());
+        }
+        [Fact]
+        public async Task DeleteTimeSlotsReturnsForbidden()
+        {
+            var mockDB = new Mock<IDatabase>();
+            var mockSignIn = new Mock<IUserSignInManager>();
+            mockDB.Setup(dB => dB.DeleteTimeSlots(doctorID, listDeleteTimeSlots))
+                .ThrowsAsync(new ArgumentException());
+            var controller = new DoctorController(mockSignIn.Object, mockDB.Object);
+            var deleted = await controller.DeleteTimeSlot(doctorID, listDeleteTimeSlots);
+            var forbiddenResult = Assert.IsType<ObjectResult>(deleted);
+            Assert.Equal(403, forbiddenResult.StatusCode);
+        }
 
         private List<TimeSlotsResponse> GetTimeSlots()
         {
@@ -276,7 +325,7 @@ namespace Backend_Tests
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
             mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
 
@@ -297,7 +346,7 @@ namespace Backend_Tests
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
             mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
 
@@ -319,7 +368,7 @@ namespace Backend_Tests
             mockDB.Setup(db => db.GetAppointment(appointmentID)).ReturnsAsync(GetAppointment);
             mockDB.Setup(db => db.GetDoctor(doctorID)).ReturnsAsync(GetDoctor);
             mockCertGen.Setup(gen => gen.Generate(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(() => "https://abc.com");
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(() => "https://abc.com");
             var controller = new DoctorController(mockSignIn.Object, mockDB.Object, mockCertGen.Object);
 
 
@@ -348,7 +397,15 @@ namespace Backend_Tests
             {
                 id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
                 whichDose = 1,
-                timeSlot = It.IsAny<TimeSlot>(),
+                timeSlot = new TimeSlot()
+                {
+                    from = DateTime.Now,
+                    to = DateTime.Now.AddMinutes(10),
+                    active = true,
+                    doctor = It.IsAny<Doctor>(),
+                    id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),
+                    isFree = true
+                },
                 patient = new Patient
                 {
                     id = new Guid("255E18E1-8FF7-4766-A0C0-08DA13EF87AE"),

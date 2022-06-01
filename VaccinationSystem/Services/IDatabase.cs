@@ -30,6 +30,7 @@ namespace VaccinationSystem.Services
         public Task<bool> EditDoctor(EditedDoctor doctor);
         public Task<bool> DeleteDoctor(Guid doctorId);
         public Task<List<TimeSlotsResponse>> GetTimeSlots(Guid doctorId);
+        public Task<List<WholeTimeSlotsResponse>> GetAllTimeSlots(Guid doctorId);
         public Task CreateTimeSlots(Guid doctorId, CreateNewVisitRequest visitRequest);
         public Task<bool> EditTimeSlot(Guid doctorId, Guid slotId, EditedTimeSlot timeSlot);
         public Task<bool> DeleteTimeSlots(Guid doctorId, List<DeleteTimeSlot> timeSlotsIds);
@@ -50,8 +51,13 @@ namespace VaccinationSystem.Services
         public Task<(bool,bool)> UpdateVaccinationCount(Guid doctorId, Guid appointmentId);
         public Task<bool> UpdateBatchInAppointment(Guid doctorId, Guid appointmentId, string batchId);
         public Task<List<CityResponse>> GetCities();
-        public Task<List<VirusResponse>> GetViruses();
+        public List<VirusResponse> GetViruses();
         public Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId);
         public Task<bool> UpdateAppointmentVaccinationDidNotHappen(Guid doctorId, Guid appointmentId);
+        public Task<bool> EditVaccine(EditVaccine vaccine);
+        public Task AddVaccine(AddVaccine vaccine);
+        public Task<List<VaccineResponse>> GetVaccines();
+        public Task<bool> DeleteVaccine(Guid vaccineId);
+        public Task<bool> DeleteTimeSlots(List<DeleteTimeSlot> timeSlotes);
     }
 }
