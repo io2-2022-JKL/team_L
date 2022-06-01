@@ -7,22 +7,34 @@ using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.Data;
 using VaccinationSystem.DTOs;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Authorization;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 
 namespace VaccinationSystem.Controllers
 {
+    //[Authorize]
     [Route("")]
     [ApiController]
     public class DefaultController : ControllerBase
     {
         private IUserSignInManager signInManager;
         private IDatabase dbManager;
-        public DefaultController(IUserSignInManager signInManager, IDatabase db)
+        private IConfiguration configuration;
+        public DefaultController(IUserSignInManager signInManager, IDatabase db, IConfiguration config = null)
         {
             this.signInManager = signInManager;
             dbManager = db;
+            configuration = config;
         }
 
+        [AllowAnonymous]
         [Route("/register")]
         [HttpPost]
         public IActionResult Register([FromBody] RegisteringPatient patient)
@@ -48,6 +60,8 @@ namespace VaccinationSystem.Controllers
             return BadRequest("Bad arguments");
 
         }
+
+        [AllowAnonymous]
         [Route("/signin")]
         [HttpPost]
         public IActionResult SignIn([FromBody] Login login) 
@@ -70,11 +84,37 @@ namespace VaccinationSystem.Controllers
                 if (lR.userId == Guid.Empty)
                     return BadRequest("Credentials are not valid");
 
+                string jwtToken = CreateAuthorizationToken(login, lR);
+                HttpContext.Response.Headers.Add(HeaderNames.Authorization, jwtToken);
+
                 return Ok(lR);
             }
             else
                 return BadRequest("Bad arguments");
         }
+
+        private string CreateAuthorizationToken(Login login, LoginResponse loginResponse)
+        {
+            var claims = new[] {
+                        new Claim(JwtRegisteredClaimNames.Sub, configuration["Jwt:Subject"]),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.AddHours(2).ToString()),
+                        new Claim("UserId", loginResponse.userId.ToString()),
+                        new Claim("Email", login.mail)
+                    };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
+            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                configuration["Jwt:Issuer"],
+                configuration["Jwt:Audience"],
+                claims,
+                expires: DateTime.UtcNow.AddMinutes(10),
+                signingCredentials: signIn);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         [Route("/user/logout/{userId}")]
         [HttpGet]
         public IActionResult Logout([FromRoute] string userId)
@@ -111,7 +151,7 @@ namespace VaccinationSystem.Controllers
             List<VirusResponse> viruses;
             try
             {
-                viruses = await dbManager.GetViruses();
+                viruses = dbManager.GetViruses();
             }
             catch (Exception)
             {

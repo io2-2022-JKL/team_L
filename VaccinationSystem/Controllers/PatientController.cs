@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
+    //[Authorize]
     [Route("patient")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -35,7 +37,7 @@ namespace VaccinationSystem.Controllers
             {
                 return StatusCode(403, "User forbidden from booking");
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return BadRequest("Something went wrong");
             }

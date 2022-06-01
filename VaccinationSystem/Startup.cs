@@ -12,6 +12,11 @@ using Azure.Storage.Queues;
 using Azure.Storage.Blobs;
 using Azure.Core.Extensions;
 using System;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Net.Http.Headers;
 
 namespace VaccinationSystem
 {
@@ -31,7 +36,8 @@ namespace VaccinationSystem
             {
                 builder.WithOrigins("http://localhost:3000")
                        .AllowAnyMethod()
-                       .AllowAnyHeader();
+                       .AllowAnyHeader()
+                       .WithExposedHeaders(HeaderNames.Authorization);
             }));
             services.AddControllers()
             .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
@@ -45,6 +51,25 @@ namespace VaccinationSystem
             services.AddSingleton<IUserSignInManager, DefaultSignInManager>();
             services.AddSingleton<ICertificateGenerator, VaccinationCertificateGenerator>();
             services.AddControllers();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
+            });
             MyFontResolver.Apply();
             services.AddAzureClients(builder =>
             {
@@ -70,7 +95,9 @@ namespace VaccinationSystem
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseRouting();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

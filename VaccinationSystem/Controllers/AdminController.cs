@@ -9,9 +9,11 @@ using VaccinationSystem.Data;
 using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
+    //[Authorize]
     [Route("admin")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -31,7 +33,7 @@ namespace VaccinationSystem.Controllers
                 centers = await dbManager.GetVaccinationCenters();
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return BadRequest("Something went wrong");
@@ -83,7 +85,7 @@ namespace VaccinationSystem.Controllers
                 return BadRequest("Something went wrong");
             }
 
-            if(edited)
+            if (edited)
                 return Ok("Vaccination center edited");
 
             return NotFound("Data not found");
@@ -99,7 +101,7 @@ namespace VaccinationSystem.Controllers
                 deleted = await dbManager.DeleteVaccinationCenter(vaccinationCenterId);
 
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 return StatusCode(403, "User forbidden from deleting vaccination center");
             }
@@ -271,7 +273,7 @@ namespace VaccinationSystem.Controllers
         [Route("doctors/timeSlots/{doctorId}")]
         public async Task<IActionResult> GetTimeSlots([FromRoute] Guid doctorId)
         {
-            List<TimeSlotsResponse> timeSlots = await dbManager.GetTimeSlots(doctorId);
+            var timeSlots = await dbManager.GetAllTimeSlots(doctorId);
 
             if (timeSlots == null || timeSlots.Count == 0)
                 return NotFound("Data not found");
@@ -364,7 +366,7 @@ namespace VaccinationSystem.Controllers
         }
         [HttpPost]
         [Route("doctors/timeSlots/deleteTimeSlots")]
-        public async Task<IActionResult> DeleteTimeSlots([FromBody]List<DeleteTimeSlot> timeSlots)
+        public async Task<IActionResult> DeleteTimeSlots([FromBody] List<DeleteTimeSlot> timeSlots)
         {
             bool deleted;
             try
