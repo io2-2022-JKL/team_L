@@ -6,7 +6,8 @@ using VaccinationSystem.Models;
 using VaccinationSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using VaccinationSystem.DTOs;
-
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace VaccinationSystem.Services
 {
@@ -443,12 +444,27 @@ namespace VaccinationSystem.Services
                 if (!dbDoctor.active)
                     throw new ArgumentException();
                 var appointments = dbContext.Appointments.Include(a => a.patient).Include(a => a.timeSlot)
-                    .Include(a => a.timeSlot.doctor)
+                    .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter)
                     .Where(d => d.timeSlot.doctor.doctorId == doctorId).ToList();
                 foreach (var app in appointments)
                 {
                     if (app.state == AppointmentState.Planned)
                         await CancelIncomingAppointment(app.patient.id, app.id);
+
+                    string centerName = app.timeSlot.doctor.vaccinationCenter.name;
+                    DateTime date = app.timeSlot.from;
+                    //string mail = app.patient.mail;
+                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                    var client = new SendGridClient(apiKey);
+                    var msg = new SendGridMessage()
+                    {
+                        From = new EmailAddress("ewi888@onet.pl", centerName),
+                        Subject = "Szczepienie anulowane",
+                        PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
+                    };
+                    msg.AddTo(new EmailAddress(app.patient.mail, app.patient.firstName + app.patient.lastName));
+                    //msg.SendAt = new DateTimeOffset(new DateTime(2022, 06, 04, 20, 25, 00)).ToUnixTimeSeconds();
+                    var response = await client.SendEmailAsync(msg);
                 }
                 dbDoctor.active = false;
                 await dbContext.SaveChangesAsync();
