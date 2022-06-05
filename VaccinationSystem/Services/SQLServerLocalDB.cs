@@ -463,7 +463,6 @@ namespace VaccinationSystem.Services
                         PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
                     };
                     msg.AddTo(new EmailAddress(app.patient.mail, app.patient.firstName + app.patient.lastName));
-                    //msg.SendAt = new DateTimeOffset(new DateTime(2022, 06, 04, 20, 25, 00)).ToUnixTimeSeconds();
                     var response = await client.SendEmailAsync(msg);
                 }
                 dbDoctor.active = false;
@@ -543,21 +542,21 @@ namespace VaccinationSystem.Services
             slot.from = DateTime.ParseExact(timeSlot.timeFrom, "dd-MM-yyyy HH:mm", null);
             slot.to = DateTime.ParseExact(timeSlot.timeTo, "dd-MM-yyyy HH:mm", null);
 
-            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient).Include(a => a.timeSlot.doctor).
+            var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient).Include(a => a.timeSlot.doctor).
                 Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot == slot);
-            if (appointment != null)
+            if (app != null)
             {
                 var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
-                string centerName = appointment.timeSlot.doctor.vaccinationCenter.name;
+                string centerName = app.timeSlot.doctor.vaccinationCenter.name;
                 DateTime date = slot.from;
                 var msg = new SendGridMessage()
                 {
                     From = new EmailAddress("ewi888@onet.pl", centerName),
-                    Subject = "Szczepienie anulowane",
+                    Subject = "Szczepienie przesuniete",
                     PlainTextContent = "Twoje szczepienie dnia " + oldDate.ToString() + " zostalo przesuniete na termin " + slot.from.ToString() + "."
                 };
-                msg.AddTo(new EmailAddress(appointment.patient.mail, appointment.patient.firstName + appointment.patient.lastName));
+                msg.AddTo(new EmailAddress(app.patient.mail, app.patient.firstName + app.patient.lastName));
                 var response = await client.SendEmailAsync(msg);
             }
 
@@ -578,10 +577,25 @@ namespace VaccinationSystem.Services
                 {
                     throw new ArgumentException();
                 }
-                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient)
-                        .SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
+                var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient).Include(a => a.timeSlot.doctor)
+                    .Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
                 if (app != null && app.state == AppointmentState.Planned)
+                {
+                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                    var client = new SendGridClient(apiKey);
+                    string centerName = app.timeSlot.doctor.vaccinationCenter.name;
+                    DateTime date = slot.from;
+                    var msg = new SendGridMessage()
+                    {
+                        From = new EmailAddress("ewi888@onet.pl", centerName),
+                        Subject = "Szczepienie anulowane",
+                        PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
+                    };
+                    msg.AddTo(new EmailAddress(app.patient.mail, app.patient.firstName + app.patient.lastName));
+                    var response = await client.SendEmailAsync(msg);
+
                     await CancelIncomingAppointment(app.patient.id, app.id);
+                }
                 slot.active = false;
             }
 
