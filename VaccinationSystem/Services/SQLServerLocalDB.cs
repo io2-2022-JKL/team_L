@@ -450,20 +450,6 @@ namespace VaccinationSystem.Services
                 {
                     if (app.state == AppointmentState.Planned)
                         await CancelIncomingAppointment(app.patient.id, app.id);
-
-                    string centerName = app.timeSlot.doctor.vaccinationCenter.name;
-                    DateTime date = app.timeSlot.from;
-                    //string mail = app.patient.mail;
-                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-                    var client = new SendGridClient(apiKey);
-                    var msg = new SendGridMessage()
-                    {
-                        From = new EmailAddress("ewi888@onet.pl", centerName),
-                        Subject = "Szczepienie anulowane",
-                        PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
-                    };
-                    msg.AddTo(new EmailAddress(app.patient.mail, app.patient.firstName + app.patient.lastName));
-                    var response = await client.SendEmailAsync(msg);
                 }
                 dbDoctor.active = false;
                 await dbContext.SaveChangesAsync();
@@ -581,19 +567,6 @@ namespace VaccinationSystem.Services
                     .Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
                 if (app != null && app.state == AppointmentState.Planned)
                 {
-                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-                    var client = new SendGridClient(apiKey);
-                    string centerName = app.timeSlot.doctor.vaccinationCenter.name;
-                    DateTime date = slot.from;
-                    var msg = new SendGridMessage()
-                    {
-                        From = new EmailAddress("ewi888@onet.pl", centerName),
-                        Subject = "Szczepienie anulowane",
-                        PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
-                    };
-                    msg.AddTo(new EmailAddress(app.patient.mail, app.patient.firstName + app.patient.lastName));
-                    var response = await client.SendEmailAsync(msg);
-
                     await CancelIncomingAppointment(app.patient.id, app.id);
                 }
                 slot.active = false;
@@ -797,7 +770,7 @@ namespace VaccinationSystem.Services
         public async Task<bool> CancelIncomingAppointment(Guid patientId, Guid appointmentId)
         {
             var dbAppointment = await dbContext.Appointments.Include(a => a.patient).Include(a => a.timeSlot)
-                .Include(a => a.vaccine).SingleAsync(a => a.id == appointmentId);
+                .Include(a => a.vaccine).Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).SingleAsync(a => a.id == appointmentId);
             if (dbAppointment != null)
             {
                 if (dbAppointment.state != AppointmentState.Planned ||
@@ -808,6 +781,19 @@ namespace VaccinationSystem.Services
                 {
                     var timeslot = await dbContext.TimeSlots.SingleAsync(t => t.id == dbAppointment.timeSlot.id);
                     timeslot.isFree = true;
+
+                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                    var client = new SendGridClient(apiKey);
+                    string centerName = dbAppointment.timeSlot.doctor.vaccinationCenter.name;
+                    DateTime date = dbAppointment.timeSlot.from;
+                    var msg = new SendGridMessage()
+                    {
+                        From = new EmailAddress("ewi888@onet.pl", centerName),
+                        Subject = "Szczepienie anulowane",
+                        PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
+                    };
+                    msg.AddTo(new EmailAddress(dbAppointment.patient.mail, dbAppointment.patient.firstName + dbAppointment.patient.lastName));
+                    var response = await client.SendEmailAsync(msg);
                 }
                 await dbContext.SaveChangesAsync();
                 return true;
