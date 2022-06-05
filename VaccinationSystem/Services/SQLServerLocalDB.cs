@@ -932,7 +932,7 @@ namespace VaccinationSystem.Services
         public async Task<(bool, bool)> UpdateVaccinationCount(Guid doctorId, Guid appointmentId)
         {
             var appointment = await dbContext.Appointments.Include(a => a.vaccine).Include(a => a.timeSlot)
-                .Include(a => a.timeSlot.doctor).Include(a => a.patient).SingleAsync(a => a.id == appointmentId);
+                .Include(a => a.timeSlot.doctor).Include(a => a.timeSlot.doctor.vaccinationCenter).Include(a => a.patient).SingleAsync(a => a.id == appointmentId);
             var doctor = await dbContext.Doctors.SingleAsync(d => d.doctorId == doctorId);
             if (appointment == null)
                 return (false, false);
@@ -944,7 +944,6 @@ namespace VaccinationSystem.Services
             appointment.state = AppointmentState.Finished;
             if (appointment.whichDose == 1)
             {
-                //await dbContext.Database.BeginTransactionAsync();
                 var newCount = new VaccinationCount()
                 {
                     virus = appointment.vaccine.virus,
@@ -952,7 +951,6 @@ namespace VaccinationSystem.Services
                     patient = appointment.patient
                 };
                 dbContext.VaccinationCounts.Add(newCount);
-                //await dbContext.Database.CommitTransactionAsync();
                 await dbContext.SaveChangesAsync();
             }
             else
@@ -965,6 +963,22 @@ namespace VaccinationSystem.Services
             }
             if (appointment.whichDose == appointment.vaccine.numberOfDoses)
                 appointment.certifyState = CertificateState.LastNotCertified;
+            else
+            {
+                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                var client = new SendGridClient(apiKey);
+                var center = appointment.timeSlot.doctor.vaccinationCenter;
+                var proposedDate = appointment.timeSlot.from.AddDays(appointment.vaccine.minDaysBetweenDoses);
+                var msg = new SendGridMessage()
+                {
+                    From = new EmailAddress("ewi888@onet.pl", center.name),
+                    Subject = "Kolejna dawka",
+                    PlainTextContent = "Dziekujemy ze sie z nami zaszczepiles. By szczepionka w pelni zadziala potrzebujesz kolejnej dawki. " +
+                        "Sugerujemy zebys zapisal sie na szczepienie na dzien " + proposedDate.Date.ToString()
+                };
+                msg.AddTo(new EmailAddress(appointment.patient.mail, appointment.patient.firstName + appointment.patient.lastName));
+                var response = await client.SendEmailAsync(msg);
+            }
 
 
             await dbContext.SaveChangesAsync();
@@ -988,7 +1002,6 @@ namespace VaccinationSystem.Services
             appointment.vaccineBatchNumber = batchId;
 
             await dbContext.SaveChangesAsync();
-            //await dbContext.Database.CommitTransactionAsync();
             return true;
         }
         public async Task<StartVaccinationResponse> GetStartedAppointmentInfo(Guid doctorId, Guid appointmentId)
