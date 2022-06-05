@@ -646,6 +646,21 @@ namespace VaccinationSystem.Services
 
             dbContext.Appointments.Add(appointment);
 
+            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            var client = new SendGridClient(apiKey);
+            var center = timeSlot.doctor.vaccinationCenter;
+            var msg = new SendGridMessage()
+            {
+                From = new EmailAddress("ewi888@onet.pl", "umieram"),
+                Subject = "Przypomnienie",
+                PlainTextContent = "Przypominamy o wizycie dnia " + timeSlot.from.ToString() + " w " + center.name
+
+            };
+            msg.AddTo(new EmailAddress(patient.mail, patient.firstName + patient.lastName));
+            DateTime toSend = new DateTime(timeSlot.from.Year, timeSlot.from.Month, timeSlot.from.Day - 1, 9, 0, 0);
+            msg.SendAt = new DateTimeOffset(toSend).ToUnixTimeSeconds();
+            var response = await client.SendEmailAsync(msg);
+
 
             await dbContext.SaveChangesAsync();
             await dbContext.Database.CommitTransactionAsync();
