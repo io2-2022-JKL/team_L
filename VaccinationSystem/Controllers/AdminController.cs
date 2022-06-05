@@ -127,16 +127,17 @@ namespace VaccinationSystem.Controllers
             // do usuniecia
             // testowy mail
             var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            //var sgMail = Environment.GetEnvironmentVariable("SENDGRID_MAIL");
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("ewi888@onet.pl", "umieram"),
+                From = new EmailAddress("ewi888@onet.pl", "ja"),
                 Subject = "Test email with sendgrid",
                 PlainTextContent = "some content"
                 
             };
             msg.AddTo(new EmailAddress("ewi888@onet.pl", "ja"));
-            msg.SendAt = new DateTimeOffset(new DateTime(2022, 06, 04, 20, 25, 00)).ToUnixTimeSeconds();
+            //msg.SendAt = new DateTimeOffset(new DateTime(2022, 06, 04, 20, 25, 00)).ToUnixTimeSeconds();
             var response = await client.SendEmailAsync(msg);
 
             if (patients != null && patients.Count != 0)
