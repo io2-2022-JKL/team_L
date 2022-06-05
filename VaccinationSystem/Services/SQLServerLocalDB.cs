@@ -539,8 +539,27 @@ namespace VaccinationSystem.Services
             if (slot.doctor.doctorId != doctorId)
                 throw new ArgumentException();
 
+            DateTime oldDate = slot.from;
             slot.from = DateTime.ParseExact(timeSlot.timeFrom, "dd-MM-yyyy HH:mm", null);
             slot.to = DateTime.ParseExact(timeSlot.timeTo, "dd-MM-yyyy HH:mm", null);
+
+            var appointment = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient).Include(a => a.timeSlot.doctor).
+                Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot == slot);
+            if (appointment != null)
+            {
+                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                var client = new SendGridClient(apiKey);
+                string centerName = appointment.timeSlot.doctor.vaccinationCenter.name;
+                DateTime date = slot.from;
+                var msg = new SendGridMessage()
+                {
+                    From = new EmailAddress("ewi888@onet.pl", centerName),
+                    Subject = "Szczepienie anulowane",
+                    PlainTextContent = "Twoje szczepienie dnia " + oldDate.ToString() + " zostalo przesuniete na termin " + slot.from.ToString() + "."
+                };
+                msg.AddTo(new EmailAddress(appointment.patient.mail, appointment.patient.firstName + appointment.patient.lastName));
+                var response = await client.SendEmailAsync(msg);
+            }
 
             await dbContext.SaveChangesAsync();
 
