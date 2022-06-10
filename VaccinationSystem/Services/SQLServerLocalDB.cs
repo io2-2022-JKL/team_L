@@ -14,9 +14,14 @@ namespace VaccinationSystem.Services
     public class SQLServerLocalDB : IDatabase
     {
         private AppDBContext dbContext;
+        private string apiKey;
+        private string apiMail;
+
         public SQLServerLocalDB(AppDBContext context)
         {
             dbContext = context;
+            apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            apiMail = Environment.GetEnvironmentVariable("SENDGRID_MAIL");
         }
         public async Task<PatientResponse> GetPatient(Guid id)
         {
@@ -532,13 +537,12 @@ namespace VaccinationSystem.Services
                 Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot == slot);
             if (app != null)
             {
-                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
                 string centerName = app.timeSlot.doctor.vaccinationCenter.name;
                 DateTime date = slot.from;
                 var msg = new SendGridMessage()
                 {
-                    From = new EmailAddress("ewi888@onet.pl", centerName),
+                    From = new EmailAddress(apiMail, centerName),
                     Subject = "Szczepienie przesuniete",
                     PlainTextContent = "Twoje szczepienie dnia " + oldDate.ToString() + " zostalo przesuniete na termin " + slot.from.ToString() + "."
                 };
@@ -619,12 +623,11 @@ namespace VaccinationSystem.Services
 
             dbContext.Appointments.Add(appointment);
 
-            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
             var client = new SendGridClient(apiKey);
             var center = timeSlot.doctor.vaccinationCenter;
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("ewi888@onet.pl", "umieram"),
+                From = new EmailAddress(apiMail, "umieram"),
                 Subject = "Przypomnienie",
                 PlainTextContent = "Przypominamy o wizycie dnia " + timeSlot.from.ToString() + " w " + center.name
 
@@ -782,13 +785,12 @@ namespace VaccinationSystem.Services
                     var timeslot = await dbContext.TimeSlots.SingleAsync(t => t.id == dbAppointment.timeSlot.id);
                     timeslot.isFree = true;
 
-                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                     var client = new SendGridClient(apiKey);
                     string centerName = dbAppointment.timeSlot.doctor.vaccinationCenter.name;
                     DateTime date = dbAppointment.timeSlot.from;
                     var msg = new SendGridMessage()
                     {
-                        From = new EmailAddress("ewi888@onet.pl", centerName),
+                        From = new EmailAddress(apiMail, centerName),
                         Subject = "Szczepienie anulowane",
                         PlainTextContent = "Twoje szczepienie dnia " + date.ToString() + " zostalo anulowane. Prosimy ponownie umowic wizyte."
                     };
@@ -965,13 +967,12 @@ namespace VaccinationSystem.Services
                 appointment.certifyState = CertificateState.LastNotCertified;
             else
             {
-                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
                 var center = appointment.timeSlot.doctor.vaccinationCenter;
                 var proposedDate = appointment.timeSlot.from.AddDays(appointment.vaccine.minDaysBetweenDoses);
                 var msg = new SendGridMessage()
                 {
-                    From = new EmailAddress("ewi888@onet.pl", center.name),
+                    From = new EmailAddress(apiMail, center.name),
                     Subject = "Kolejna dawka",
                     PlainTextContent = "Dziekujemy ze sie z nami zaszczepiles. By szczepionka w pelni zadziala potrzebujesz kolejnej dawki. " +
                         "Sugerujemy zebys zapisal sie na szczepienie na dzien " + proposedDate.Date.ToString()
