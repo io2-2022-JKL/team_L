@@ -10,6 +10,8 @@ using VaccinationSystem.Models;
 using VaccinationSystem.Services;
 using VaccinationSystem.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace VaccinationSystem.Controllers
 {
@@ -121,6 +123,22 @@ namespace VaccinationSystem.Controllers
         public async Task<IActionResult> GetPatients()
         {
             var patients = await dbManager.GetPatients();
+
+            // mail for testing purposes
+            /*var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            var sgMail = Environment.GetEnvironmentVariable("SENDGRID_MAIL");
+            var client = new SendGridClient(apiKey);
+            var msg = new SendGridMessage()
+            {
+                From = new EmailAddress(sgMail, "ja"),
+                Subject = "Test email with sendgrid",
+                PlainTextContent = "some content"
+                
+            };
+            msg.AddTo(new EmailAddress(sgMail, "ja"));
+            //msg.SendAt = new DateTimeOffset(new DateTime(2022, 06, 04, 20, 25, 00)).ToUnixTimeSeconds();
+            var response = await client.SendEmailAsync(msg);*/
+
             if (patients != null && patients.Count != 0)
                 return Ok(patients);
             else
