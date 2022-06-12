@@ -583,7 +583,7 @@ namespace VaccinationSystem.Services
 
         public async Task<TimeSlot> GetTimeSlot(Guid timeSlotId)
         {
-            var timeSlot = await dbContext.TimeSlots.SingleOrDefaultAsync(t => t.id == timeSlotId);
+            var timeSlot = await dbContext.TimeSlots.Include(t=>t.doctor).Include(t=>t.doctor.vaccinationCenter).SingleOrDefaultAsync(t => t.id == timeSlotId);
 
             return timeSlot;
         }
@@ -595,6 +595,10 @@ namespace VaccinationSystem.Services
             var patient = await dbContext.Patients.SingleOrDefaultAsync(p => p.id == patientId);
 
             if (timeSlot == null || vaccine == null || patient == null)
+                return false;
+
+            var incApps = await GetIncomingAppointments(patientId);
+            if (incApps.Where(a => a.vaccineVirus == vaccine.virus.ToString()).Count() > 0)
                 return false;
 
             await dbContext.Database.BeginTransactionAsync();
@@ -623,6 +627,7 @@ namespace VaccinationSystem.Services
 
             dbContext.Appointments.Add(appointment);
 
+
             var client = new SendGridClient(apiKey);
             var center = timeSlot.doctor.vaccinationCenter;
             var msg = new SendGridMessage()
@@ -636,7 +641,7 @@ namespace VaccinationSystem.Services
             DateTime toSend = new DateTime(timeSlot.from.Year, timeSlot.from.Month, timeSlot.from.Day - 1, 9, 0, 0);
             msg.SendAt = new DateTimeOffset(toSend).ToUnixTimeSeconds();
             var response = await client.SendEmailAsync(msg);
-
+            
 
             await dbContext.SaveChangesAsync();
             await dbContext.Database.CommitTransactionAsync();

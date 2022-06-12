@@ -38,7 +38,13 @@ namespace VaccinationSystem
                        .AllowAnyMethod()
                        .AllowAnyHeader()
                        .WithExposedHeaders(HeaderNames.Authorization);
+
+                builder.WithOrigins("https://teamlvaccinationsystem.surge.sh")
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .WithExposedHeaders(HeaderNames.Authorization);
             }));
+
             services.AddControllers()
             .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
             services.AddDbContext<AppDBContext>(options =>
@@ -89,6 +95,7 @@ namespace VaccinationSystem
 
             app.UseSwagger();
             app.UseCors("MyPolicy");
+
 
             if (env.IsDevelopment())
             {

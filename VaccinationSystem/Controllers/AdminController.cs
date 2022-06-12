@@ -159,7 +159,7 @@ namespace VaccinationSystem.Controllers
         [Route("patients/editPatient")]
         public async Task<IActionResult> EditPatient([FromBody] EditedPatient patient)
         {
-            //autoryzacja
+
 
             if (!ModelState.IsValid)
                 return BadRequest("Invalid model");

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("patient")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -39,7 +39,7 @@ namespace VaccinationSystem.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Something went wrong");
+                return BadRequest("Something went wrong"+ e.Message+e.StackTrace);
             }
 
             if (made)
