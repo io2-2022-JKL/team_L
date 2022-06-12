@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace VaccinationSystem.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("admin")]
     [ApiController]
     public class AdminController : ControllerBase

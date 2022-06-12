@@ -19,7 +19,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace VaccinationSystem.Controllers
 {
-    //[Authorize]
     [Route("")]
     [ApiController]
     public class DefaultController : ControllerBase
@@ -34,7 +33,6 @@ namespace VaccinationSystem.Controllers
             configuration = config;
         }
 
-        [AllowAnonymous]
         [Route("/register")]
         [HttpPost]
         public IActionResult Register([FromBody] RegisteringPatient patient)
@@ -61,7 +59,6 @@ namespace VaccinationSystem.Controllers
 
         }
 
-        [AllowAnonymous]
         [Route("/signin")]
         [HttpPost]
         public IActionResult SignIn([FromBody] Login login) 
