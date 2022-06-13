@@ -627,7 +627,7 @@ namespace VaccinationSystem.Services
             var center = timeSlot.doctor.vaccinationCenter;
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress(apiMail, "umieram"),
+                From = new EmailAddress(apiMail, center.name),
                 Subject = "Przypomnienie",
                 PlainTextContent = "Przypominamy o wizycie dnia " + timeSlot.from.ToString() + " w " + center.name
 
