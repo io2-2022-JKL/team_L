@@ -34,12 +34,7 @@ namespace VaccinationSystem
             services.AddSwaggerGen();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
-                builder.WithOrigins("http://localhost:3000")
-                       .AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .WithExposedHeaders(HeaderNames.Authorization);
-
-                builder.WithOrigins("https://teamlvaccinationsystem.surge.sh")
+                builder.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader()
                        .WithExposedHeaders(HeaderNames.Authorization);

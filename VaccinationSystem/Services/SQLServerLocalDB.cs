@@ -534,7 +534,7 @@ namespace VaccinationSystem.Services
             slot.to = DateTime.ParseExact(timeSlot.timeTo, "dd-MM-yyyy HH:mm", null);
 
             var app = await dbContext.Appointments.Include(a => a.timeSlot).Include(a => a.patient).Include(a => a.timeSlot.doctor).
-                Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot == slot);
+                Include(a => a.timeSlot.doctor.vaccinationCenter).SingleOrDefaultAsync(a => a.timeSlot.id == slot.id);
             if (app != null)
             {
                 var client = new SendGridClient(apiKey);
